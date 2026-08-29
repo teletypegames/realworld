@@ -13,7 +13,6 @@ func itemBlackMarketArmilla() inkwell.Item {
 			TapeSay(Dex, "Two slots, and both of them lie about the temperature. Don't trade me in for it."),
 		),
 		OnUseWith: map[string]inkwell.Action{
-
 			ItemNoodleLetter: inkwell.Seq(
 				inkwell.Say(Paul, "A letter and a bracelet. Brilliant."),
 				TapeSay(Dex, "Nothing. Which is what I'd charge for it."),

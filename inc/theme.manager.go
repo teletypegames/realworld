@@ -12,11 +12,21 @@ const (
 )
 
 func RGB(hex uint32) color.Color {
-	return color.RGBA{R: uint8(hex >> 16), G: uint8(hex >> 8), B: uint8(hex), A: 0xff}
+	return color.RGBA{
+		R: uint8(hex >> 16),
+		G: uint8(hex >> 8),
+		B: uint8(hex),
+		A: 0xff,
+	}
 }
 
 func RGBA(hex uint32, a uint8) color.Color {
-	return color.RGBA{R: uint8(hex >> 16), G: uint8(hex >> 8), B: uint8(hex), A: a}
+	return color.RGBA{
+		R: uint8(hex >> 16),
+		G: uint8(hex >> 8),
+		B: uint8(hex),
+		A: a,
+	}
 }
 
 var (
@@ -31,47 +41,38 @@ var (
 
 func realWorldTheme() inkwell.Theme {
 	return inkwell.Theme{
-		Name:       RealWorld,
-		PanelBG:    black,
-		StatusText: Ink,
-		FlashText:  Amber,
-
-		VerbButtonBG:         RGB(0x1E1A14),
-		VerbButtonSelectedBG: AmberLo,
-		VerbButtonText:       Ink,
-
+		Name:                    RealWorld,
+		PanelBG:                 black,
+		StatusText:              Ink,
+		FlashText:               Amber,
+		VerbButtonBG:            RGB(0x1E1A14),
+		VerbButtonSelectedBG:    AmberLo,
+		VerbButtonText:          Ink,
 		InventorySlotBG:         RGB(0x1E1A14),
 		InventorySlotSelectedBG: AmberLo,
-
-		SpeechBubbleBG:    RGBA(0x14120E, 0xDC),
-		SpeechDefaultText: Ink,
-
-		DialogBG:          RGBA(0x0D0B08, 0xF0),
-		DialogBorder:      AmberLo,
-		DialogChoiceBG:    RGB(0x1E1A14),
-		DialogChoiceHover: Amber,
-		DialogSpeaker:     Amber,
-		DialogText:        Ink,
-
-		EndCardBG:   RGBA(0x000000, 0xFA),
-		EndCardText: Ink,
-
-		CursorColor:    Amber,
-		HotspotOutline: RGB(0x7A6A44),
-		SceneBackdrop:  sceneBG,
-
-		TopBarBG:     panel,
-		TopBarText:   InkDim,
-		TopBarAccent: Amber,
-
-		ChatLogBG:       panel,
-		ChatLogPrompt:   InkDim,
-		ChatLogResponse: Amber,
-		ChatLogSystem:   RGB(0x6B6353),
-
-		CharacterPanelBG:     panel,
-		CharacterPanelBorder: AmberLo,
-		CharacterPanelTitle:  Amber,
+		SpeechBubbleBG:          RGBA(0x14120E, 0xDC),
+		SpeechDefaultText:       Ink,
+		DialogBG:                RGBA(0x0D0B08, 0xF0),
+		DialogBorder:            AmberLo,
+		DialogChoiceBG:          RGB(0x1E1A14),
+		DialogChoiceHover:       Amber,
+		DialogSpeaker:           Amber,
+		DialogText:              Ink,
+		EndCardBG:               RGBA(0x000000, 0xFA),
+		EndCardText:             Ink,
+		CursorColor:             Amber,
+		HotspotOutline:          RGB(0x7A6A44),
+		SceneBackdrop:           sceneBG,
+		TopBarBG:                panel,
+		TopBarText:              InkDim,
+		TopBarAccent:            Amber,
+		ChatLogBG:               panel,
+		ChatLogPrompt:           InkDim,
+		ChatLogResponse:         Amber,
+		ChatLogSystem:           RGB(0x6B6353),
+		CharacterPanelBG:        panel,
+		CharacterPanelBorder:    AmberLo,
+		CharacterPanelTitle:     Amber,
 	}
 }
 
@@ -83,47 +84,38 @@ var (
 
 func nokiaPunkTheme() inkwell.Theme {
 	return inkwell.Theme{
-		Name:       NokiaPunk,
-		PanelBG:    npBlack,
-		StatusText: Green,
-		FlashText:  RGB(0xD8F06A),
-
-		VerbButtonBG:         RGB(0x08140A),
-		VerbButtonSelectedBG: GreenLo,
-		VerbButtonText:       Green,
-
+		Name:                    NokiaPunk,
+		PanelBG:                 npBlack,
+		StatusText:              Green,
+		FlashText:               RGB(0xD8F06A),
+		VerbButtonBG:            RGB(0x08140A),
+		VerbButtonSelectedBG:    GreenLo,
+		VerbButtonText:          Green,
 		InventorySlotBG:         RGB(0x08140A),
 		InventorySlotSelectedBG: GreenLo,
-
-		SpeechBubbleBG:    RGBA(0x030603, 0xDC),
-		SpeechDefaultText: Green,
-
-		DialogBG:          RGBA(0x030603, 0xF0),
-		DialogBorder:      Green,
-		DialogChoiceBG:    RGB(0x08140A),
-		DialogChoiceHover: RGB(0xB4FFC8),
-		DialogSpeaker:     RGB(0xB4FFC8),
-		DialogText:        Green,
-
-		EndCardBG:   RGBA(0x000000, 0xFA),
-		EndCardText: Green,
-
-		CursorColor:    Green,
-		HotspotOutline: GreenLo,
-		SceneBackdrop:  npBlack,
-
-		TopBarBG:     RGB(0x061006),
-		TopBarText:   GreenLo,
-		TopBarAccent: Green,
-
-		ChatLogBG:       RGB(0x040A04),
-		ChatLogPrompt:   GreenLo,
-		ChatLogResponse: Green,
-		ChatLogSystem:   RGB(0x156030),
-
-		CharacterPanelBG:     RGB(0x040A04),
-		CharacterPanelBorder: Green,
-		CharacterPanelTitle:  RGB(0xB4FFC8),
+		SpeechBubbleBG:          RGBA(0x030603, 0xDC),
+		SpeechDefaultText:       Green,
+		DialogBG:                RGBA(0x030603, 0xF0),
+		DialogBorder:            Green,
+		DialogChoiceBG:          RGB(0x08140A),
+		DialogChoiceHover:       RGB(0xB4FFC8),
+		DialogSpeaker:           RGB(0xB4FFC8),
+		DialogText:              Green,
+		EndCardBG:               RGBA(0x000000, 0xFA),
+		EndCardText:             Green,
+		CursorColor:             Green,
+		HotspotOutline:          GreenLo,
+		SceneBackdrop:           npBlack,
+		TopBarBG:                RGB(0x061006),
+		TopBarText:              GreenLo,
+		TopBarAccent:            Green,
+		ChatLogBG:               RGB(0x040A04),
+		ChatLogPrompt:           GreenLo,
+		ChatLogResponse:         Green,
+		ChatLogSystem:           RGB(0x156030),
+		CharacterPanelBG:        RGB(0x040A04),
+		CharacterPanelBorder:    Green,
+		CharacterPanelTitle:     RGB(0xB4FFC8),
 	}
 }
 

@@ -10,11 +10,20 @@ func screenAlley() screen {
 		title:      "ALLEY — BEHIND NOODLE'S HOUSE",
 		background: BgAlley,
 		exits: []exit{
-
-			{to: ScreenNoodleHouse, label: "back out to the street", side: sideLeft},
+			{
+				to:    ScreenNoodleHouse,
+				label: "back out to the street",
+				side:  sideLeft,
+			},
 		},
 		actors: []inkwell.SceneActor{
-			{CharacterName: Paul, At: inkwell.Point{X: 120, Y: 232}},
+			{
+				CharacterName: Paul,
+				At: inkwell.Point{
+					X: 120,
+					Y: 232,
+				},
+			},
 		},
 		onEnter:  setVarIfEmpty(VarArmillaStrip, "SRP: 1 tape"),
 		hotspots: []inkwell.Hotspot{hidingPlace(), backDoor(), bin(), fireEscape()},
@@ -59,7 +68,6 @@ func backDoor() inkwell.Hotspot {
 		),
 		OnTalk: inkwell.Say(Paul, "To the door? I'm not there yet."),
 		OnUseWith: map[string]inkwell.Action{
-
 			ItemBlackArmilla: inkwell.Seq(
 				inkwell.Say(Paul, "A black-market bracelet doesn't open a keypad."),
 				TapeSay(Dex, "But you do get an advert out of it."),

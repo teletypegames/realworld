@@ -57,8 +57,20 @@ func registerScreen(w *World) {
 
 var screenFloor = []inkwell.Polygon{
 	inkwell.Poly(
-		inkwell.Point{X: 16, Y: 196}, inkwell.Point{X: 624, Y: 196},
-		inkwell.Point{X: 624, Y: 258}, inkwell.Point{X: 16, Y: 258},
+		inkwell.Point{
+			X: 16,
+			Y: 196,
+		}, inkwell.Point{
+			X: 624,
+			Y: 196,
+		},
+		inkwell.Point{
+			X: 624,
+			Y: 258,
+		}, inkwell.Point{
+			X: 16,
+			Y: 258,
+		},
 	),
 }
 
@@ -76,7 +88,13 @@ func screenBuild(w *World, s screen) inkwell.Scene {
 	actors := s.actors
 	if actors == nil {
 		actors = []inkwell.SceneActor{
-			{CharacterName: Paul, At: inkwell.Point{X: 320, Y: 232}},
+			{
+				CharacterName: Paul,
+				At: inkwell.Point{
+					X: 320,
+					Y: 232,
+				},
+			},
 		}
 	}
 	walkboxes := s.walkboxes

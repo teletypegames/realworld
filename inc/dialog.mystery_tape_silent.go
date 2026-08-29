@@ -9,8 +9,11 @@ func dialogMysteryTapeSilent() inkwell.Dialogue {
 		Name:  DlgMysteryTape,
 		Start: "root",
 		Nodes: []inkwell.DialogueNode{{
-			Name:  "root",
-			Lines: []inkwell.DialogueLine{{Speaker: Dex, Text: "Nothing. Warm, spinning, and silent."}},
+			Name: "root",
+			Lines: []inkwell.DialogueLine{{
+				Speaker: Dex,
+				Text:    "Nothing. Warm, spinning, and silent.",
+			}},
 			Choices: []inkwell.DialogueChoice{
 				{
 					Text: "Are you sure it works?",

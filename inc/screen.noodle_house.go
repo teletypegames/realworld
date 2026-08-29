@@ -7,7 +7,11 @@ func screenNoodleHouse() screen {
 		background: BgNoodleHouse,
 		onSelector: true,
 		exits: []exit{
-			{to: ScreenAlley, label: "the alley behind the house", side: sideRight},
+			{
+				to:    ScreenAlley,
+				label: "the alley behind the house",
+				side:  sideRight,
+			},
 		},
 	}
 }

@@ -64,7 +64,10 @@ func (t *TapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 			col, txt = th.ChatLogSystem, m.Text
 		}
 		for _, wl := range wrap(txt, wrapW) {
-			rendered = append(rendered, line{text: wl, col: col})
+			rendered = append(rendered, line{
+				text: wl,
+				col:  col,
+			})
 		}
 	}
 

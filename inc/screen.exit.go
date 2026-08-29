@@ -38,7 +38,11 @@ type exit struct {
 }
 
 func toSelector() exit {
-	return exit{to: ScreenSelector, label: "the rest of the city", side: sideNear}
+	return exit{
+		to:    ScreenSelector,
+		label: "the rest of the city",
+		side:  sideNear,
+	}
 }
 
 func exitName(to string) string {

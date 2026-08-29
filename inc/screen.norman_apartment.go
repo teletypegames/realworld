@@ -7,8 +7,16 @@ func screenNormanApartment() screen {
 		background: BgNormanApartment,
 		onSelector: true,
 		exits: []exit{
-			{to: ScreenRooftopHideout, label: "the stairs up to the roof", side: sideBack},
-			{to: ScreenBBSTerminal, label: "Norman's terminal", side: sideRight},
+			{
+				to:    ScreenRooftopHideout,
+				label: "the stairs up to the roof",
+				side:  sideBack,
+			},
+			{
+				to:    ScreenBBSTerminal,
+				label: "Norman's terminal",
+				side:  sideRight,
+			},
 		},
 	}
 }

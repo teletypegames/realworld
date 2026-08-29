@@ -30,7 +30,10 @@ type World struct {
 }
 
 func newWorld(g *inkwell.Game) *World {
-	return &World{G: g, mode: ModePlay}
+	return &World{
+		G:    g,
+		mode: ModePlay,
+	}
 }
 
 func (w *World) Mode() Mode { return w.mode }

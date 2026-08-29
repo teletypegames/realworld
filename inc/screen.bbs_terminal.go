@@ -6,7 +6,10 @@ func screenBbsTerminal() screen {
 		title:      "TERMINAL — BBS ACCESS POINT",
 		background: BgBBSTerminal,
 		exits: []exit{
-			{label: "step back from the terminal", side: sideNear},
+			{
+				label: "step back from the terminal",
+				side:  sideNear,
+			},
 		},
 	}
 }

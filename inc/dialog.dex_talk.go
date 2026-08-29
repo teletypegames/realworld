@@ -9,8 +9,11 @@ func dialogDexTalk() inkwell.Dialogue {
 		Name:  DlgDex,
 		Start: "root",
 		Nodes: []inkwell.DialogueNode{{
-			Name:  "root",
-			Lines: []inkwell.DialogueLine{{Speaker: Dex, Text: "Talk."}},
+			Name: "root",
+			Lines: []inkwell.DialogueLine{{
+				Speaker: Dex,
+				Text:    "Talk.",
+			}},
 			Choices: []inkwell.DialogueChoice{
 				{
 					Text: "What am I doing here, Dex?",

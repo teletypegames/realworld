@@ -28,7 +28,10 @@ func (w *World) PumpTick(dt float64) {
 		w.running = w.queue[0].Start()
 		w.queue = w.queue[1:]
 	}
-	ctx := &inkwell.Ctx{Game: w.G, DT: dt}
+	ctx := &inkwell.Ctx{
+		Game: w.G,
+		DT:   dt,
+	}
 	if s, ok := w.G.SceneManager.Get(w.scene); ok {
 		ctx.Scene = &s
 	}
@@ -59,7 +62,11 @@ func (p *ActionPump) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
 
 type fnAction struct{ fn func(*inkwell.Ctx) }
 
-func (a *fnAction) Start() inkwell.Runner { return &fnRunner{spec: a} }
+func (a *fnAction) Start() inkwell.Runner {
+	return &fnRunner{
+		spec: a,
+	}
+}
 
 type fnRunner struct{ spec *fnAction }
 
@@ -68,7 +75,11 @@ func (r *fnRunner) Tick(ctx *inkwell.Ctx) inkwell.Status {
 	return inkwell.StatusDone
 }
 
-func Fn(f func(*inkwell.Ctx)) inkwell.Action { return &fnAction{fn: f} }
+func Fn(f func(*inkwell.Ctx)) inkwell.Action {
+	return &fnAction{
+		fn: f,
+	}
+}
 
 func UseTheme(name string) inkwell.Action {
 	return Fn(func(ctx *inkwell.Ctx) { ctx.Game.UseTheme(name) })
@@ -97,12 +108,19 @@ func Back(w *World) inkwell.Action {
 }
 
 func TapeSay(speaker, text string) inkwell.Action {
-	return &tapeSayAction{speaker: speaker, text: text}
+	return &tapeSayAction{
+		speaker: speaker,
+		text:    text,
+	}
 }
 
 type tapeSayAction struct{ speaker, text string }
 
-func (a *tapeSayAction) Start() inkwell.Runner { return &tapeSayRunner{spec: a} }
+func (a *tapeSayAction) Start() inkwell.Runner {
+	return &tapeSayRunner{
+		spec: a,
+	}
+}
 
 type tapeSayRunner struct {
 	spec     *tapeSayAction
@@ -143,7 +161,10 @@ func (w *World) TakeTapeOffer() {
 }
 
 func Paused(w *World, inner inkwell.Action) inkwell.Action {
-	return &pausedAction{w: w, inner: inner}
+	return &pausedAction{
+		w:     w,
+		inner: inner,
+	}
 }
 
 type pausedAction struct {
@@ -152,7 +173,10 @@ type pausedAction struct {
 }
 
 func (a *pausedAction) Start() inkwell.Runner {
-	return &pausedRunner{spec: a, inner: a.inner.Start()}
+	return &pausedRunner{
+		spec:  a,
+		inner: a.inner.Start(),
+	}
 }
 
 type pausedRunner struct {

@@ -23,9 +23,8 @@ func screenSelector(rest []screen) screen {
 		title:      "SAN FRANCISCO",
 		background: BgSelector,
 		exits:      exits,
-
-		actors:    []inkwell.SceneActor{},
-		walkboxes: []inkwell.Polygon{},
+		actors:     []inkwell.SceneActor{},
+		walkboxes:  []inkwell.Polygon{},
 	}
 }
 

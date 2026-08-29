@@ -30,57 +30,101 @@ const (
 func registerUI(w *World) {
 	g := w.G
 
-	g.UIManager.Register(&UseWithGuard{Name: "usewith_guard", W: w})
-	g.UIManager.Register(&ActionPump{Name: "pump", W: w})
-	g.UIManager.Register(&screenNav{Name: "screen_nav", W: w})
-	g.UIManager.Register(&windowSizer{Name: "window", Scale: 2})
-	g.UIManager.Register(&inkwell.HotspotDebug{Name: "hotspot_debug"})
+	g.UIManager.Register(&UseWithGuard{
+		Name: "usewith_guard",
+		W:    w,
+	})
+	g.UIManager.Register(&ActionPump{
+		Name: "pump",
+		W:    w,
+	})
+	g.UIManager.Register(&screenNav{
+		Name: "screen_nav",
+		W:    w,
+	})
+	g.UIManager.Register(&windowSizer{
+		Name:  "window",
+		Scale: 2,
+	})
+	g.UIManager.Register(&inkwell.HotspotDebug{
+		Name: "hotspot_debug",
+	})
 
 	top := &inkwell.TopBar{
-		Name:   "topbar",
-		Height: TopBarH,
-
+		Name:    "topbar",
+		Height:  TopBarH,
 		TimeVar: VarArmillaStrip,
 	}
 	w.SetTopBar(top)
 	g.UIManager.Register(gated(w, "topbar_gate", top))
 
-	g.UIManager.Register(&Letterbox{Name: "letterbox", W: w, Bar: 36})
-	g.UIManager.Register(&hudFrame{Name: "hudframe", W: w})
+	g.UIManager.Register(&Letterbox{
+		Name: "letterbox",
+		W:    w,
+		Bar:  36,
+	})
+	g.UIManager.Register(&hudFrame{
+		Name: "hudframe",
+		W:    w,
+	})
 
 	g.UIManager.Register(gated(w, "status_gate", &inkwell.StatusLine{
-		Name: "status", Y: statusY, Align: inkwell.AlignLeft, ScreenWidth: DividerX,
+		Name:        "status",
+		Y:           statusY,
+		Align:       inkwell.AlignLeft,
+		ScreenWidth: DividerX,
 	}))
 	g.UIManager.Register(gated(w, "inventory_gate", &inkwell.InventoryBar{
-		Name: "inventory", Origin: inkwell.Point{X: Pad + 2, Y: invY},
-		Slots: 8, Cols: 4, SlotSize: invSlot, Gap: invGap,
+		Name: "inventory",
+		Origin: inkwell.Point{
+			X: Pad + 2,
+			Y: invY,
+		},
+		Slots:    8,
+		Cols:     4,
+		SlotSize: invSlot,
+		Gap:      invGap,
 	}))
 	g.UIManager.Register(&TapeSlots{
-		Name: "tapes", W: w,
+		Name:   "tapes",
+		W:      w,
 		Bounds: inkwell.Rect(192, slotsY, 194, slotsH),
 	})
 	g.UIManager.Register(&TapeChannel{
-		Name: "channel", W: w,
+		Name:   "channel",
+		W:      w,
 		Bounds: inkwell.Rect(DividerX+2, HUDTop+2, ScreenW-DividerX-4, ScreenH-HUDTop-4),
 	})
 
 	g.UIManager.Register(&inkwell.SpeechBubble{
-		Name: "speech", MaxWidth: 360, Padding: Pad, OffsetY: 8, FallbackY: TopBarH + Pad,
+		Name:      "speech",
+		MaxWidth:  360,
+		Padding:   Pad,
+		OffsetY:   8,
+		FallbackY: TopBarH + Pad,
 	})
 
 	g.UIManager.Register(&inkwell.DialogBox{
-		Name: "dialog", Bounds: inkwell.Rect(0, ScreenH-LineH*9, DividerX, LineH*9),
-		LineHeight: LineH, Padding: Pad,
+		Name:       "dialog",
+		Bounds:     inkwell.Rect(0, ScreenH-LineH*9, DividerX, LineH*9),
+		LineHeight: LineH,
+		Padding:    Pad,
 	})
 
 	g.UIManager.Register(&inkwell.RadialVerbs{
-		Name: "verbs", Trigger: inkwell.MouseButtonRight, Radius: 58,
+		Name:    "verbs",
+		Trigger: inkwell.MouseButtonRight,
+		Radius:  58,
 		Labels: map[string]string{
 			"look": "Look", "use": "Use", "talk": "Talk", "take": "Take",
 		},
 	})
-	g.UIManager.Register(&inkwell.EndCard{Name: "endcard"})
-	g.UIManager.Register(&inkwell.Cursor{Name: "cursor"})
+	g.UIManager.Register(&inkwell.EndCard{
+		Name: "endcard",
+	})
+	g.UIManager.Register(&inkwell.Cursor{
+		Name: "cursor",
+	})
 }
 
 type windowSizer struct {
@@ -111,7 +155,11 @@ type gate struct {
 }
 
 func gated(w *World, name string, inner inkwell.Widget) inkwell.Widget {
-	return &gate{Name: name, W: w, Inner: inner}
+	return &gate{
+		Name:  name,
+		W:     w,
+		Inner: inner,
+	}
 }
 
 func (n *gate) GetName() string { return n.Name }

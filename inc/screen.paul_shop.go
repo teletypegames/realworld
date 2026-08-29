@@ -6,7 +6,11 @@ func screenPaulShop() screen {
 		title:      "PAUL'S SHOP — JUNK AND GARAGE",
 		background: BgPaulShop,
 		exits: []exit{
-			{to: ScreenNoodleHouse, label: "the bus to San Francisco", side: sideNear},
+			{
+				to:    ScreenNoodleHouse,
+				label: "the bus to San Francisco",
+				side:  sideNear,
+			},
 		},
 	}
 }
