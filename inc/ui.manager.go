@@ -36,8 +36,8 @@ func registerUI() {
 	g.UIManager.Register(&actionPump{
 		Name: "pump",
 	})
-	g.UIManager.Register(&screenNav{
-		Name: "screen_nav",
+	g.UIManager.Register(&sceneNav{
+		Name: "scene_nav",
 	})
 	g.UIManager.Register(&windowSizer{
 		Name:  "window",

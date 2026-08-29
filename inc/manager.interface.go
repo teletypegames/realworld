@@ -12,6 +12,6 @@ var (
 	_ ManagerInterface[Dialog]     = DialogManager
 	_ ManagerInterface[Item]       = ItemManager
 	_ ManagerInterface[Script]     = ScriptManager
-	_ ManagerInterface[Screen]     = ScreenManager
+	_ ManagerInterface[Scene]      = SceneManager
 	_ ManagerInterface[Theme]      = ThemeManager
 )

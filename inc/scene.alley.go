@@ -5,15 +5,15 @@ import (
 )
 
 func init() {
-	ScreenManager.Register(Screen{
-		Name:       ScreenAlley,
+	SceneManager.Register(Scene{
+		Name:       SceneAlley,
 		Title:      "ALLEY — BEHIND NOODLE'S HOUSE",
 		Background: BgAlley,
-		Exits: []exit{
+		Exits: []inkwell.Exit{
 			{
-				to:    ScreenNoodleHouse,
-				label: "back out to the street",
-				side:  sideLeft,
+				To:    SceneNoodleHouse,
+				Label: "back out to the street",
+				Side:  inkwell.ExitLeft,
 			},
 		},
 		Actors: []inkwell.SceneActor{

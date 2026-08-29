@@ -48,12 +48,12 @@ This holds for nested literals too, including small ones such as
 All game code lives in one flat package, `inc`. There are no subdirectories: a
 file's name carries the structure, in the form `[category].[name].go`.
 
-- The category is always **singular**: `item`, `screen`, `background`,
+- The category is always **singular**: `item`, `scene`, `background`,
   `character`, `dialog`, `script`, `world`, `ui`, `theme`, `names`, `boot`,
   `content`.
 - `[category].manager.go` is the file that ties a category together — its
   manager, its entity type, whatever the category shares.
-- Every other file in a category holds exactly one entity: one screen, one
+- Every other file in a category holds exactly one entity: one scene, one
   background, one item. The file registers it itself, in an `init()`.
 
 ```
@@ -70,14 +70,14 @@ inc/world.action.go        custom actions and the action pump
 inc/ui.manager.go          HUD layout and widget registration
 inc/ui.*.go                custom widgets, coloured text
 inc/content.manager.go     composition root; calls every register…
-inc/background.*.go        one image asset per screen
+inc/background.*.go        one image asset per scene
 inc/character.*.go         the cast, tapes included
 inc/item.*.go              inventory
 inc/dialog.*.go            dialogue trees
 inc/script.*.go            named action sequences
-inc/screen.manager.go      the Screen type, the deck, the scene builder
-inc/screen.exit.go         the connections between screens
-inc/screen.*.go            one file per screen
+inc/scene.manager.go       the Scene alias, the defaults every scene gets
+inc/scene.selector.go      the map screen: its pins are derived from the graph
+inc/scene.*.go             one file per scene
 ```
 
 `manager` is the one category with no entities of its own: it holds the registry
@@ -101,7 +101,7 @@ var CharacterManager = NewManager(func(entity Character) string { return entity.
 
 That is the whole of a category's manager file — an alias and one line. There
 are seven managers: `BackgroundManager`, `CharacterManager`, `DialogManager`,
-`ItemManager`, `ScriptManager`, `ScreenManager`, `ThemeManager`.
+`ItemManager`, `ScriptManager`, `SceneManager`, `ThemeManager`.
 
 `manager.interface.go` holds the contract they all keep, and asserts each one
 against it. A new manager goes on that list.
@@ -118,8 +118,9 @@ type ManagerInterface[T any] interface {
 twice is an update, never a duplicate. `GetAll` returns the slice itself, in
 registration order.
 
-`Screen` is the one entity type that is not an alias: a screen carries exits and
-an `OnSelector` flag that inkwell's `Scene` knows nothing about.
+Every entity type is an alias, `Scene` included. It was once a struct of our
+own, because inkwell's `Scene` could not carry exits; that gap was closed in the
+engine, so there is nothing left for a second type to hold.
 
 ### Entities register themselves
 
@@ -144,7 +145,7 @@ variables are initialised before any `init()` runs, so the managers exist by the
 time the first file registers into one.
 
 `init()` order is file-name order, so **registration order is alphabetical**.
-Nothing may depend on it — including the order the arrow keys walk the screens,
+Nothing may depend on it — including the order the arrow keys walk the scenes,
 which is simply the order the files sit in.
 
 ### Handing a category to the engine
@@ -159,13 +160,13 @@ func registerContent() {
 	registerAll(ItemManager, World.G.ItemManager.Register)
 	registerAll(DialogManager, World.G.DialogueManager.Register)
 	registerAll(ScriptManager, World.G.ScriptManager.Register)
-	registerScreen()
+	registerScene()
 }
 ```
 
-`registerScreen` is the one that needs its own function, because a screen has to
-be turned into an `inkwell.Scene` first, and because the selector's pins are
-derived from whichever screens marked themselves `OnSelector`.
+`registerScene` is the one that needs its own function: it fills in the defaults
+a scene may leave out (Paul's starting position, the floor walkbox), and it
+derives the selector's pins by reading the exit graph backwards.
 
 ## The world
 
@@ -185,7 +186,7 @@ One package means one namespace, so an entity's constructor carries its
 category as a prefix:
 
 ```go
-screenFloor  screenBuild  registerScreen  fillSelectorPins
+sceneFloor  sceneDefaults  registerScene  fillSelectorPins
 ```
 
 Entities themselves need no name at all — they are anonymous literals inside
@@ -198,12 +199,12 @@ constants in `names.manager.go`, the colour tokens, and the action constructors
 
 Everything else is machinery and stays unexported: the HUD widgets
 (`tapeSlots`, `letterbox`, `hudFrame`, …), the `register…` functions, the
-runners, `screenBuild`, `exit`.
+runners, `sceneDefaults`, `fillSelectorPins`.
 
-The engine's word for a screen is `Scene`. Ours is **screen**, because the
-wiki, the concept-art deck and the beat tables all count screens. "Scene"
-survives only where the code talks to the engine (`EnterScene`,
-`SceneManager`).
+The word is **scene**, the engine's own. The wiki and the concept-art deck count
+*screens*, and this code used to as well, but everything a screen had that a
+scene did not now lives in inkwell. "Screen" survives only where it means the
+display: `ScreenW`, `ScreenH`.
 
 ## Layering
 
@@ -219,10 +220,10 @@ names ← theme ← world ← ui
 `world` knows nothing about the HUD or the content. Both build on it, never the
 other way round.
 
-## Adding a screen
+## Adding a scene
 
-1. Constants in `inc/names.manager.go`: `Screen<Name>`, `Bg<Name>`
-2. `inc/screen.<name>.go` — an `init()` registering a `Screen`
+1. Constants in `inc/names.manager.go`: `Scene<Name>`, `Bg<Name>`
+2. `inc/scene.<name>.go` — an `init()` registering a `Scene`
 3. `inc/background.<name>.go` — an `init()` registering a `Background`
 4. A 640×380 PNG in `assets/bg/`
 
@@ -234,7 +235,7 @@ Nothing else moves. There is no list to update.
 make build     native binary into bin/
 make wasm      js/wasm build into dist/
 make watch     rebuild on change
-go run . -screen <name>    start on a given screen
+go run . -scene <name>     start on a given scene
 go run . -finale           start with the finale
 ```
 

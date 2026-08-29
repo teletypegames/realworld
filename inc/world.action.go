@@ -32,7 +32,7 @@ func (w *world) PumpTick(dt float64) {
 		Game: w.G,
 		DT:   dt,
 	}
-	if s, ok := w.G.SceneManager.Get(w.scene); ok {
+	if s, ok := w.G.SceneManager.Get(w.G.CurrentScene()); ok {
 		ctx.Scene = &s
 	}
 	if w.running.Tick(ctx) != inkwell.StatusRunning {
@@ -41,7 +41,7 @@ func (w *world) PumpTick(dt float64) {
 }
 
 func (w *world) sceneTitle() string {
-	s, ok := w.G.SceneManager.Get(w.scene)
+	s, ok := w.G.SceneManager.Get(w.G.CurrentScene())
 	if !ok {
 		return ""
 	}
@@ -86,24 +86,6 @@ func UseTheme(name string) inkwell.Action {
 
 func SetMode(m Mode) inkwell.Action {
 	return Fn(func(*inkwell.Ctx) { World.SetMode(m) })
-}
-
-func EnterScene(name string) inkwell.Action {
-	return Fn(func(*inkwell.Ctx) {
-		if name != World.scene {
-			World.prev = World.scene
-		}
-		World.scene = name
-	})
-}
-
-func Back() inkwell.Action {
-	return Fn(func(ctx *inkwell.Ctx) {
-		if World.prev == "" {
-			return
-		}
-		inkwell.GoTo(World.prev).Start().Tick(ctx)
-	})
 }
 
 func TapeSay(speaker, text string) inkwell.Action {

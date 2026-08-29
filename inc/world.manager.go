@@ -17,8 +17,6 @@ type world struct {
 
 	mode Mode
 
-	scene   string
-	prev    string
 	paused  bool
 	pending string
 	queue   []inkwell.Action
@@ -34,8 +32,6 @@ var World = &world{}
 func (w *world) attach(g *inkwell.Game) {
 	w.G = g
 	w.mode = ModePlay
-	w.scene = ""
-	w.prev = ""
 	w.paused = false
 	w.pending = ""
 	w.queue = nil
@@ -50,10 +46,6 @@ func (w *world) Mode() Mode { return w.mode }
 func (w *world) SetMode(m Mode) { w.mode = m }
 
 func (w *world) HUDVisible() bool { return w.mode == ModePlay }
-
-func (w *world) Scene() string { return w.scene }
-
-func (w *world) Previous() string { return w.prev }
 
 func (w *world) Paused() bool { return w.paused }
 

@@ -6,9 +6,15 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
+var exitToSelector = inkwell.Exit{
+	To:    SceneSelector,
+	Label: "the rest of the city",
+	Side:  inkwell.ExitNear,
+}
+
 func init() {
-	ScreenManager.Register(Screen{
-		Name:       ScreenSelector,
+	SceneManager.Register(Scene{
+		Name:       SceneSelector,
 		Title:      "SAN FRANCISCO",
 		Background: BgSelector,
 		Actors:     []inkwell.SceneActor{},
@@ -17,23 +23,32 @@ func init() {
 }
 
 func fillSelectorPins() {
-	selector, ok := ScreenManager.GetByName(ScreenSelector)
+	selector, ok := SceneManager.GetByName(SceneSelector)
 	if !ok {
 		return
 	}
-	var exits []exit
-	for _, entity := range ScreenManager.GetAll() {
-		if !entity.OnSelector {
+	var exits []inkwell.Exit
+	for _, entity := range SceneManager.GetAll() {
+		if !leadsToSelector(entity) {
 			continue
 		}
-		exits = append(exits, exit{
-			to:    entity.Name,
-			label: pinLabel(entity.Title),
-			area:  pin(len(exits)),
+		exits = append(exits, inkwell.Exit{
+			To:    entity.Name,
+			Label: pinLabel(entity.Title),
+			Area:  pin(len(exits)),
 		})
 	}
 	selector.Exits = exits
-	ScreenManager.Register(selector)
+	SceneManager.Register(selector)
+}
+
+func leadsToSelector(s Scene) bool {
+	for _, e := range s.Exits {
+		if e.To == SceneSelector {
+			return true
+		}
+	}
+	return false
 }
 
 const (

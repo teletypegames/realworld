@@ -3,7 +3,7 @@ module git.teletypegames.org/games/realworld
 go 1.26.3
 
 require (
-	git.teletypegames.org/engines/inkwell v0.1.0
+	git.teletypegames.org/engines/inkwell v0.1.1-0.20260829220920-f9745e426624
 	github.com/hajimehoshi/ebiten/v2 v2.9.9
 )
 

@@ -6,5 +6,5 @@ func registerContent() {
 	registerAll(ItemManager, World.G.ItemManager.Register)
 	registerAll(DialogManager, World.G.DialogueManager.Register)
 	registerAll(ScriptManager, World.G.ScriptManager.Register)
-	registerScreen()
+	registerScene()
 }

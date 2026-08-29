@@ -17,7 +17,7 @@ func init() { inkwell.AssetFS = assets }
 
 func main() {
 	var o inc.Opts
-	flag.StringVar(&o.Screen, "screen", "", "starting screen (empty: the alley)")
+	flag.StringVar(&o.Scene, "scene", "", "starting scene (empty: the alley)")
 	flag.BoolVar(&o.Finale, "finale", false,
 		"start with the finale, to try the Nokia-punk theme switch")
 	flag.Parse()

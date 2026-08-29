@@ -25,11 +25,11 @@ go run .
 ```bash
 go run .                   # the alley (beat 3)
 go run . -finale           # the finale — try the Nokia-punk theme switch
-go run . -screen selector  # the location selector: the map the city hangs off
-go run . -screen hospital  # any screen in the deck, e.g. to look at the art
+go run . -scene selector   # the location selector: the map the city hangs off
+go run . -scene hospital   # any scene in the deck, e.g. to look at the art
 ```
 
-Screen names are the constants in `names.manager.go` (`selector`, `paul_shop`,
+Scene names are the constants in `names.manager.go` (`selector`, `paul_shop`,
 `noodle_house`, `alley`, `norman_apartment`, `police_station`, `hackerspace`,
 `ice_cream_shop`, `trinket_shop`, `small_restaurant`, `secret_club`,
 `bbs_terminal`, `street`, `hospital`, `server_farm`, `secret_lab`,
@@ -62,12 +62,12 @@ Release metadata lives in `metadata.json`.
 |---|---|
 | left click | run the selected verb |
 | right click | verb coin (Look / Use / Talk / Take) |
-| `←` `→` | previous / next screen, in file order, wrapping |
+| `←` `→` | previous / next scene, in file order, wrapping |
 | `F1` | toggle hotspot outlines |
 | `SPACE` | during a cutscene: let the tape speak, if it offered |
 
-The screens are connected to each other (see **The map** below); the arrow keys
-are a reviewing tool on top of that, walking every screen in turn. The walk is
+The scenes are connected to each other (see **The map** below); the arrow keys
+are a reviewing tool on top of that, walking every scene in turn. The walk is
 inert during a cutscene, a menu, or a stopped world, so it can never cut
 across an authored beat.
 
@@ -181,15 +181,15 @@ Content is one registered entity per file, and the category prefix groups them
 the way directories used to:
 
 ```
-background.*.go  one file per screen: background.paul_shop.go, …
+background.*.go  one file per scene: background.paul_shop.go, …
 character.*.go   character.paul.go  character.dex.go  character.mystery_tape.go
 item.*.go        item.noodle_letter.go  item.black_market_armilla.go  …
 dialog.*.go      dialog.dex_talk.go  dialog.mystery_tape_silent.go
 script.*.go      script.tape_insert.go  script.awakening_finale.go
-screen.*.go      one file per screen: screen.alley.go, … + screen.exit.go
+scene.*.go       one file per scene: scene.alley.go, … + scene.selector.go
 ```
 
-Adding a screen means adding `screen.<name>.go` and `background.<name>.go`.
+Adding a scene means adding `scene.<name>.go` and `background.<name>.go`.
 Nothing else moves.
 
 Every category owns a manager, and they are all the same generic type,
@@ -229,13 +229,13 @@ func init() {
 
 So adding an entity is adding a file, and there is no second list to keep in
 step. The price is that registration order is file-name order: the arrow keys
-walk the screens alphabetically rather than in the concept-art deck's order.
+walk the scenes alphabetically rather than in the concept-art deck's order.
 That was a deliberate trade — the deck order was a list that had to be kept in
 step with the files by hand, and the deck is a thing to look at, not a thing to
 play through.
 
 The game's own catalogue is readable without going through the engine:
-`ScreenManager.GetByName("alley")` answers before a single scene has been handed
+`SceneManager.GetByName("alley")` answers before a single scene has been handed
 over. `registerContent` is where the hand-off happens, one `registerAll` call
 per category.
 
@@ -244,50 +244,62 @@ a `*world` parameter and no widget holds a back-reference, which is what lets a
 script file be a literal — the tape-insert script closes over `World` rather
 than over a parameter someone would have had to thread to it.
 
-**On the word "screen".** inkwell's entity is called a `Scene`, and that is the
-type every `screen.*.go` file returns — but the wiki, the concept-art deck and
-the beat tables all count *screens*, so the category, the files and the flag say
-screen. "Scene" survives only where the code is talking to the engine
-(`EnterScene`, `SceneManager`).
+**On the word "scene".** The wiki, the concept-art deck and the beat tables all
+count *screens*, and this code used to as well: it carried its own `Screen`
+struct, because inkwell's `Scene` could not hold the things a screen needs —
+its exits above all. Those went into the engine instead (inkwell `Exit`,
+`Game.SceneRect`, `CurrentScene`/`PreviousScene`, `Back()`), and with the gap
+closed there was nothing left for a second type to carry. The code says scene,
+because that is what the thing is. "Screen" survives only where it means the
+display: `ScreenW`, `ScreenH`.
 
 Art lives in `assets/bg/` and is embedded into the binary (`main.go`), because
 js/wasm has no OS filesystem and `make binaries` packages the executable alone.
 
 ## The map
 
-Where a screen leads is recorded **in that screen**, in its own file, and it
+Where a scene leads is recorded **in that scene**, in its own file, and it
 comes from the wiki's location graph
 (`projects/realworld/story#helyszín-gráf-vázlat`). That graph has two kinds of
 edge and so does the code:
 
 - **Physical adjacency** — the alley is behind Noodle's house, the eating place
   is next door to the trinket shop, the club is through its back room, the roof
-  is up Norman's stairs. Declared with `to:` in the screen's `exits`.
+  is up Norman's stairs. Declared with `To:` in the scene's `Exits`.
 - **The selector** — the wiki centres its map on a *Helyszínválasztó*, "nem
-  valódi helyszín, hanem a menü-képernyő": a screen every main location connects
-  to both ways. A screen marks itself `onSelector: true`; `screen/selector.go`
-  builds the other half of each of those edges, so the list of locations on the
-  map is never written down twice.
+  valódi helyszín, hanem a menü-képernyő": a scene every main location connects
+  to both ways. A main location lists `exitToSelector` among its exits, and
+  `scene.selector.go` derives the other half of each edge by reading the graph
+  backwards — every scene with an exit to the selector gets a pin on it. The
+  list of locations on the map is never written down twice.
 
-The wiki's conditional arrows survive too: `needs:` holds the flag an exit waits
+The wiki's conditional arrows survive too: `Needs:` holds the flag an exit waits
 for, which is how *Bolt →|beengedés| Klub* is expressed — the way into the club
 is visible and named from the first visit, and stays shut until the shopkeeper
 has been shown the underwater sun.
 
 Until the doors are measured on the paintings, an exit is a strip along one edge
-of the picture (`sideLeft`, `sideRight`, `sideBack`, `sideNear`) — the
-convention every 1990s point & click used, and one field to re-aim later. A
-screen reached from several rooms has no fixed way out: the BBS terminal is the
-same terminal from the club, the flat or the roof, so its exit is `back`.
+of the picture (`inkwell.ExitLeft`, `ExitRight`, `ExitBack`, `ExitNear`), sized
+from `Game.SceneRect` so it lands inside the painting rather than under the HUD
+— the convention every 1990s point & click used, and one field to re-aim later.
+A scene reached from several rooms has no fixed way out: the BBS terminal is the
+same terminal from the club, the flat or the roof, so its exit leaves `To` empty
+and the engine binds it to `Back()`.
 
 The graph stays machine-readable: exit hotspots are named `exit:<target>`, so
-the connections can be read straight back out of the registered screens.
+the connections can be read straight back out of the registered scenes — and
+`Validate` rejects an exit that names a scene nobody registered.
 
 ## Engine workarounds
 
-Five inkwell limits turned up during implementation that the engine README does
-not mention. All five are worked around on the domain side; each is a candidate
+Four inkwell limits turned up during implementation that the engine README does
+not mention. All four are worked around on the domain side; each is a candidate
 for a small engine change.
+
+Two others have been fixed in the engine since: exits are now
+[`inkwell.Exit`](https://git.teletypegames.org/engines/inkwell) on the scene
+itself, and `Game.CurrentScene()` / `PreviousScene()` mean the domain no longer
+has to shadow where the player is.
 
 1. **`drawText` discards colour.** In `asset.text.go` the colour argument is
    `_ = c` and rendering goes through `ebitenutil.DebugPrintAt`, which only
@@ -308,16 +320,12 @@ for a small engine change.
    `handleSceneInput` and can consume the click, so unauthored pairs fail in
    character instead, escalating on repeats.
 
-4. **No exported `CurrentScene()`**, but the pump needs `Ctx.Scene`.
-   *Workaround:* `EnterScene` is the first step of every scene's
-   `OnEnter`; the domain tracks it.
-
-5. **Widgets have no `Visible` field and the `Manager` cannot unregister**, so
+4. **Widgets have no `Visible` field and the `Manager` cannot unregister**, so
    the built-in HUD cannot be hidden during a cutscene. *Workaround:* the
    `gate` wrapper in `ui/ui.go` forwards `Tick`/`Draw`/`BlocksClickAt` only
    while the HUD is visible.
 
-6. **`Run` hardcodes a 4× window** (`core.dsl.go`), which at 640×400 would be
+5. **`Run` hardcodes a 4× window** (`core.dsl.go`), which at 640×400 would be
    2560×1600 — bigger than most laptop screens. *Workaround:* the `windowSizer`
    widget resizes once on the first tick, since Run sets the size before
    entering the loop.
@@ -332,15 +340,15 @@ Also: the inkwell README gives the module path as
   stretched, but the strip is opaque and 118px of the 380 sit on top of the
   picture. Either the deck gets recut so nothing that matters lives in its
   bottom third, or the HUD gets a translucent panel treatment.
-- **The screens are empty.** 22 backgrounds are in and they are wired to each
+- **The scenes are empty.** 22 backgrounds are in and they are wired to each
   other, but only the alley has hotspots, NPCs and dialogue; everywhere else
   there is nothing to do but leave again.
 - **The selector has no art.** The wiki's Helyszínválasztó is the centre of the
   map and the deck does not include it, so it renders as a placeholder with one
   labelled pin per location on a plain grid.
-- **Two screens are missing from the deck.** The alley (the one authored beat)
+- **Two scenes are missing from the deck.** The alley (the one authored beat)
   and deck 05, Norman's workplace — which is in the wiki's catalogue but has no
-  screen file yet, so the workplace thread of the story has nowhere to happen.
+  scene file yet, so the workplace thread of the story has nowhere to happen.
 - **Spent dialogue choices are hidden, not struck through.** `DialogueChoice.Once`
   hides them; the deck wanted them struck through but visible, so the list
   becomes a memory of what you already tried. Needs a thin override over
