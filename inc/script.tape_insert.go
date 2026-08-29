@@ -4,9 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// tapeInsert runs whenever a tape goes into slot 2: it activates the tape and
-// makes Dex comment. The wiki calls the comment mandatory — Dex remarks on
-// every newly loaded tape, without exception.
 func scriptTapeInsert(w *World) inkwell.Script {
 	return inkwell.Script{
 		Name: ScriptTapeInsert,

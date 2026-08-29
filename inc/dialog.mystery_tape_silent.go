@@ -4,9 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// mysteryTapeSilent covers the stretch before the club trigger (beat 6), while
-// the tape is still mute. Talking to it is really Dex talking about it — the
-// tape itself says nothing.
 func dialogMysteryTapeSilent() inkwell.Dialogue {
 	return inkwell.Dialogue{
 		Name:  DlgMysteryTape,

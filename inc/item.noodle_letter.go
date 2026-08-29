@@ -4,7 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// noodleLetter starts the story: it is what brings Paul to the city.
 func itemNoodleLetter() inkwell.Item {
 	return inkwell.Item{
 		Name:        ItemNoodleLetter,

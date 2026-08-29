@@ -1,18 +1,5 @@
 package inc
 
-// TapeChannel — the tape channel down the right-hand side.
-//
-// Not assistant UI: this is the voice of CHARACTERS. The wiki is explicit that
-// ACPs and Personal Tapes are not props but characters with their own voice.
-// That is why we do not use the built-in ChatLog — it paints every LogResponse
-// in one Theme.ChatLogResponse colour, whereas here three or four tapes can
-// speak into the same strip (Dex, the mystery tape, the tech support tape) and
-// the colour comes per speaker from Character.SpeechColor.
-//
-// Paul and the NPCs never appear here: they speak in the scene, through the
-// SpeechBubble. The channel is what the tapes said, plus — quietly — what you
-// did to prompt it. That gives the "joke book, not a scoreboard" log for free.
-
 import (
 	"image/color"
 
@@ -31,8 +18,6 @@ func (t *TapeChannel) GetName() string { return t.Name }
 
 func (t *TapeChannel) Tick(ctx *inkwell.UICtx) {}
 
-// BlocksClickAt — the channel is not interactive, but it is a solid input
-// zone: the verb coin must not open over it.
 func (t *TapeChannel) BlocksClickAt(p inkwell.Point) bool {
 	return t.W.HUDVisible() && t.Bounds.Contains(p)
 }
@@ -51,7 +36,6 @@ func (t *TapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 
 	vector.DrawFilledRect(dst, float32(b.X), float32(b.Y), float32(b.W), float32(b.H), th.ChatLogBG, false)
 
-	// Header: the name of whichever tape spoke last — not "console".
 	speaker, speakerCol := t.lastSpeaker(g, th)
 	drawTextC(dst, speaker, int(b.X)+pad, int(b.Y)+pad, speakerCol)
 	hy := float32(b.Y+pad+lh) + 2
@@ -69,12 +53,11 @@ func (t *TapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 		var txt string
 		switch m.Kind {
 		case inkwell.LogAction:
-			// Your own actions — quiet, but visible: that is what makes the
-			// joke book readable.
+
 			col, txt = th.ChatLogPrompt, m.Text
 		case inkwell.LogResponse:
 			if !IsTape(m.Speaker) {
-				continue // Paul and the NPCs speak in the scene, not here
+				continue
 			}
 			col, txt = speechColor(g, m.Speaker, th.ChatLogResponse), m.Text
 		default:
@@ -98,8 +81,6 @@ func (t *TapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	}
 }
 
-// lastSpeaker returns the display name and colour of whichever tape spoke
-// last, defaulting to the occupant of slot 1.
 func (t *TapeChannel) lastSpeaker(g *inkwell.Game, th inkwell.Theme) (string, color.Color) {
 	msgs := g.Messages()
 	for i := len(msgs) - 1; i >= 0; i-- {
@@ -111,7 +92,6 @@ func (t *TapeChannel) lastSpeaker(g *inkwell.Game, th inkwell.Theme) (string, co
 	return TapeDisplayName(Dex), speechColor(g, Dex, th.ChatLogResponse)
 }
 
-// speechColor is the character's voice colour, falling back to the theme's.
 func speechColor(g *inkwell.Game, name string, fallback color.Color) color.Color {
 	if c, ok := g.CharacterManager.Get(name); ok && c.SpeechColor != nil {
 		return c.SpeechColor

@@ -1,22 +1,5 @@
 package inc
 
-// UseWithGuard — enforcing authored failure.
-//
-// The rule: a failed interaction fails IN CHARACTER, never with an error
-// message. But inkwell hardcodes a "Nem ehhez." flash in core.engine.go when an
-// item/hotspot pair has no OnUseWith handler, and that string cannot be
-// replaced from the domain.
-//
-// The fix, without touching the engine: widgets tick BEFORE the engine's
-// handleSceneInput and may consume the click. So this widget catches the
-// "selected item + hotspot with no authored pair" case and fails in Paul's
-// voice with a remark from Dex — costing nothing, since nothing is consumed and
-// nothing breaks.
-//
-// IMPORTANT: it must be registered FIRST so that it ticks LAST among the
-// widgets. That way every HUD widget (inventory, tape slots, dialogue) sees the
-// click first, and this only ever catches clicks that land on the scene.
-
 import (
 	"math/rand"
 
@@ -43,7 +26,7 @@ func (u *UseWithGuard) Tick(ctx *inkwell.UICtx) {
 	}
 	h := g.HotspotAt(g.Input.Point())
 	if h == nil || hasAuthoredPair(g, h, sel) {
-		return // leave authored pairs to the engine
+		return
 	}
 
 	g.Input.ConsumeLeft()
@@ -55,7 +38,6 @@ func (u *UseWithGuard) Tick(ctx *inkwell.UICtx) {
 	}
 	g.LogAction("> Use " + itemLabel(g, sel) + " on: " + label)
 
-	// The tone escalates on repeats: dry, then teasing, then a real nudge.
 	key := "fail." + sel + "." + h.Name
 	g.State.NoteTalked(key)
 	n := g.State.Talked(key)
@@ -66,7 +48,6 @@ func (u *UseWithGuard) Tick(ctx *inkwell.UICtx) {
 	))
 }
 
-// hasAuthoredPair mirrors the engine's lookup order in invokeHotspotVerb.
 func hasAuthoredPair(g *inkwell.Game, h *inkwell.Hotspot, item string) bool {
 	if h.OnUseWith != nil {
 		if a, ok := h.OnUseWith[item]; ok && a != nil {
@@ -98,8 +79,6 @@ var dexTease = []string{
 	"Do it a few more times, maybe physics reconsiders.",
 }
 
-// dexFail escalates: dry, then teasing, then an actual hint — so the joke
-// never becomes the wall.
 func dexFail(n int) string {
 	switch {
 	case n <= 1:

@@ -1,20 +1,5 @@
 package inc
 
-// TapeSlots — the two slots of Paul's Armilla.
-//
-// In canon Paul's Armilla has TWO slots where the standard has one: Dex sits
-// permanently in the first, and tapes picked up during the game go into the
-// second. The wireframe deck does not know about this at all — this is the one
-// HUD element that comes purely from the wiki.
-//
-// Interaction follows the selected verb, like everything else:
-//
-//	talk  → converse with whoever occupies the slot
-//	look  → describe the slot
-//	use   + a selected tape → load it into slot 2
-//
-// Nothing here touches the world: this is the Vox side of the two channels.
-
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -33,7 +18,6 @@ func (t *TapeSlots) BlocksClickAt(p inkwell.Point) bool {
 	return t.W.HUDVisible() && t.Bounds.Contains(p)
 }
 
-// slotRects splits the widget bounds into the two slot rectangles.
 func (t *TapeSlots) slotRects() (inkwell.Rectangle, inkwell.Rectangle) {
 	b := t.Bounds
 	w := (b.W - Pad) / 2
@@ -48,7 +32,6 @@ func (t *TapeSlots) Tick(ctx *inkwell.UICtx) {
 	mp := g.Input.Point()
 	r1, r2 := t.slotRects()
 
-	// Hover label, so the StatusLine spells out what is about to happen.
 	switch {
 	case r1.Contains(mp):
 		g.SetHoverLabel(TapeDisplayName(Dex))
@@ -71,7 +54,6 @@ func (t *TapeSlots) Tick(ctx *inkwell.UICtx) {
 	slot2 := r2.Contains(mp)
 	sel := g.Inventory.Selected()
 
-	// Loading a tape into slot 2.
 	if slot2 && sel != "" {
 		g.Inventory.Select("")
 		if IsTapeItem(sel) {
@@ -99,7 +81,7 @@ func (t *TapeSlots) Tick(ctx *inkwell.UICtx) {
 			return
 		}
 		t.W.Do(TapeSay(Dex, "Empty. Nobody to talk to."))
-	default: // look, take, use all fall back to a description
+	default:
 		if !slot2 {
 			t.W.Do(TapeSay(Dex, "Me. Four kilobytes of a dead man. Be grateful."))
 			return
@@ -120,8 +102,6 @@ func (t *TapeSlots) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	th := g.Theme()
 	r1, r2 := t.slotRects()
 
-	// Two text rows per slot: the slot number on top, its occupant below.
-	// Both rows are LineH tall, so nothing can overlap the border.
 	drawSlot := func(r inkwell.Rectangle, label, body string, filled bool) {
 		bg, border, col := th.InventorySlotBG, th.ChatLogSystem, th.ChatLogSystem
 		if filled {
@@ -143,7 +123,6 @@ func (t *TapeSlots) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	}
 }
 
-// itemLabel is a short display label for an inventory item.
 func itemLabel(g *inkwell.Game, name string) string {
 	if it, ok := g.ItemManager.Get(name); ok && it.Description != "" {
 		return it.Description

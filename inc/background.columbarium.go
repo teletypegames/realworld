@@ -4,7 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// columbarium — deck 23.
 func backgroundColumbarium() inkwell.Asset {
 	return inkwell.Asset{
 		Name: BgColumbarium,

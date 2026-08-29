@@ -10,11 +10,6 @@ import (
 	"git.teletypegames.org/games/realworld/inc"
 )
 
-// The art ships inside the binary. js/wasm has no OS filesystem, so without
-// this every background in the web build falls back to a placeholder; and
-// `make binaries` packages the executable alone, with no assets directory
-// beside it.
-//
 //go:embed assets
 var assets embed.FS
 

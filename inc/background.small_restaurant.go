@@ -4,7 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// smallRestaurant — deck 09.
 func backgroundSmallRestaurant() inkwell.Asset {
 	return inkwell.Asset{
 		Name: BgSmallRestaurant,

@@ -6,9 +6,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// The mode must not leak into saved state: inkwell saves State.Vars but drops
-// the in-flight script, so a save taken mid-cutscene would otherwise reload
-// into a letterboxed, HUD-less game with nothing running.
 func TestModeIsNotSavedState(t *testing.T) {
 	w := newWorld(inkwell.NewGame("t", 320, 200))
 
@@ -19,7 +16,6 @@ func TestModeIsNotSavedState(t *testing.T) {
 		}
 	}
 
-	// Slot 2, by contrast, is real game state and must be saved.
 	w.SetSlot2(ItemMysteryTape)
 	if w.G.State.Var(VarSlot2) != ItemMysteryTape {
 		t.Error("slot 2 is not in State.Vars")
@@ -29,7 +25,6 @@ func TestModeIsNotSavedState(t *testing.T) {
 	}
 }
 
-// The widget marks a tape as pending; the script consumes it — once.
 func TestPendingIsConsumedOnce(t *testing.T) {
 	w := newWorld(inkwell.NewGame("t", 320, 200))
 	w.SetPending(ItemMysteryTape)

@@ -6,9 +6,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// The arrow keys walk the deck in registration order and wrap at both ends —
-// until the beats grow doors, that walk is the only way through most screens,
-// so a dead end at either end would strand the player on a greybox screen.
 func TestScreenNavWrapsBothWays(t *testing.T) {
 	g := inkwell.NewGame("t", ScreenW, ScreenH)
 	for _, n := range []string{"a", "b", "c"} {

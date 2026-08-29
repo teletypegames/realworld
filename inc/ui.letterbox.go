@@ -1,12 +1,5 @@
 package inc
 
-// Letterbox — the cutscene frame.
-//
-// The one exception to the fixed layout. In cutscene mode the HUD strip and
-// the TopBar are hidden, the scene gets a black bar top and bottom, and a line
-// at the foot of the screen says a tape would like to speak — but it does not
-// speak on its own. The floor is the player's: a tape signals, never interrupts.
-
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -17,7 +10,7 @@ import (
 type Letterbox struct {
 	Name string
 	W    *World
-	Bar  float64 // height of the black bar, top and bottom
+	Bar  float64
 }
 
 func (l *Letterbox) GetName() string { return l.Name }
@@ -26,7 +19,7 @@ func (l *Letterbox) Tick(ctx *inkwell.UICtx) {
 	if l.W.Mode() != ModeCutscene || !l.W.TapeWaiting() {
 		return
 	}
-	// inkwell's Input only covers the mouse; read the key directly.
+
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		l.W.TakeTapeOffer()
 	}

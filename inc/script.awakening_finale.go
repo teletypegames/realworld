@@ -4,12 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// awakeningFinale is the end of game two. The point of it, mechanically, is
-// the theme switch: this is where the Nokia-punk texture breaks in.
-//
-// Run it early and often during development (`go run . -finale`) — it is the
-// single most important visual beat in the game, so you want to be looking at
-// it long before the surrounding scene exists.
 func scriptAwakeningFinale(w *World) inkwell.Script {
 	return inkwell.Script{
 		Name: ScriptFinale,

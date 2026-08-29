@@ -4,8 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// dexTalk is the standing conversation with Dex. Its branches are gated on
-// story flags, so the same entry point stays useful as the game progresses.
 func dialogDexTalk() inkwell.Dialogue {
 	return inkwell.Dialogue{
 		Name:  DlgDex,

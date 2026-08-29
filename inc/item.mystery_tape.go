@@ -4,8 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// mysteryTape is the engine of the investigation. Password-locked; it only
-// starts speaking after the club trigger (beat 6).
 func itemMysteryTape() inkwell.Item {
 	return inkwell.Item{
 		Name:        ItemMysteryTape,

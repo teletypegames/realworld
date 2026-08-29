@@ -4,7 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// secretLab — deck 15.
 func backgroundSecretLab() inkwell.Asset {
 	return inkwell.Asset{
 		Name: BgSecretLab,

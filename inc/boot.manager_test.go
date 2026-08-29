@@ -19,9 +19,6 @@ func newTestGame(t *testing.T) *inkwell.Game {
 	return g
 }
 
-// The engine's Validate only checks scene→asset/character references. A typo in
-// a dialogue, script or item name would surface at runtime as a silent no-op
-// (RunDialogue and RunScript fail quietly), so check them here.
 func TestReferencesResolve(t *testing.T) {
 	g := newTestGame(t)
 
@@ -45,7 +42,7 @@ func TestReferencesResolve(t *testing.T) {
 			t.Errorf("tape character not registered: %q", n)
 		}
 	}
-	// Every loadable tape needs an item, a character and a dialogue.
+
 	for item, char := range TapeItems {
 		if !g.ItemManager.Has(item) {
 			t.Errorf("tape item not registered: %q", item)
@@ -59,9 +56,6 @@ func TestReferencesResolve(t *testing.T) {
 	}
 }
 
-// The two-channel rule: every tape needs its own voice colour, distinct from
-// the world's. Without that, "if something is amber, a tape said it" is not
-// readable.
 func TestTapeVoicesAreDistinct(t *testing.T) {
 	g := newTestGame(t)
 	paul, _ := g.CharacterManager.Get(Paul)
@@ -84,8 +78,6 @@ func TestTapeVoicesAreDistinct(t *testing.T) {
 	}
 }
 
-// HUD geometry: the two channels must not overlap, and both must stay inside
-// the HUD strip.
 func TestHUDGeometry(t *testing.T) {
 	g := newTestGame(t)
 
@@ -112,8 +104,6 @@ func TestHUDGeometry(t *testing.T) {
 		t.Errorf("tape slots cross the divider: %v > %v", ts.Bounds.X+ts.Bounds.W, DividerX)
 	}
 
-	// The dialogue box deliberately covers only the left region, so a tape can
-	// comment alongside the conversation.
 	db, ok := g.UIManager.Get("dialog")
 	if !ok {
 		t.Fatal("no 'dialog' widget")
@@ -124,8 +114,6 @@ func TestHUDGeometry(t *testing.T) {
 	}
 }
 
-// The guard must be registered FIRST so it ticks LAST among the widgets —
-// otherwise it would swallow HUD clicks.
 func TestWidgetOrder(t *testing.T) {
 	g := newTestGame(t)
 	n := g.UIManager.Names()
@@ -137,22 +125,9 @@ func TestWidgetOrder(t *testing.T) {
 	}
 }
 
-// Every screen needs a background, the drawn ones need the file to be where the
-// asset says it is, and the file has to be exactly screen-sized.
-//
-// The path check: a renamed or mistyped path shows up in the running game only
-// as an inkwell placeholder, which is exactly what a still-greyboxed screen
-// looks like — invisible as a bug.
-//
-// The size check: the engine scales a background over the WHOLE screen, so a
-// painting that is not ScreenW×ScreenH is silently squashed to fit. That is why
-// the screen is 640×380 in the first place; this keeps the two in step.
 func TestSceneBackgroundsResolve(t *testing.T) {
 	g := newTestGame(t)
 
-	// Not drawn yet: these render as placeholders on purpose. The alley is
-	// missing from the concept-art deck; the selector is the wiki's menu
-	// screen, which the deck does not cover at all.
 	undrawn := map[string]bool{BgAlley: true, BgSelector: true}
 
 	for _, n := range g.SceneManager.Names() {
@@ -183,9 +158,6 @@ func TestSceneBackgroundsResolve(t *testing.T) {
 	}
 }
 
-// exits reads the connection graph back out of the registered screens. The
-// exit hotspots are named "exit:<target>", which is what keeps the graph
-// machine-readable — see screen.exit.go.
 func exits(g *inkwell.Game, screen string) []string {
 	var out []string
 	for _, h := range g.SceneManager.MustGet(screen).Hotspots {
@@ -196,8 +168,6 @@ func exits(g *inkwell.Game, screen string) []string {
 	return out
 }
 
-// An exit that names a screen nobody registered is a dead end the player walks
-// into: the engine logs "changeScene: unknown" and nothing happens on screen.
 func TestExitsResolve(t *testing.T) {
 	g := newTestGame(t)
 	for _, n := range g.SceneManager.Names() {
@@ -209,12 +179,6 @@ func TestExitsResolve(t *testing.T) {
 	}
 }
 
-// Every screen has to be walkable to from the start of the game, through the
-// exits alone — the arrow keys are a browsing tool, not the map. A screen that
-// only the arrow keys can reach is content no player would ever see.
-//
-// The walk starts at Paul's shop, where the letter arrives, and mostly runs
-// through the selector: that is what the wiki's location graph is centred on.
 func TestEveryScreenIsReachable(t *testing.T) {
 	g := newTestGame(t)
 
@@ -238,8 +202,6 @@ func TestEveryScreenIsReachable(t *testing.T) {
 	}
 }
 
-// A screen with no way out at all is a trap: the player walks in and the only
-// way on is the debug walk.
 func TestEveryScreenHasAWayOut(t *testing.T) {
 	g := newTestGame(t)
 	for _, n := range g.SceneManager.Names() {

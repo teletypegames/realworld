@@ -4,7 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// secretClub — deck 10.
 func backgroundSecretClub() inkwell.Asset {
 	return inkwell.Asset{
 		Name: BgSecretClub,

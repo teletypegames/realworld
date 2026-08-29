@@ -1,45 +1,28 @@
 package inc
 
-// Themes — the game's two colour themes and its colour tokens.
-//
-// In canon the machines of this world are matte black with a green or amber
-// character display, and in the Real World finale "the Nokia-punk texture
-// breaks in" — with inkwell's runtime theme switching that beat is a single
-// line (see UseTheme and scriptAwakeningFinale).
-//
-// The colour rule: tapes speak in amber (green in Nokia-punk), the world and
-// Paul speak in bone white. If something is amber, a tape said it.
-
 import (
 	"image/color"
 
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// The two theme names. Runtime switching (inkwell UseTheme) refers to these.
 const (
 	RealWorld = "realworld-93"
 	NokiaPunk = "nokia-punk"
 )
 
-// RGB builds an opaque colour from a hex literal.
 func RGB(hex uint32) color.Color {
 	return color.RGBA{R: uint8(hex >> 16), G: uint8(hex >> 8), B: uint8(hex), A: 0xff}
 }
 
-// RGBA builds a colour with the given alpha from a hex literal.
 func RGBA(hex uint32, a uint8) color.Color {
 	return color.RGBA{R: uint8(hex >> 16), G: uint8(hex >> 8), B: uint8(hex), A: a}
 }
 
-// realworld-93 — 95% of the game. Muted earth tones, black HUD, amber tape
-// channel. The Neumatronic layer is not visible yet.
-// The realworld-93 palette. Ink and Amber are the two sides of the two-channel
-// colour rule: the world speaks in bone white, tapes speak in amber.
 var (
-	Ink     = RGB(0xDCD5C4) // bone white — the voice of the world and of Paul
+	Ink     = RGB(0xDCD5C4)
 	InkDim  = RGB(0x8A806B)
-	Amber   = RGB(0xE0A33E) // tape voice
+	Amber   = RGB(0xE0A33E)
 	AmberLo = RGB(0xA8701A)
 	black   = RGB(0x14120E)
 	panel   = RGB(0x0D0B08)
@@ -82,8 +65,8 @@ func realWorldTheme() inkwell.Theme {
 		TopBarAccent: Amber,
 
 		ChatLogBG:       panel,
-		ChatLogPrompt:   InkDim, // your own actions — quiet
-		ChatLogResponse: Amber,  // tape voice
+		ChatLogPrompt:   InkDim,
+		ChatLogResponse: Amber,
 		ChatLogSystem:   RGB(0x6B6353),
 
 		CharacterPanelBG:     panel,
@@ -92,10 +75,6 @@ func realWorldTheme() inkwell.Theme {
 	}
 }
 
-// nokia-punk — at peak decay, on BBS/ECHO terminals, and in the finale.
-// Matte black and phosphor green: a tuned variant of the engine's
-// terminal-green preset.
-// The nokia-punk palette — phosphor green on black glass.
 var (
 	Green   = RGB(0x3BE86B)
 	GreenLo = RGB(0x1F7A39)
@@ -148,7 +127,6 @@ func nokiaPunkTheme() inkwell.Theme {
 	}
 }
 
-// registerTheme adds both themes to the game.
 func registerTheme(g *inkwell.Game) {
 	g.ThemeManager.Register(realWorldTheme())
 	g.ThemeManager.Register(nokiaPunkTheme())

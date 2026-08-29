@@ -1,99 +1,67 @@
 package inc
 
-// Names — the single source of entity names and world-state keys.
-//
-// The names follow the wiki entity catalogue
-// (services/wiki-pages/pages/projects/realworld/entities) so that content and
-// design share one vocabulary. Note that the wiki's world-state table spells
-// its keys in Hungarian (hatosagi_tipp, titokzatos_tape_megvan, romlas_szint,
-// tape_behelyezes, sikator); the constants below are their English
-// equivalents — the mapping is one-to-one, in catalogue order.
-//
-// These constants are the vocabulary every other category speaks in; nothing
-// here depends on anything else in the game.
-
-// Characters.
 const (
 	Paul = "paul"
-	Dex  = "dex" // Personal Tape, permanently in slot 1 of Paul's Armilla
+	Dex  = "dex"
 
-	// Tapes (Personal Tapes) are characters, not props: the wiki is explicit
-	// that they have their own personality, motivation and voice.
-	TapeMystery = "tape_mystery" // = The AI, but that only surfaces in the finale
-	TapeSupport = "tape_support" // the "Indian tech support" tape
+	TapeMystery = "tape_mystery"
+	TapeSupport = "tape_support"
 )
 
-// Inventory items.
 const (
 	ItemNoodleLetter = "noodle_letter"
 	ItemMysteryTape  = "mystery_tape"
 	ItemBlackArmilla = "black_market_armilla"
 )
 
-// Dialogues.
 const (
 	DlgDex         = "dex_talk"
 	DlgMysteryTape = "mystery_tape_silent"
 )
 
-// Scripts.
 const (
 	ScriptTapeInsert = "tape_insert"
 	ScriptFinale     = "awakening_finale"
 )
 
-// World state — flags and variables.
 const (
-	FlagPoliceTip = "police_tip"       // wiki: hatosagi_tipp
-	FlagHasTape   = "has_mystery_tape" // wiki: titokzatos_tape_megvan
-	FlagTapeSpoke = "tape_spoke"       // wiki: tape_megszolalt
-	FlagClubEntry = "club_entry"       // wiki: klub_bejutas — the shopkeeper let Paul through
+	FlagPoliceTip = "police_tip"
+	FlagHasTape   = "has_mystery_tape"
+	FlagTapeSpoke = "tape_spoke"
+	FlagClubEntry = "club_entry"
 
 	VarSlot2        = "armilla.slot2"
 	VarArmillaStrip = "armilla.strip"
-	VarDecay        = "decay_level" // wiki: romlas_szint
+	VarDecay        = "decay_level"
 )
 
-// Screens.
-//
-// One constant per screen in the wiki's location catalogue
-// (entities#helyszinek), whose order the concept-art deck follows number for
-// number (games/realworld_screen_assets); the trailing comment is the wiki's
-// Hungarian name. The last seven are the catalogue's "javaslat" locations —
-// drawn, so they are wired up, but no beat lands on them yet.
-//
-// Two screens have no deck number. The alley shares the catalogue's "Noodle
-// háza & a sikátor" row with the house; the selector is the wiki's
-// Helyszínválasztó (story#helyszínválasztó), the menu screen the location
-// graph is centred on.
 const (
-	ScreenSelector        = "selector"         // wiki: Helyszínválasztó
-	ScreenPaulShop        = "paul_shop"        // wiki: Paul boltja / garázsa
-	ScreenNoodleHouse     = "noodle_house"     // wiki: Noodle háza
-	ScreenNormanApartment = "norman_apartment" // wiki: Norman lakása / műhelye
-	ScreenPoliceStation   = "police_station"   // wiki: rendőrség / fogda
-	ScreenAlley           = "alley"            // wiki: sikátor (Noodle háza mögött)
-	ScreenHackerspace     = "hackerspace"      // wiki: hackerspace
-	ScreenIceCreamShop    = "ice_cream_shop"   // wiki: fagyizó
-	ScreenTrinketShop     = "trinket_shop"     // wiki: chinatowni csecsebecse-bolt
-	ScreenSmallRestaurant = "small_restaurant" // wiki: kajálda
-	ScreenSecretClub      = "secret_club"      // wiki: titkos klub („vízalatti nap")
-	ScreenBBSTerminal     = "bbs_terminal"     // wiki: a terminál / BBS-hozzáférési pont
-	ScreenStreet          = "street"           // wiki: köztér / utca
-	ScreenHospital        = "hospital"         // wiki: kórház / pszichiátria
-	ScreenServerFarm      = "server_farm"      // wiki: szerverfarm / adatközpont
-	ScreenSecretLab       = "secret_lab"       // wiki: titkos kutatólabor
-	ScreenRooftopHideout  = "rooftop_hideout"  // wiki: Norman tetőterasz-rejteke
-	ScreenPublicBBS       = "public_bbs"       // wiki 💡: nyilvános BBS-terminál
-	ScreenBVKBranch       = "bvk_branch"       // wiki 💡: BVK-kirendeltség (San Francisco)
-	ScreenCuratorShop     = "curator_shop"     // wiki 💡: kurátor-szerviz („a Mester")
-	ScreenScrapMarket     = "scrap_market"     // wiki 💡: selejt-piac
-	ScreenSamizdatPress   = "samizdat_press"   // wiki 💡: samizdat-nyomda / P2P-csomópont
-	ScreenShowroom        = "showroom"         // wiki 💡: Neumatronic márkakereskedés
-	ScreenColumbarium     = "columbarium"      // wiki 💡: kolumbárium / Dex emlékhelye
+	ScreenSelector        = "selector"
+	ScreenPaulShop        = "paul_shop"
+	ScreenNoodleHouse     = "noodle_house"
+	ScreenNormanApartment = "norman_apartment"
+	ScreenPoliceStation   = "police_station"
+	ScreenAlley           = "alley"
+	ScreenHackerspace     = "hackerspace"
+	ScreenIceCreamShop    = "ice_cream_shop"
+	ScreenTrinketShop     = "trinket_shop"
+	ScreenSmallRestaurant = "small_restaurant"
+	ScreenSecretClub      = "secret_club"
+	ScreenBBSTerminal     = "bbs_terminal"
+	ScreenStreet          = "street"
+	ScreenHospital        = "hospital"
+	ScreenServerFarm      = "server_farm"
+	ScreenSecretLab       = "secret_lab"
+	ScreenRooftopHideout  = "rooftop_hideout"
+	ScreenPublicBBS       = "public_bbs"
+	ScreenBVKBranch       = "bvk_branch"
+	ScreenCuratorShop     = "curator_shop"
+	ScreenScrapMarket     = "scrap_market"
+	ScreenSamizdatPress   = "samizdat_press"
+	ScreenShowroom        = "showroom"
+	ScreenColumbarium     = "columbarium"
 )
 
-// Backgrounds — one per screen, same order.
 const (
 	BgSelector        = "bg_selector"
 	BgPaulShop        = "bg_paul_shop"
@@ -121,19 +89,14 @@ const (
 	BgColumbarium     = "bg_columbarium"
 )
 
-// Tapes maps a character name to the label shown in the tape channel header.
-// TapeChannel uses this to decide whether a line belongs in the tape channel
-// or stays in the scene.
 var Tapes = map[string]string{
 	Dex:         "DEX",
 	TapeMystery: "UNKNOWN TAPE",
 	TapeSupport: "TECH SUPPORT",
 }
 
-// IsTape reports whether a character is a tape.
 func IsTape(name string) bool { _, ok := Tapes[name]; return ok }
 
-// TapeDisplayName is the label shown in the tape channel header.
 func TapeDisplayName(name string) string {
 	if d, ok := Tapes[name]; ok {
 		return d
@@ -141,16 +104,12 @@ func TapeDisplayName(name string) string {
 	return name
 }
 
-// TapeItems maps an inventory item that can go into slot 2 to the character
-// living on it.
 var TapeItems = map[string]string{
 	ItemMysteryTape: TapeMystery,
 }
 
-// IsTapeItem reports whether an item can be loaded into slot 2.
 func IsTapeItem(item string) bool { _, ok := TapeItems[item]; return ok }
 
-// TapeDialogue is the dialogue belonging to a tape in slot 2.
 func TapeDialogue(item string) string {
 	switch item {
 	case ItemMysteryTape:

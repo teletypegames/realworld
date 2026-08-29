@@ -4,7 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// samizdatPress — deck 21.
 func backgroundSamizdatPress() inkwell.Asset {
 	return inkwell.Asset{
 		Name: BgSamizdatPress,

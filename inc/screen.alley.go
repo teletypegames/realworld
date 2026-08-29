@@ -4,21 +4,13 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-// alley is the alley behind Noodle's house — beat 3, and the vertical slice the
-// whole HUD is measured against: hotspots, a gated pickup, the two-slot
-// Armilla, tape dialogue and an authored failure.
-//
-// The wiki keeps it in the same catalogue row as the house ("Noodle háza & a
-// sikátor") and its graph has one arrow in, NoodleUtcafront → Sikátor, so the
-// only way out is back to the street. The alley's own locked back door is the
-// New Game+ hook and leads to a room the deck has not painted.
 func screenAlley() screen {
 	return screen{
 		name:       ScreenAlley,
 		title:      "ALLEY — BEHIND NOODLE'S HOUSE",
 		background: BgAlley,
 		exits: []exit{
-			// On the left: the back door hotspot below owns the other end.
+
 			{to: ScreenNoodleHouse, label: "back out to the street", side: sideLeft},
 		},
 		actors: []inkwell.SceneActor{
@@ -29,8 +21,6 @@ func screenAlley() screen {
 	}
 }
 
-// hidingPlace holds the mystery tape. It only opens once Paul has the tip from
-// the police station (beat 2) — without it he does not know what to look for.
 func hidingPlace() inkwell.Hotspot {
 	return inkwell.Hotspot{
 		Name:  "hiding_place",
@@ -57,8 +47,6 @@ func hidingPlace() inkwell.Hotspot {
 	}
 }
 
-// backDoor is the New Game+ hook: the code can be entered on the first visit
-// too, if the player already knows it.
 func backDoor() inkwell.Hotspot {
 	return inkwell.Hotspot{
 		Name:   "back_door",
@@ -71,7 +59,7 @@ func backDoor() inkwell.Hotspot {
 		),
 		OnTalk: inkwell.Say(Paul, "To the door? I'm not there yet."),
 		OnUseWith: map[string]inkwell.Action{
-			// An AUTHORED failure — not the engine's hardcoded flash.
+
 			ItemBlackArmilla: inkwell.Seq(
 				inkwell.Say(Paul, "A black-market bracelet doesn't open a keypad."),
 				TapeSay(Dex, "But you do get an advert out of it."),
