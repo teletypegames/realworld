@@ -20,8 +20,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 
-	"realworld/internal/names"
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 type TapeChannel struct {

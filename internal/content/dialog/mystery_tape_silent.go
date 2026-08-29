@@ -3,7 +3,7 @@ package dialog
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/names"
 )
 
 // mysteryTapeSilent covers the stretch before the club trigger (beat 6), while

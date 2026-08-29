@@ -3,8 +3,8 @@ package scene
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 // alley is the alley behind Noodle's house — beat 3, and the vertical slice

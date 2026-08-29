@@ -3,8 +3,8 @@ package script
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 // tapeInsert runs whenever a tape goes into slot 2: it activates the tape and

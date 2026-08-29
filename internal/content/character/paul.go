@@ -3,8 +3,8 @@ package character
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
-	"realworld/internal/theme"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/theme"
 )
 
 // paul is the player character: a junk dealer and street survivor, technically

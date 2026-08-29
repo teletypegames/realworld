@@ -1,0 +1,9 @@
+{
+  "name": "realworld",
+  "title": "Project Real World",
+  "author": "Teletype Games",
+  "desc": "A story-heavy point-and-click adventure: Paul investigates what happened to Norman, with a dead friend riding along on tape",
+  "site": "https://git.teletypegames.org/games/realworld",
+  "license": "MIT License",
+  "version": "0.1"
+}

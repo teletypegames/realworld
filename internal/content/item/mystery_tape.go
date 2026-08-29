@@ -3,8 +3,8 @@ package item
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 // mysteryTape is the engine of the investigation. Password-locked; it only

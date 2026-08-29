@@ -9,7 +9,7 @@ package world
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/names"
 )
 
 // Mode is the HUD mode.

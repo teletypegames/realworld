@@ -4,7 +4,7 @@ package scene
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 // Register adds every scene to the game.

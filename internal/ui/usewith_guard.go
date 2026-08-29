@@ -23,8 +23,8 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"realworld/internal/names"
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 type UseWithGuard struct {

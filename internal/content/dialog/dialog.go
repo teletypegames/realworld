@@ -12,7 +12,7 @@ package dialog
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 // Register adds every dialogue to the game.

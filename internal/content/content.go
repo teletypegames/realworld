@@ -7,13 +7,13 @@
 package content
 
 import (
-	"realworld/internal/content/asset"
-	"realworld/internal/content/character"
-	"realworld/internal/content/dialog"
-	"realworld/internal/content/item"
-	"realworld/internal/content/scene"
-	"realworld/internal/content/script"
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/content/asset"
+	"git.teletypegames.org/games/realworld/internal/content/character"
+	"git.teletypegames.org/games/realworld/internal/content/dialog"
+	"git.teletypegames.org/games/realworld/internal/content/item"
+	"git.teletypegames.org/games/realworld/internal/content/scene"
+	"git.teletypegames.org/games/realworld/internal/content/script"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 // Register adds every entity to the game. Order matters only in that scenes

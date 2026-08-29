@@ -5,9 +5,9 @@ import (
 
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/boot"
-	"realworld/internal/names"
-	"realworld/internal/ui"
+	"git.teletypegames.org/games/realworld/internal/boot"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/ui"
 )
 
 func build(t *testing.T) *inkwell.Game {

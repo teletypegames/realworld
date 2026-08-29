@@ -3,8 +3,8 @@ package character
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
-	"realworld/internal/theme"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/theme"
 )
 
 // dex is the personality imprint of a dead friend, permanently in slot 1 of

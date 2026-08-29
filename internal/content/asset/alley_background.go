@@ -3,7 +3,7 @@ package asset
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/names"
 )
 
 // alleyBackground is the alley behind Noodle's house (beat 3).

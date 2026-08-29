@@ -1,4 +1,6 @@
-/realworld
-/saves/
-*.png.tmp
+bin
+dist
+*.zip
+.version
+saves
 screenshot*.png

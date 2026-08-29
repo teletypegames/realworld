@@ -13,9 +13,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 
-	"realworld/internal/names"
-	"realworld/internal/theme"
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/theme"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 type Letterbox struct {

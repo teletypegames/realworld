@@ -3,8 +3,8 @@ package character
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
-	"realworld/internal/theme"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/theme"
 )
 
 // mysteryTape is the tape found in the alley — in truth Norman's Personal

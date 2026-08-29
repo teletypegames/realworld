@@ -6,7 +6,7 @@ import (
 
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/boot"
+	"git.teletypegames.org/games/realworld/internal/boot"
 )
 
 func main() {

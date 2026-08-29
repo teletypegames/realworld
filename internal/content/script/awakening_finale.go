@@ -3,9 +3,9 @@ package script
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
-	"realworld/internal/theme"
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/theme"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 // awakeningFinale is the end of game two. The point of it, mechanically, is

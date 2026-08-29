@@ -11,15 +11,45 @@ the wiki (`services/wiki-pages/pages/projects/realworld` and
 
 ## Running
 
+inkwell is consumed as an ordinary Go module from the forge. Prerequisites:
+Go 1.26+ and SSH access to `git.teletypegames.org`.
+
+```bash
+git clone ssh://git@git.teletypegames.org:2222/games/realworld
+cd realworld
+export GOPRIVATE=git.teletypegames.org   # the Makefile sets this for its own targets
+go mod tidy
+go run .
+```
+
 ```bash
 go run .                 # the alley scene (beat 3)
 go run . -finale         # the finale — try the Nokia-punk theme switch
 go run . -scene alley    # pick a starting scene
-go test ./...            # content and layout checks, no window needed
 ```
 
-`go.mod` carries a `replace` pointing at the neighbouring inkwell checkout so
-the engine and the game move together. Drop that line for a release build.
+To work against a local inkwell checkout, add a `replace` line temporarily —
+and take it out before committing:
+
+```bash
+go mod edit -replace git.teletypegames.org/engines/inkwell=../../engines/inkwell
+go mod edit -dropreplace git.teletypegames.org/engines/inkwell
+```
+
+## Building
+
+```bash
+make build                    # native binary into bin/
+make test                     # headless: validates content and HUD layout
+make wasm                     # dist/game.wasm + wasm_exec.js
+make export VERSION=0.1       # zipped HTML/WASM bundle
+make binaries VERSION=0.1     # win-x86, win-x64, linux-x64 zips
+make clean
+```
+
+CI is Woodpecker; `.woodpecker.yaml` only names the platform, and the update
+server serves the actual pipeline (`GET /build/config?platform=ebitengine`).
+Release metadata lives in `metadata.json`.
 
 | Control | |
 |---|---|

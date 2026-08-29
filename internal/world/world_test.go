@@ -5,8 +5,8 @@ import (
 
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
-	"realworld/internal/world"
+	"git.teletypegames.org/games/realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/world"
 )
 
 // The mode must not leak into saved state: inkwell saves State.Vars but drops

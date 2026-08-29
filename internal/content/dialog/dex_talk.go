@@ -3,7 +3,7 @@ package dialog
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/internal/names"
+	"git.teletypegames.org/games/realworld/internal/names"
 )
 
 // dexTalk is the standing conversation with Dex. Its branches are gated on
