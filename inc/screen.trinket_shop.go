@@ -1,12 +1,12 @@
 package inc
 
-func screenTrinketShop() screen {
-	return screen{
-		name:       ScreenTrinketShop,
-		title:      "CHINATOWN — TRINKET SHOP",
-		background: BgTrinketShop,
-		onSelector: true,
-		exits: []exit{
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenTrinketShop,
+		Title:      "CHINATOWN — TRINKET SHOP",
+		Background: BgTrinketShop,
+		OnSelector: true,
+		Exits: []exit{
 			{
 				to:    ScreenSmallRestaurant,
 				label: "the eating place next door",
@@ -20,5 +20,5 @@ func screenTrinketShop() screen {
 				blocked: "Just a shop, as far as the man behind the counter is concerned.",
 			},
 		},
-	}
+	})
 }

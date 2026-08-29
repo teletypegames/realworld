@@ -4,10 +4,10 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func backgroundIceCreamShop() inkwell.Asset {
-	return inkwell.Asset{
+func init() {
+	BackgroundManager.Register(Background{
 		Name: BgIceCreamShop,
 		Path: "assets/bg/ice_cream_shop.png",
 		Kind: inkwell.AssetImage,
-	}
+	})
 }

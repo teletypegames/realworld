@@ -1,10 +1,10 @@
 package inc
 
-func screenShowroom() screen {
-	return screen{
-		name:       ScreenShowroom,
-		title:      "NEUMATRONIC SHOWROOM",
-		background: BgShowroom,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenShowroom,
+		Title:      "NEUMATRONIC SHOWROOM",
+		Background: BgShowroom,
+		OnSelector: true,
+	})
 }

@@ -1,10 +1,10 @@
 package inc
 
-func screenPoliceStation() screen {
-	return screen{
-		name:       ScreenPoliceStation,
-		title:      "SFPD — STATION AND HOLDING",
-		background: BgPoliceStation,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenPoliceStation,
+		Title:      "SFPD — STATION AND HOLDING",
+		Background: BgPoliceStation,
+		OnSelector: true,
+	})
 }

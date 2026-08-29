@@ -4,11 +4,11 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func scriptAwakeningFinale(w *World) inkwell.Script {
-	return inkwell.Script{
+func init() {
+	ScriptManager.Register(Script{
 		Name: ScriptFinale,
 		Actions: inkwell.Seq(
-			SetMode(w, ModeCutscene),
+			SetMode(ModeCutscene),
 			inkwell.Wait(0.6),
 			inkwell.Say(Paul, "I'm putting it in. That's all this is."),
 			inkwell.Wait(0.4),
@@ -19,5 +19,5 @@ func scriptAwakeningFinale(w *World) inkwell.Script {
 			inkwell.Wait(1.0),
 			inkwell.ShowEnd("REAL WORLD — end of game two"),
 		),
-	}
+	})
 }

@@ -48,7 +48,6 @@ go mod edit -dropreplace git.teletypegames.org/engines/inkwell
 
 ```bash
 make build                    # native binary into bin/
-make test                     # headless: validates content and HUD layout
 make wasm                     # dist/game.wasm + wasm_exec.js
 make export VERSION=0.1       # zipped HTML/WASM bundle
 make binaries VERSION=0.1     # win-x86, win-x64, linux-x64 zips
@@ -63,13 +62,13 @@ Release metadata lives in `metadata.json`.
 |---|---|
 | left click | run the selected verb |
 | right click | verb coin (Look / Use / Talk / Take) |
-| `←` `→` | previous / next screen, in concept-art order, wrapping |
+| `←` `→` | previous / next screen, in file order, wrapping |
 | `F1` | toggle hotspot outlines |
 | `SPACE` | during a cutscene: let the tape speak, if it offered |
 
 The screens are connected to each other (see **The map** below); the arrow keys
-are a reviewing tool on top of that, walking the deck in concept-art order. The
-walk is inert during a cutscene, a menu, or a stopped world, so it can never cut
+are a reviewing tool on top of that, walking every screen in turn. The walk is
+inert during a cutscene, a menu, or a stopped world, so it can never cut
 across an authored beat.
 
 Screenshots: `EBITEN_SCREENSHOT_KEY=q go run .`, then press `q` in the window.
@@ -154,20 +153,22 @@ licence.
 The game is one flat package, `inc`. There are no subdirectories: a file's
 name says where it belongs, in the form `[category].[name].go`. The category is
 always singular, and `[category].manager.go` is the file that ties that category
-together — its `register…`, its shared types, its list.
+together — its manager, its shared types, its hand-off to the engine.
 
 ```
-main.go                  flags + inkwell.Run
-inc/names.manager.go     entity names and world-state keys
-inc/theme.manager.go     realworld-93 + nokia-punk
-inc/world.*.go           unsaved runtime state, custom actions, action pump
-inc/ui.*.go              HUD: layout, custom widgets, coloured text
-inc/<kind>.<name>.go     one file per registered entity, by kind
-inc/boot.manager.go      wiring
+main.go                    flags + inkwell.Run
+inc/manager.manager.go     Manager[T], the generic registry
+inc/manager.interface.go   ManagerInterface, the contract every manager keeps
+inc/names.manager.go       entity names and world-state keys
+inc/theme.*.go             realworld-93 + nokia-punk
+inc/world.*.go             unsaved runtime state, custom actions, action pump
+inc/ui.*.go                HUD: layout, custom widgets, coloured text
+inc/<kind>.<name>.go       one file per registered entity, by kind
+inc/boot.manager.go        wiring
 ```
 
 Nothing is enforced by the compiler any more, so the layering is a rule the
-code keeps by hand: the world knows nothing about the HUD or the content, and
+code keeps by hand: the world holds no opinion about the HUD or the content, and
 both build on it, never the other way round.
 
 ```
@@ -188,12 +189,60 @@ script.*.go      script.tape_insert.go  script.awakening_finale.go
 screen.*.go      one file per screen: screen.alley.go, … + screen.exit.go
 ```
 
-Adding a screen means adding `screen.<name>.go` and `background.<name>.go`, and
-one line in each category's manager list. Nothing else moves.
+Adding a screen means adding `screen.<name>.go` and `background.<name>.go`.
+Nothing else moves.
 
-Since everything shares one namespace, an entity's constructor carries its
-category: `screenAlley()` is the screen, `backgroundAlley()` the painting behind
-it, `itemMysteryTape()` the prop and `characterMysteryTape()` the voice on it.
+Every category owns a manager, and they are all the same generic type,
+`Manager[T]` — one slice in registration order, one `map[string]int` beside it,
+so a lookup by name is a map hit rather than a scan. The entity types are
+aliases of engine structs and cannot carry methods, so the manager is handed a
+function that reads the name instead. A category's manager file is an alias and
+one line:
+
+```go
+type Character = inkwell.Character
+
+var CharacterManager = NewManager(func(entity Character) string { return entity.Name })
+```
+
+They all keep the same contract, asserted in `manager.interface.go`:
+
+```go
+type ManagerInterface[T any] interface {
+	Register(entity T)
+	GetByName(name string) (T, bool)
+	GetAll() []T
+}
+```
+
+An entity file is a literal that hands itself over in an `init()`:
+
+```go
+func init() {
+	BackgroundManager.Register(Background{
+		Name: BgServerFarm,
+		Path: "assets/bg/server_farm.png",
+		Kind: inkwell.AssetImage,
+	})
+}
+```
+
+So adding an entity is adding a file, and there is no second list to keep in
+step. The price is that registration order is file-name order: the arrow keys
+walk the screens alphabetically rather than in the concept-art deck's order.
+That was a deliberate trade — the deck order was a list that had to be kept in
+step with the files by hand, and the deck is a thing to look at, not a thing to
+play through.
+
+The game's own catalogue is readable without going through the engine:
+`ScreenManager.GetByName("alley")` answers before a single scene has been handed
+over. `registerContent` is where the hand-off happens, one `registerAll` call
+per category.
+
+There is one world, and it is a package-level singleton: `World`. Nothing takes
+a `*world` parameter and no widget holds a back-reference, which is what lets a
+script file be a literal — the tape-insert script closes over `World` rather
+than over a parameter someone would have had to thread to it.
 
 **On the word "screen".** inkwell's entity is called a `Scene`, and that is the
 type every `screen.*.go` file returns — but the wiki, the concept-art deck and
@@ -231,9 +280,8 @@ convention every 1990s point & click used, and one field to re-aim later. A
 screen reached from several rooms has no fixed way out: the BBS terminal is the
 same terminal from the club, the flat or the roof, so its exit is `back`.
 
-Three tests keep the map honest: every exit names a registered screen, every
-screen has a way out, and every screen can be walked to from Paul's shop through
-the exits alone — the arrow keys do not count.
+The graph stays machine-readable: exit hotspots are named `exit:<target>`, so
+the connections can be read straight back out of the registered screens.
 
 ## Engine workarounds
 
@@ -297,9 +345,10 @@ Also: the inkwell README gives the module path as
   hides them; the deck wanted them struck through but visible, so the list
   becomes a memory of what you already tried. Needs a thin override over
   `DialogBox`.
-- **Only beat 3 exists.** The alley is a vertical slice; `boot.opening` sets the
+- **Only beat 3 exists.** The alley is a vertical slice; `bootOpening` sets the
   police-tip flag that beat 2 will eventually set.
 - **The render has only been inspected once, by the author of this repo.**
-  Geometry is covered by tests and a layout dump, but this environment cannot
-  take a screenshot (both synthetic keystrokes and screen capture are blocked by
-  macOS privacy permissions), so every visual judgement has to come from you.
+  Geometry is derived from one font cell and one screen size, but this
+  environment cannot take a screenshot (both synthetic keystrokes and screen
+  capture are blocked by macOS privacy permissions), so every visual judgement
+  has to come from you.

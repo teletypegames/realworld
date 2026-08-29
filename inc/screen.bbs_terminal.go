@@ -1,15 +1,15 @@
 package inc
 
-func screenBbsTerminal() screen {
-	return screen{
-		name:       ScreenBBSTerminal,
-		title:      "TERMINAL — BBS ACCESS POINT",
-		background: BgBBSTerminal,
-		exits: []exit{
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenBBSTerminal,
+		Title:      "TERMINAL — BBS ACCESS POINT",
+		Background: BgBBSTerminal,
+		Exits: []exit{
 			{
 				label: "step back from the terminal",
 				side:  sideNear,
 			},
 		},
-	}
+	})
 }

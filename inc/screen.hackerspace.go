@@ -1,10 +1,10 @@
 package inc
 
-func screenHackerspace() screen {
-	return screen{
-		name:       ScreenHackerspace,
-		title:      "HACKERSPACE",
-		background: BgHackerspace,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenHackerspace,
+		Title:      "HACKERSPACE",
+		Background: BgHackerspace,
+		OnSelector: true,
+	})
 }

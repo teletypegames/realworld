@@ -1,10 +1,10 @@
 package inc
 
-func screenPublicBBS() screen {
-	return screen{
-		name:       ScreenPublicBBS,
-		title:      "PUBLIC BBS TERMINAL",
-		background: BgPublicBBS,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenPublicBBS,
+		Title:      "PUBLIC BBS TERMINAL",
+		Background: BgPublicBBS,
+		OnSelector: true,
+	})
 }

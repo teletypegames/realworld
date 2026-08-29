@@ -1,10 +1,10 @@
 package inc
 
-func screenSamizdatPress() screen {
-	return screen{
-		name:       ScreenSamizdatPress,
-		title:      "SAMIZDAT PRINTING HOUSE",
-		background: BgSamizdatPress,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenSamizdatPress,
+		Title:      "SAMIZDAT PRINTING HOUSE",
+		Background: BgSamizdatPress,
+		OnSelector: true,
+	})
 }

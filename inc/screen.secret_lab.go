@@ -1,10 +1,10 @@
 package inc
 
-func screenSecretLab() screen {
-	return screen{
-		name:       ScreenSecretLab,
-		title:      "SECRET RESEARCH LABORATORY",
-		background: BgSecretLab,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenSecretLab,
+		Title:      "SECRET RESEARCH LABORATORY",
+		Background: BgSecretLab,
+		OnSelector: true,
+	})
 }

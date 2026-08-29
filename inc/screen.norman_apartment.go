@@ -1,12 +1,12 @@
 package inc
 
-func screenNormanApartment() screen {
-	return screen{
-		name:       ScreenNormanApartment,
-		title:      "NORMAN'S APARTMENT",
-		background: BgNormanApartment,
-		onSelector: true,
-		exits: []exit{
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenNormanApartment,
+		Title:      "NORMAN'S APARTMENT",
+		Background: BgNormanApartment,
+		OnSelector: true,
+		Exits: []exit{
 			{
 				to:    ScreenRooftopHideout,
 				label: "the stairs up to the roof",
@@ -18,5 +18,5 @@ func screenNormanApartment() screen {
 				side:  sideRight,
 			},
 		},
-	}
+	})
 }

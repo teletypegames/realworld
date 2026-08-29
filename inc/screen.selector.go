@@ -6,26 +6,34 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func screenSelector(rest []screen) screen {
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenSelector,
+		Title:      "SAN FRANCISCO",
+		Background: BgSelector,
+		Actors:     []inkwell.SceneActor{},
+		Walkboxes:  []inkwell.Polygon{},
+	})
+}
+
+func fillSelectorPins() {
+	selector, ok := ScreenManager.GetByName(ScreenSelector)
+	if !ok {
+		return
+	}
 	var exits []exit
-	for _, s := range rest {
-		if !s.onSelector {
+	for _, entity := range ScreenManager.GetAll() {
+		if !entity.OnSelector {
 			continue
 		}
 		exits = append(exits, exit{
-			to:    s.name,
-			label: pinLabel(s.title),
+			to:    entity.Name,
+			label: pinLabel(entity.Title),
 			area:  pin(len(exits)),
 		})
 	}
-	return screen{
-		name:       ScreenSelector,
-		title:      "SAN FRANCISCO",
-		background: BgSelector,
-		exits:      exits,
-		actors:     []inkwell.SceneActor{},
-		walkboxes:  []inkwell.Polygon{},
-	}
+	selector.Exits = exits
+	ScreenManager.Register(selector)
 }
 
 const (

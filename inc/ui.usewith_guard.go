@@ -7,17 +7,16 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type UseWithGuard struct {
+type useWithGuard struct {
 	Name string
-	W    *World
 }
 
-func (u *UseWithGuard) GetName() string                            { return u.Name }
-func (u *UseWithGuard) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
+func (u *useWithGuard) GetName() string                            { return u.Name }
+func (u *useWithGuard) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
 
-func (u *UseWithGuard) Tick(ctx *inkwell.UICtx) {
+func (u *useWithGuard) Tick(ctx *inkwell.UICtx) {
 	g := ctx.Game
-	if !u.W.HUDVisible() || !g.Input.LeftClicked() {
+	if !World.HUDVisible() || !g.Input.LeftClicked() {
 		return
 	}
 	sel := g.Inventory.Selected()
@@ -42,7 +41,7 @@ func (u *UseWithGuard) Tick(ctx *inkwell.UICtx) {
 	g.State.NoteTalked(key)
 	n := g.State.Talked(key)
 
-	u.W.Do(inkwell.Seq(
+	World.Do(inkwell.Seq(
 		inkwell.Say(Paul, pick(paulFails, n)),
 		TapeSay(Dex, dexFail(n)),
 	))

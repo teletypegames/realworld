@@ -4,8 +4,8 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func dialogMysteryTapeSilent() inkwell.Dialogue {
-	return inkwell.Dialogue{
+func init() {
+	DialogManager.Register(Dialog{
 		Name:  DlgMysteryTape,
 		Start: "root",
 		Nodes: []inkwell.DialogueNode{{
@@ -28,5 +28,5 @@ func dialogMysteryTapeSilent() inkwell.Dialogue {
 				},
 			},
 		}},
-	}
+	})
 }

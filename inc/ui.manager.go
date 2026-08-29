@@ -27,20 +27,17 @@ const (
 	invGap  = 4
 )
 
-func registerUI(w *World) {
-	g := w.G
+func registerUI() {
+	g := World.G
 
-	g.UIManager.Register(&UseWithGuard{
+	g.UIManager.Register(&useWithGuard{
 		Name: "usewith_guard",
-		W:    w,
 	})
-	g.UIManager.Register(&ActionPump{
+	g.UIManager.Register(&actionPump{
 		Name: "pump",
-		W:    w,
 	})
 	g.UIManager.Register(&screenNav{
 		Name: "screen_nav",
-		W:    w,
 	})
 	g.UIManager.Register(&windowSizer{
 		Name:  "window",
@@ -55,26 +52,24 @@ func registerUI(w *World) {
 		Height:  TopBarH,
 		TimeVar: VarArmillaStrip,
 	}
-	w.SetTopBar(top)
-	g.UIManager.Register(gated(w, "topbar_gate", top))
+	World.SetTopBar(top)
+	g.UIManager.Register(gated("topbar_gate", top))
 
-	g.UIManager.Register(&Letterbox{
+	g.UIManager.Register(&letterbox{
 		Name: "letterbox",
-		W:    w,
 		Bar:  36,
 	})
 	g.UIManager.Register(&hudFrame{
 		Name: "hudframe",
-		W:    w,
 	})
 
-	g.UIManager.Register(gated(w, "status_gate", &inkwell.StatusLine{
+	g.UIManager.Register(gated("status_gate", &inkwell.StatusLine{
 		Name:        "status",
 		Y:           statusY,
 		Align:       inkwell.AlignLeft,
 		ScreenWidth: DividerX,
 	}))
-	g.UIManager.Register(gated(w, "inventory_gate", &inkwell.InventoryBar{
+	g.UIManager.Register(gated("inventory_gate", &inkwell.InventoryBar{
 		Name: "inventory",
 		Origin: inkwell.Point{
 			X: Pad + 2,
@@ -85,14 +80,12 @@ func registerUI(w *World) {
 		SlotSize: invSlot,
 		Gap:      invGap,
 	}))
-	g.UIManager.Register(&TapeSlots{
+	g.UIManager.Register(&tapeSlots{
 		Name:   "tapes",
-		W:      w,
 		Bounds: inkwell.Rect(192, slotsY, 194, slotsH),
 	})
-	g.UIManager.Register(&TapeChannel{
+	g.UIManager.Register(&tapeChannel{
 		Name:   "channel",
-		W:      w,
 		Bounds: inkwell.Rect(DividerX+2, HUDTop+2, ScreenW-DividerX-4, ScreenH-HUDTop-4),
 	})
 
@@ -150,14 +143,12 @@ func (s *windowSizer) Tick(ctx *inkwell.UICtx) {
 
 type gate struct {
 	Name  string
-	W     *World
 	Inner inkwell.Widget
 }
 
-func gated(w *World, name string, inner inkwell.Widget) inkwell.Widget {
+func gated(name string, inner inkwell.Widget) inkwell.Widget {
 	return &gate{
 		Name:  name,
-		W:     w,
 		Inner: inner,
 	}
 }
@@ -165,19 +156,19 @@ func gated(w *World, name string, inner inkwell.Widget) inkwell.Widget {
 func (n *gate) GetName() string { return n.Name }
 
 func (n *gate) Tick(ctx *inkwell.UICtx) {
-	if n.W.HUDVisible() {
+	if World.HUDVisible() {
 		n.Inner.Tick(ctx)
 	}
 }
 
 func (n *gate) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
-	if n.W.HUDVisible() {
+	if World.HUDVisible() {
 		n.Inner.Draw(dst, ctx)
 	}
 }
 
 func (n *gate) BlocksClickAt(p inkwell.Point) bool {
-	if !n.W.HUDVisible() {
+	if !World.HUDVisible() {
 		return false
 	}
 	b, ok := n.Inner.(interface{ BlocksClickAt(inkwell.Point) bool })
@@ -186,14 +177,13 @@ func (n *gate) BlocksClickAt(p inkwell.Point) bool {
 
 type hudFrame struct {
 	Name string
-	W    *World
 }
 
 func (h *hudFrame) GetName() string         { return h.Name }
 func (h *hudFrame) Tick(ctx *inkwell.UICtx) {}
 
 func (h *hudFrame) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
-	if !h.W.HUDVisible() {
+	if !World.HUDVisible() {
 		return
 	}
 	th := ctx.Game.Theme()
@@ -205,5 +195,5 @@ func (h *hudFrame) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 }
 
 func (h *hudFrame) BlocksClickAt(p inkwell.Point) bool {
-	return h.W.HUDVisible() && p.Y >= HUDTop
+	return World.HUDVisible() && p.Y >= HUDTop
 }

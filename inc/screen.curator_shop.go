@@ -1,10 +1,10 @@
 package inc
 
-func screenCuratorShop() screen {
-	return screen{
-		name:       ScreenCuratorShop,
-		title:      "CURATOR SERVICE — THE MASTER'S WORKSHOP",
-		background: BgCuratorShop,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenCuratorShop,
+		Title:      "CURATOR SERVICE — THE MASTER'S WORKSHOP",
+		Background: BgCuratorShop,
+		OnSelector: true,
+	})
 }

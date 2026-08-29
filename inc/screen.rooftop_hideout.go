@@ -1,11 +1,11 @@
 package inc
 
-func screenRooftopHideout() screen {
-	return screen{
-		name:       ScreenRooftopHideout,
-		title:      "NORMAN'S ROOFTOP HIDEOUT",
-		background: BgRooftopHideout,
-		exits: []exit{
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenRooftopHideout,
+		Title:      "NORMAN'S ROOFTOP HIDEOUT",
+		Background: BgRooftopHideout,
+		Exits: []exit{
 			{
 				to:    ScreenNormanApartment,
 				label: "back down into the flat",
@@ -17,5 +17,5 @@ func screenRooftopHideout() screen {
 				side:  sideRight,
 			},
 		},
-	}
+	})
 }

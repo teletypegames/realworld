@@ -52,10 +52,10 @@ func exitName(to string) string {
 	return "exit:" + to
 }
 
-func (e exit) hotspot(w *World) inkwell.Hotspot {
+func (e exit) hotspot() inkwell.Hotspot {
 	var travel inkwell.Action = inkwell.GoTo(e.to)
 	if e.to == "" {
-		travel = Back(w)
+		travel = Back()
 	}
 	if e.needs != "" {
 		travel = inkwell.If(inkwell.Flag(e.needs), travel, inkwell.Say(Paul, e.blocked))

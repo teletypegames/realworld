@@ -4,55 +4,28 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-type screen struct {
-	name       string
-	title      string
-	background string
+type Screen struct {
+	Name       string
+	Title      string
+	Background string
 
-	exits []exit
+	Exits []exit
 
-	onSelector bool
+	OnSelector bool
 
-	hotspots  []inkwell.Hotspot
-	actors    []inkwell.SceneActor
-	walkboxes []inkwell.Polygon
-	onEnter   inkwell.Action
+	Hotspots  []inkwell.Hotspot
+	Actors    []inkwell.SceneActor
+	Walkboxes []inkwell.Polygon
+	OnEnter   inkwell.Action
 }
 
-var screenDeck = []func() screen{
-	screenPaulShop,
-	screenNoodleHouse,
-	screenAlley,
-	screenNormanApartment,
-	screenPoliceStation,
-	screenHackerspace,
-	screenIceCreamShop,
-	screenTrinketShop,
-	screenSmallRestaurant,
-	screenSecretClub,
-	screenBbsTerminal,
-	screenStreet,
-	screenHospital,
-	screenServerFarm,
-	screenSecretLab,
-	screenRooftopHideout,
-	screenPublicBBS,
-	screenBvkBranch,
-	screenCuratorShop,
-	screenScrapMarket,
-	screenSamizdatPress,
-	screenShowroom,
-	screenColumbarium,
-}
+var ScreenManager = NewManager(func(entity Screen) string { return entity.Name })
 
-func registerScreen(w *World) {
-	screens := make([]screen, 0, len(screenDeck)+1)
-	for _, f := range screenDeck {
-		screens = append(screens, f())
-	}
-	for _, s := range append([]screen{screenSelector(screens)}, screens...) {
-		w.G.SceneManager.Register(screenBuild(w, s))
-	}
+func registerScreen() {
+	fillSelectorPins()
+	registerAll(ScreenManager, func(entity Screen) {
+		World.G.SceneManager.Register(screenBuild(entity))
+	})
 }
 
 var screenFloor = []inkwell.Polygon{
@@ -74,18 +47,18 @@ var screenFloor = []inkwell.Polygon{
 	),
 }
 
-func screenBuild(w *World, s screen) inkwell.Scene {
-	exits := s.exits
-	if s.onSelector {
+func screenBuild(s Screen) inkwell.Scene {
+	exits := s.Exits
+	if s.OnSelector {
 		exits = append(exits, toSelector())
 	}
-	hotspots := make([]inkwell.Hotspot, 0, len(exits)+len(s.hotspots))
-	hotspots = append(hotspots, s.hotspots...)
+	hotspots := make([]inkwell.Hotspot, 0, len(exits)+len(s.Hotspots))
+	hotspots = append(hotspots, s.Hotspots...)
 	for _, e := range exits {
-		hotspots = append(hotspots, e.hotspot(w))
+		hotspots = append(hotspots, e.hotspot())
 	}
 
-	actors := s.actors
+	actors := s.Actors
 	if actors == nil {
 		actors = []inkwell.SceneActor{
 			{
@@ -97,19 +70,19 @@ func screenBuild(w *World, s screen) inkwell.Scene {
 			},
 		}
 	}
-	walkboxes := s.walkboxes
+	walkboxes := s.Walkboxes
 	if walkboxes == nil {
 		walkboxes = screenFloor
 	}
-	onEnter := inkwell.Action(EnterScene(w, s.name))
-	if s.onEnter != nil {
-		onEnter = inkwell.Seq(onEnter, s.onEnter)
+	onEnter := inkwell.Action(EnterScene(s.Name))
+	if s.OnEnter != nil {
+		onEnter = inkwell.Seq(onEnter, s.OnEnter)
 	}
 
 	return inkwell.Scene{
-		Name:       s.name,
-		Title:      s.title,
-		Background: s.background,
+		Name:       s.Name,
+		Title:      s.Title,
+		Background: s.Background,
 		Actors:     actors,
 		Walkboxes:  walkboxes,
 		Hotspots:   hotspots,

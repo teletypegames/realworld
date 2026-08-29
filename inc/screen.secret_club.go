@@ -1,11 +1,11 @@
 package inc
 
-func screenSecretClub() screen {
-	return screen{
-		name:       ScreenSecretClub,
-		title:      "SECRET CLUB — THE UNDERWATER SUN",
-		background: BgSecretClub,
-		exits: []exit{
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenSecretClub,
+		Title:      "SECRET CLUB — THE UNDERWATER SUN",
+		Background: BgSecretClub,
+		Exits: []exit{
 			{
 				to:    ScreenBBSTerminal,
 				label: "the terminal in the corner",
@@ -17,5 +17,5 @@ func screenSecretClub() screen {
 				side:  sideNear,
 			},
 		},
-	}
+	})
 }

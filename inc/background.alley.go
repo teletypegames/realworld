@@ -4,10 +4,10 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func backgroundAlley() inkwell.Asset {
-	return inkwell.Asset{
+func init() {
+	BackgroundManager.Register(Background{
 		Name: BgAlley,
 		Path: "assets/bg/alley.png",
 		Kind: inkwell.AssetImage,
-	}
+	})
 }

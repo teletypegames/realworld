@@ -4,8 +4,8 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func itemBlackMarketArmilla() inkwell.Item {
-	return inkwell.Item{
+func init() {
+	ItemManager.Register(Item{
 		Name:        ItemBlackArmilla,
 		Description: "black-market Armilla",
 		OnUseSelf: inkwell.Seq(
@@ -18,5 +18,5 @@ func itemBlackMarketArmilla() inkwell.Item {
 				TapeSay(Dex, "Nothing. Which is what I'd charge for it."),
 			),
 		},
-	}
+	})
 }

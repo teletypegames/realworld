@@ -8,14 +8,13 @@ import (
 
 type screenNav struct {
 	Name string
-	W    *World
 }
 
 func (n *screenNav) GetName() string                            { return n.Name }
 func (n *screenNav) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
 
 func (n *screenNav) Tick(ctx *inkwell.UICtx) {
-	if !n.W.HUDVisible() || n.W.Paused() {
+	if !World.HUDVisible() || World.Paused() {
 		return
 	}
 	step := 0
@@ -29,7 +28,7 @@ func (n *screenNav) Tick(ctx *inkwell.UICtx) {
 		return
 	}
 	if next := n.neighbour(ctx.Game, step); next != "" {
-		n.W.Do(inkwell.GoTo(next))
+		World.Do(inkwell.GoTo(next))
 	}
 }
 
@@ -39,7 +38,7 @@ func (n *screenNav) neighbour(g *inkwell.Game, step int) string {
 		return ""
 	}
 	for i, name := range deck {
-		if name == n.W.Scene() {
+		if name == World.Scene() {
 			return deck[((i+step)%len(deck)+len(deck))%len(deck)]
 		}
 	}

@@ -4,10 +4,10 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func backgroundColumbarium() inkwell.Asset {
-	return inkwell.Asset{
+func init() {
+	BackgroundManager.Register(Background{
 		Name: BgColumbarium,
 		Path: "assets/bg/columbarium.png",
 		Kind: inkwell.AssetImage,
-	}
+	})
 }

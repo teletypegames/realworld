@@ -1,10 +1,10 @@
 package inc
 
-func screenColumbarium() screen {
-	return screen{
-		name:       ScreenColumbarium,
-		title:      "COLUMBARIUM — DEX'S MEMORIAL",
-		background: BgColumbarium,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenColumbarium,
+		Title:      "COLUMBARIUM — DEX'S MEMORIAL",
+		Background: BgColumbarium,
+		OnSelector: true,
+	})
 }

@@ -6,26 +6,25 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-type TapeSlots struct {
+type tapeSlots struct {
 	Name   string
-	W      *World
 	Bounds inkwell.Rectangle
 }
 
-func (t *TapeSlots) GetName() string { return t.Name }
+func (t *tapeSlots) GetName() string { return t.Name }
 
-func (t *TapeSlots) BlocksClickAt(p inkwell.Point) bool {
-	return t.W.HUDVisible() && t.Bounds.Contains(p)
+func (t *tapeSlots) BlocksClickAt(p inkwell.Point) bool {
+	return World.HUDVisible() && t.Bounds.Contains(p)
 }
 
-func (t *TapeSlots) slotRects() (inkwell.Rectangle, inkwell.Rectangle) {
+func (t *tapeSlots) slotRects() (inkwell.Rectangle, inkwell.Rectangle) {
 	b := t.Bounds
 	w := (b.W - Pad) / 2
 	return inkwell.Rect(b.X, b.Y, w, b.H), inkwell.Rect(b.X+w+Pad, b.Y, w, b.H)
 }
 
-func (t *TapeSlots) Tick(ctx *inkwell.UICtx) {
-	if !t.W.HUDVisible() {
+func (t *tapeSlots) Tick(ctx *inkwell.UICtx) {
+	if !World.HUDVisible() {
 		return
 	}
 	g := ctx.Game
@@ -36,7 +35,7 @@ func (t *TapeSlots) Tick(ctx *inkwell.UICtx) {
 	case r1.Contains(mp):
 		g.SetHoverLabel(TapeDisplayName(Dex))
 	case r2.Contains(mp):
-		if s := t.W.Slot2(); s != "" {
+		if s := World.Slot2(); s != "" {
 			g.SetHoverLabel(itemLabel(g, s))
 		} else {
 			g.SetHoverLabel("empty tape slot")
@@ -57,45 +56,45 @@ func (t *TapeSlots) Tick(ctx *inkwell.UICtx) {
 	if slot2 && sel != "" {
 		g.Inventory.Select("")
 		if IsTapeItem(sel) {
-			t.W.SetPending(sel)
-			t.W.Do(inkwell.RunScript(ScriptTapeInsert))
+			World.SetPending(sel)
+			World.Do(inkwell.RunScript(ScriptTapeInsert))
 			return
 		}
-		t.W.Do(TapeSay(Dex, "That isn't a tape, Paul. That's an object. There is a difference."))
+		World.Do(TapeSay(Dex, "That isn't a tape, Paul. That's an object. There is a difference."))
 		return
 	}
 	if !slot2 && sel != "" {
 		g.Inventory.Select("")
-		t.W.Do(TapeSay(Dex, "The first slot is mine. I'm not moving."))
+		World.Do(TapeSay(Dex, "The first slot is mine. I'm not moving."))
 		return
 	}
 
 	switch g.SelectedVerb() {
 	case "talk":
 		if !slot2 {
-			t.W.Do(Paused(t.W, inkwell.RunDialogue(DlgDex)))
+			World.Do(Paused(inkwell.RunDialogue(DlgDex)))
 			return
 		}
-		if s := t.W.Slot2(); s != "" {
-			t.W.Do(Paused(t.W, inkwell.RunDialogue(TapeDialogue(s))))
+		if s := World.Slot2(); s != "" {
+			World.Do(Paused(inkwell.RunDialogue(TapeDialogue(s))))
 			return
 		}
-		t.W.Do(TapeSay(Dex, "Empty. Nobody to talk to."))
+		World.Do(TapeSay(Dex, "Empty. Nobody to talk to."))
 	default:
 		if !slot2 {
-			t.W.Do(TapeSay(Dex, "Me. Four kilobytes of a dead man. Be grateful."))
+			World.Do(TapeSay(Dex, "Me. Four kilobytes of a dead man. Be grateful."))
 			return
 		}
-		if s := t.W.Slot2(); s != "" {
-			t.W.Do(TapeSay(Dex, "That is the second slot. Be careful what you let in."))
+		if s := World.Slot2(); s != "" {
+			World.Do(TapeSay(Dex, "That is the second slot. Be careful what you let in."))
 			return
 		}
-		t.W.Do(TapeSay(Dex, "The second slot is empty. That's the rarer state."))
+		World.Do(TapeSay(Dex, "The second slot is empty. That's the rarer state."))
 	}
 }
 
-func (t *TapeSlots) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
-	if !t.W.HUDVisible() {
+func (t *tapeSlots) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
+	if !World.HUDVisible() {
 		return
 	}
 	g := ctx.Game
@@ -116,7 +115,7 @@ func (t *TapeSlots) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	}
 
 	drawSlot(r1, "SLOT 1", TapeDisplayName(Dex), true)
-	if s := t.W.Slot2(); s != "" {
+	if s := World.Slot2(); s != "" {
 		drawSlot(r2, "SLOT 2", itemLabel(g, s), true)
 	} else {
 		drawSlot(r2, "SLOT 2", "empty", false)

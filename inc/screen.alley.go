@@ -4,19 +4,19 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func screenAlley() screen {
-	return screen{
-		name:       ScreenAlley,
-		title:      "ALLEY — BEHIND NOODLE'S HOUSE",
-		background: BgAlley,
-		exits: []exit{
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenAlley,
+		Title:      "ALLEY — BEHIND NOODLE'S HOUSE",
+		Background: BgAlley,
+		Exits: []exit{
 			{
 				to:    ScreenNoodleHouse,
 				label: "back out to the street",
 				side:  sideLeft,
 			},
 		},
-		actors: []inkwell.SceneActor{
+		Actors: []inkwell.SceneActor{
 			{
 				CharacterName: Paul,
 				At: inkwell.Point{
@@ -25,9 +25,9 @@ func screenAlley() screen {
 				},
 			},
 		},
-		onEnter:  setVarIfEmpty(VarArmillaStrip, "SRP: 1 tape"),
-		hotspots: []inkwell.Hotspot{hidingPlace(), backDoor(), bin(), fireEscape()},
-	}
+		OnEnter:  setVarIfEmpty(VarArmillaStrip, "SRP: 1 tape"),
+		Hotspots: []inkwell.Hotspot{hidingPlace(), backDoor(), bin(), fireEscape()},
+	})
 }
 
 func hidingPlace() inkwell.Hotspot {

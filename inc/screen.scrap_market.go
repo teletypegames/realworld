@@ -1,10 +1,10 @@
 package inc
 
-func screenScrapMarket() screen {
-	return screen{
-		name:       ScreenScrapMarket,
-		title:      "SCRAP MARKET",
-		background: BgScrapMarket,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenScrapMarket,
+		Title:      "SCRAP MARKET",
+		Background: BgScrapMarket,
+		OnSelector: true,
+	})
 }

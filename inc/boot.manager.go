@@ -18,21 +18,21 @@ func New(o Opts) *inkwell.Game {
 	g := inkwell.NewGame("Real World", ScreenW, ScreenH)
 	g.MaxLogLines = 64
 
-	w := newWorld(g)
-	registerTheme(g)
-	registerContent(w)
+	World.attach(g)
+	registerTheme()
+	registerContent()
 
 	g.UseTheme(RealWorld)
-	registerUI(w)
+	registerUI()
 
 	g.StartAt(start)
-	g.OnStart(inkwell.Seq(bootOpening(w, start, o.Finale)...))
+	g.OnStart(inkwell.Seq(bootOpening(start, o.Finale)...))
 	return g
 }
 
-func bootOpening(w *World, start string, finale bool) []inkwell.Action {
+func bootOpening(start string, finale bool) []inkwell.Action {
 	acts := []inkwell.Action{
-		EnterScene(w, start),
+		EnterScene(start),
 		inkwell.SetFlag(FlagPoliceTip),
 		inkwell.Say(Paul, "Back alley. Just like the clerk said."),
 		TapeSay(Dex, "A government office tipped you off to remove something from a scene. That doesn't strike you as odd?"),

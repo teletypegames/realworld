@@ -1,10 +1,10 @@
 package inc
 
-func screenServerFarm() screen {
-	return screen{
-		name:       ScreenServerFarm,
-		title:      "SERVER FARM",
-		background: BgServerFarm,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenServerFarm,
+		Title:      "SERVER FARM",
+		Background: BgServerFarm,
+		OnSelector: true,
+	})
 }

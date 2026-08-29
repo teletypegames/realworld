@@ -5,13 +5,13 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func (w *World) Do(a inkwell.Action) {
+func (w *world) Do(a inkwell.Action) {
 	if a != nil {
 		w.queue = append(w.queue, a)
 	}
 }
 
-func (w *World) PumpTick(dt float64) {
+func (w *world) PumpTick(dt float64) {
 
 	if w.top != nil {
 		title := w.sceneTitle()
@@ -40,7 +40,7 @@ func (w *World) PumpTick(dt float64) {
 	}
 }
 
-func (w *World) sceneTitle() string {
+func (w *world) sceneTitle() string {
 	s, ok := w.G.SceneManager.Get(w.scene)
 	if !ok {
 		return ""
@@ -51,14 +51,13 @@ func (w *World) sceneTitle() string {
 	return s.Name
 }
 
-type ActionPump struct {
+type actionPump struct {
 	Name string
-	W    *World
 }
 
-func (p *ActionPump) GetName() string                            { return p.Name }
-func (p *ActionPump) Tick(ctx *inkwell.UICtx)                    { p.W.PumpTick(ctx.DT) }
-func (p *ActionPump) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
+func (p *actionPump) GetName() string                            { return p.Name }
+func (p *actionPump) Tick(ctx *inkwell.UICtx)                    { World.PumpTick(ctx.DT) }
+func (p *actionPump) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
 
 type fnAction struct{ fn func(*inkwell.Ctx) }
 
@@ -85,25 +84,25 @@ func UseTheme(name string) inkwell.Action {
 	return Fn(func(ctx *inkwell.Ctx) { ctx.Game.UseTheme(name) })
 }
 
-func SetMode(w *World, m Mode) inkwell.Action {
-	return Fn(func(*inkwell.Ctx) { w.SetMode(m) })
+func SetMode(m Mode) inkwell.Action {
+	return Fn(func(*inkwell.Ctx) { World.SetMode(m) })
 }
 
-func EnterScene(w *World, name string) inkwell.Action {
+func EnterScene(name string) inkwell.Action {
 	return Fn(func(*inkwell.Ctx) {
-		if name != w.scene {
-			w.prev = w.scene
+		if name != World.scene {
+			World.prev = World.scene
 		}
-		w.scene = name
+		World.scene = name
 	})
 }
 
-func Back(w *World) inkwell.Action {
+func Back() inkwell.Action {
 	return Fn(func(ctx *inkwell.Ctx) {
-		if w.prev == "" {
+		if World.prev == "" {
 			return
 		}
-		inkwell.GoTo(w.prev).Start().Tick(ctx)
+		inkwell.GoTo(World.prev).Start().Tick(ctx)
 	})
 }
 
@@ -143,14 +142,14 @@ func (r *tapeSayRunner) Tick(ctx *inkwell.Ctx) inkwell.Status {
 	return inkwell.StatusRunning
 }
 
-func TapeOffer(w *World, line inkwell.Action) inkwell.Action {
+func TapeOffer(line inkwell.Action) inkwell.Action {
 	return Fn(func(*inkwell.Ctx) {
-		w.tapeLine = line
-		w.tapeWaiting = true
+		World.tapeLine = line
+		World.tapeWaiting = true
 	})
 }
 
-func (w *World) TakeTapeOffer() {
+func (w *world) TakeTapeOffer() {
 	if !w.tapeWaiting {
 		return
 	}
@@ -160,15 +159,13 @@ func (w *World) TakeTapeOffer() {
 	w.Do(line)
 }
 
-func Paused(w *World, inner inkwell.Action) inkwell.Action {
+func Paused(inner inkwell.Action) inkwell.Action {
 	return &pausedAction{
-		w:     w,
 		inner: inner,
 	}
 }
 
 type pausedAction struct {
-	w     *World
 	inner inkwell.Action
 }
 
@@ -188,11 +185,11 @@ type pausedRunner struct {
 func (r *pausedRunner) Tick(ctx *inkwell.Ctx) inkwell.Status {
 	if !r.started {
 		r.started = true
-		r.spec.w.paused = true
+		World.paused = true
 	}
 	s := r.inner.Tick(ctx)
 	if s != inkwell.StatusRunning {
-		r.spec.w.paused = false
+		World.paused = false
 	}
 	return s
 }

@@ -1,10 +1,10 @@
 package inc
 
-func screenStreet() screen {
-	return screen{
-		name:       ScreenStreet,
-		title:      "STREET",
-		background: BgStreet,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenStreet,
+		Title:      "STREET",
+		Background: BgStreet,
+		OnSelector: true,
+	})
 }

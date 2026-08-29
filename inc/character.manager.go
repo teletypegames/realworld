@@ -4,13 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func registerCharacter(w *World) {
-	for _, c := range []inkwell.Character{
-		characterPaul(),
-		characterDex(),
-		characterMysteryTape(),
-		characterSupportTape(),
-	} {
-		w.G.CharacterManager.Register(c)
-	}
-}
+type Character = inkwell.Character
+
+var CharacterManager = NewManager(func(entity Character) string { return entity.Name })

@@ -12,7 +12,7 @@ const (
 	ModeMenu     Mode = "menu"
 )
 
-type World struct {
+type world struct {
 	G *inkwell.Game
 
 	mode Mode
@@ -29,42 +29,51 @@ type World struct {
 	tapeLine    inkwell.Action
 }
 
-func newWorld(g *inkwell.Game) *World {
-	return &World{
-		G:    g,
-		mode: ModePlay,
-	}
+var World = &world{}
+
+func (w *world) attach(g *inkwell.Game) {
+	w.G = g
+	w.mode = ModePlay
+	w.scene = ""
+	w.prev = ""
+	w.paused = false
+	w.pending = ""
+	w.queue = nil
+	w.running = nil
+	w.top = nil
+	w.tapeWaiting = false
+	w.tapeLine = nil
 }
 
-func (w *World) Mode() Mode { return w.mode }
+func (w *world) Mode() Mode { return w.mode }
 
-func (w *World) SetMode(m Mode) { w.mode = m }
+func (w *world) SetMode(m Mode) { w.mode = m }
 
-func (w *World) HUDVisible() bool { return w.mode == ModePlay }
+func (w *world) HUDVisible() bool { return w.mode == ModePlay }
 
-func (w *World) Scene() string { return w.scene }
+func (w *world) Scene() string { return w.scene }
 
-func (w *World) Previous() string { return w.prev }
+func (w *world) Previous() string { return w.prev }
 
-func (w *World) Paused() bool { return w.paused }
+func (w *world) Paused() bool { return w.paused }
 
-func (w *World) SetTopBar(t *inkwell.TopBar) { w.top = t }
+func (w *world) SetTopBar(t *inkwell.TopBar) { w.top = t }
 
-func (w *World) Slot2() string {
+func (w *world) Slot2() string {
 	if v, ok := w.G.State.Var(VarSlot2).(string); ok {
 		return v
 	}
 	return ""
 }
 
-func (w *World) SetSlot2(item string) { w.G.State.SetVar(VarSlot2, item) }
+func (w *world) SetSlot2(item string) { w.G.State.SetVar(VarSlot2, item) }
 
-func (w *World) SetPending(item string) { w.pending = item }
+func (w *world) SetPending(item string) { w.pending = item }
 
-func (w *World) TakePending() string {
+func (w *world) TakePending() string {
 	item := w.pending
 	w.pending = ""
 	return item
 }
 
-func (w *World) TapeWaiting() bool { return w.tapeWaiting }
+func (w *world) TapeWaiting() bool { return w.tapeWaiting }

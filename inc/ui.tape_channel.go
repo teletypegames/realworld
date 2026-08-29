@@ -8,22 +8,21 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-type TapeChannel struct {
+type tapeChannel struct {
 	Name   string
-	W      *World
 	Bounds inkwell.Rectangle
 }
 
-func (t *TapeChannel) GetName() string { return t.Name }
+func (t *tapeChannel) GetName() string { return t.Name }
 
-func (t *TapeChannel) Tick(ctx *inkwell.UICtx) {}
+func (t *tapeChannel) Tick(ctx *inkwell.UICtx) {}
 
-func (t *TapeChannel) BlocksClickAt(p inkwell.Point) bool {
-	return t.W.HUDVisible() && t.Bounds.Contains(p)
+func (t *tapeChannel) BlocksClickAt(p inkwell.Point) bool {
+	return World.HUDVisible() && t.Bounds.Contains(p)
 }
 
-func (t *TapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
-	if !t.W.HUDVisible() {
+func (t *tapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
+	if !World.HUDVisible() {
 		return
 	}
 	g := ctx.Game
@@ -84,7 +83,7 @@ func (t *TapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	}
 }
 
-func (t *TapeChannel) lastSpeaker(g *inkwell.Game, th inkwell.Theme) (string, color.Color) {
+func (t *tapeChannel) lastSpeaker(g *inkwell.Game, th inkwell.Theme) (string, color.Color) {
 	msgs := g.Messages()
 	for i := len(msgs) - 1; i >= 0; i-- {
 		m := msgs[i]

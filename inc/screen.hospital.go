@@ -1,10 +1,10 @@
 package inc
 
-func screenHospital() screen {
-	return screen{
-		name:       ScreenHospital,
-		title:      "HOSPITAL — PSYCHIATRIC WING",
-		background: BgHospital,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenHospital,
+		Title:      "HOSPITAL — PSYCHIATRIC WING",
+		Background: BgHospital,
+		OnSelector: true,
+	})
 }

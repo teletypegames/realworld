@@ -1,10 +1,10 @@
 package inc
 
-func screenBvkBranch() screen {
-	return screen{
-		name:       ScreenBVKBranch,
-		title:      "BVK — SAN FRANCISCO BRANCH",
-		background: BgBVKBranch,
-		onSelector: true,
-	}
+func init() {
+	ScreenManager.Register(Screen{
+		Name:       ScreenBVKBranch,
+		Title:      "BVK — SAN FRANCISCO BRANCH",
+		Background: BgBVKBranch,
+		OnSelector: true,
+	})
 }

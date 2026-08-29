@@ -4,10 +4,10 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func backgroundServerFarm() inkwell.Asset {
-	return inkwell.Asset{
+func init() {
+	BackgroundManager.Register(Background{
 		Name: BgServerFarm,
 		Path: "assets/bg/server_farm.png",
 		Kind: inkwell.AssetImage,
-	}
+	})
 }

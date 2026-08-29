@@ -4,8 +4,8 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func dialogDexTalk() inkwell.Dialogue {
-	return inkwell.Dialogue{
+func init() {
+	DialogManager.Register(Dialog{
 		Name:  DlgDex,
 		Start: "root",
 		Nodes: []inkwell.DialogueNode{{
@@ -52,5 +52,5 @@ func dialogDexTalk() inkwell.Dialogue {
 				},
 			},
 		}},
-	}
+	})
 }

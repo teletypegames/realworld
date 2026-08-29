@@ -7,26 +7,25 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-type Letterbox struct {
+type letterbox struct {
 	Name string
-	W    *World
 	Bar  float64
 }
 
-func (l *Letterbox) GetName() string { return l.Name }
+func (l *letterbox) GetName() string { return l.Name }
 
-func (l *Letterbox) Tick(ctx *inkwell.UICtx) {
-	if l.W.Mode() != ModeCutscene || !l.W.TapeWaiting() {
+func (l *letterbox) Tick(ctx *inkwell.UICtx) {
+	if World.Mode() != ModeCutscene || !World.TapeWaiting() {
 		return
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		l.W.TakeTapeOffer()
+		World.TakeTapeOffer()
 	}
 }
 
-func (l *Letterbox) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
-	if l.W.Mode() != ModeCutscene {
+func (l *letterbox) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
+	if World.Mode() != ModeCutscene {
 		return
 	}
 	g := ctx.Game
@@ -40,7 +39,7 @@ func (l *Letterbox) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	vector.DrawFilledRect(dst, 0, 0, w, float32(bar), black, false)
 	vector.DrawFilledRect(dst, 0, h-float32(bar), w, float32(bar), black, false)
 
-	if l.W.TapeWaiting() {
+	if World.TapeWaiting() {
 		msg := "SPACE — " + TapeDisplayName(Dex) + " has something to say"
 		drawTextC(dst, msg, g.Width-textW(msg)-4, g.Height-int(bar)+4, th.ChatLogResponse)
 	}

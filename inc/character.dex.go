@@ -1,12 +1,8 @@
 package inc
 
-import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-)
-
-func characterDex() inkwell.Character {
-	return inkwell.Character{
+func init() {
+	CharacterManager.Register(Character{
 		Name:        Dex,
 		SpeechColor: Amber,
-	}
+	})
 }
