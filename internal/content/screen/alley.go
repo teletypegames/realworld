@@ -1,4 +1,4 @@
-package scene
+package screen
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
@@ -7,33 +7,28 @@ import (
 	"git.teletypegames.org/games/realworld/internal/world"
 )
 
-// alley is the alley behind Noodle's house — beat 3, and the vertical slice
-// the whole HUD is measured against: hotspots, a gated pickup, the two-slot
+// alley is the alley behind Noodle's house — beat 3, and the vertical slice the
+// whole HUD is measured against: hotspots, a gated pickup, the two-slot
 // Armilla, tape dialogue and an authored failure.
-func alley(w *world.World) inkwell.Scene {
-	return inkwell.Scene{
-		Name:       names.SceneAlley,
-		Title:      "ALLEY — BEHIND NOODLE'S HOUSE",
-		Background: names.AssetAlleyBG,
-		Actors: []inkwell.SceneActor{
+//
+// The wiki keeps it in the same catalogue row as the house ("Noodle háza & a
+// sikátor") and its graph has one arrow in, NoodleUtcafront → Sikátor, so the
+// only way out is back to the street. The alley's own locked back door is the
+// New Game+ hook and leads to a room the deck has not painted.
+func alley() screen {
+	return screen{
+		name:       names.ScreenAlley,
+		title:      "ALLEY — BEHIND NOODLE'S HOUSE",
+		background: names.BgAlley,
+		exits: []exit{
+			// On the left: the back door hotspot below owns the other end.
+			{to: names.ScreenNoodleHouse, label: "back out to the street", side: sideLeft},
+		},
+		actors: []inkwell.SceneActor{
 			{CharacterName: names.Paul, At: inkwell.Point{X: 120, Y: 232}},
 		},
-		Walkboxes: []inkwell.Polygon{
-			inkwell.Poly(
-				inkwell.Point{X: 16, Y: 196}, inkwell.Point{X: 624, Y: 196},
-				inkwell.Point{X: 624, Y: 258}, inkwell.Point{X: 16, Y: 258},
-			),
-		},
-		OnEnter: inkwell.Seq(
-			world.EnterScene(w, names.SceneAlley),
-			setVarIfEmpty(names.VarArmillaStrip, "SRP: 1 tape"),
-		),
-		Hotspots: []inkwell.Hotspot{
-			hidingPlace(),
-			backDoor(),
-			bin(),
-			fireEscape(),
-		},
+		onEnter:  setVarIfEmpty(names.VarArmillaStrip, "SRP: 1 tape"),
+		hotspots: []inkwell.Hotspot{hidingPlace(), backDoor(), bin(), fireEscape()},
 	}
 }
 

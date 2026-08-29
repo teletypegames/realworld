@@ -104,7 +104,27 @@ func SetMode(w *World, m Mode) inkwell.Action {
 // EnterScene tells the domain which scene we are in. inkwell exposes no
 // CurrentScene accessor, and the pump needs Ctx.Scene.
 func EnterScene(w *World, name string) inkwell.Action {
-	return Fn(func(*inkwell.Ctx) { w.scene = name })
+	return Fn(func(*inkwell.Ctx) {
+		if name != w.scene {
+			w.prev = w.scene
+		}
+		w.scene = name
+	})
+}
+
+// Back returns to the screen we came from.
+//
+// Most exits name their destination, because a door leads where it leads. A
+// screen that is reached from several different rooms cannot: the BBS terminal
+// is the same terminal whether you walked to it from the club, from Norman's
+// flat or from the roof, so its way out is "back", not a place.
+func Back(w *World) inkwell.Action {
+	return Fn(func(ctx *inkwell.Ctx) {
+		if w.prev == "" {
+			return
+		}
+		inkwell.GoTo(w.prev).Start().Tick(ctx)
+	})
 }
 
 // ----- TapeSay ----------------------------------------------------------

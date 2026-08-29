@@ -1,6 +1,10 @@
 package boot_test
 
 import (
+	"image/png"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	inkwell "git.teletypegames.org/engines/inkwell"
@@ -134,5 +138,123 @@ func TestWidgetOrder(t *testing.T) {
 	}
 	if n[len(n)-1] != "cursor" {
 		t.Errorf("cursor is not registered last: %v", n)
+	}
+}
+
+// Every screen needs a background, the drawn ones need the file to be where the
+// asset says it is, and the file has to be exactly screen-sized.
+//
+// The path check: a renamed or mistyped path shows up in the running game only
+// as an inkwell placeholder, which is exactly what a still-greyboxed screen
+// looks like — invisible as a bug.
+//
+// The size check: the engine scales a background over the WHOLE screen, so a
+// painting that is not ScreenW×ScreenH is silently squashed to fit. That is why
+// the screen is 640×380 in the first place; this keeps the two in step.
+func TestSceneBackgroundsResolve(t *testing.T) {
+	g := build(t)
+
+	// Not drawn yet: these render as placeholders on purpose. The alley is
+	// missing from the concept-art deck; the selector is the wiki's menu
+	// screen, which the deck does not cover at all.
+	undrawn := map[string]bool{names.BgAlley: true, names.BgSelector: true}
+
+	for _, n := range g.SceneManager.Names() {
+		s := g.SceneManager.MustGet(n)
+		a, ok := g.AssetManager.Get(s.Background)
+		if !ok {
+			t.Errorf("scene %q: unknown background %q", n, s.Background)
+			continue
+		}
+		if undrawn[a.Name] {
+			continue
+		}
+		f, err := os.Open(filepath.Join("..", "..", a.Path))
+		if err != nil {
+			t.Errorf("scene %q: background file missing: %v", n, err)
+			continue
+		}
+		cfg, err := png.DecodeConfig(f)
+		f.Close()
+		if err != nil {
+			t.Errorf("scene %q: unreadable background: %v", n, err)
+			continue
+		}
+		if cfg.Width != ui.ScreenW || cfg.Height != ui.ScreenH {
+			t.Errorf("scene %q: background is %d×%d, want %d×%d — it will be stretched",
+				n, cfg.Width, cfg.Height, ui.ScreenW, ui.ScreenH)
+		}
+	}
+}
+
+// exits reads the connection graph back out of the registered screens. The
+// exit hotspots are named "exit:<target>", which is what keeps the graph
+// machine-readable — see content/screen/exit.go.
+func exits(g *inkwell.Game, screen string) []string {
+	var out []string
+	for _, h := range g.SceneManager.MustGet(screen).Hotspots {
+		if to, ok := strings.CutPrefix(h.Name, "exit:"); ok && to != "back" {
+			out = append(out, to)
+		}
+	}
+	return out
+}
+
+// An exit that names a screen nobody registered is a dead end the player walks
+// into: the engine logs "changeScene: unknown" and nothing happens on screen.
+func TestExitsResolve(t *testing.T) {
+	g := build(t)
+	for _, n := range g.SceneManager.Names() {
+		for _, to := range exits(g, n) {
+			if !g.SceneManager.Has(to) {
+				t.Errorf("screen %q: exit to unknown screen %q", n, to)
+			}
+		}
+	}
+}
+
+// Every screen has to be walkable to from the start of the game, through the
+// exits alone — the arrow keys are a browsing tool, not the map. A screen that
+// only the arrow keys can reach is content no player would ever see.
+//
+// The walk starts at Paul's shop, where the letter arrives, and mostly runs
+// through the selector: that is what the wiki's location graph is centred on.
+func TestEveryScreenIsReachable(t *testing.T) {
+	g := build(t)
+
+	seen := map[string]bool{names.ScreenPaulShop: true}
+	queue := []string{names.ScreenPaulShop}
+	for len(queue) > 0 {
+		at := queue[0]
+		queue = queue[1:]
+		for _, to := range exits(g, at) {
+			if !seen[to] && g.SceneManager.Has(to) {
+				seen[to] = true
+				queue = append(queue, to)
+			}
+		}
+	}
+
+	for _, n := range g.SceneManager.Names() {
+		if !seen[n] {
+			t.Errorf("screen %q cannot be reached from %q by its exits", n, names.ScreenPaulShop)
+		}
+	}
+}
+
+// A screen with no way out at all is a trap: the player walks in and the only
+// way on is the debug walk.
+func TestEveryScreenHasAWayOut(t *testing.T) {
+	g := build(t)
+	for _, n := range g.SceneManager.Names() {
+		var ways int
+		for _, h := range g.SceneManager.MustGet(n).Hotspots {
+			if strings.HasPrefix(h.Name, "exit:") {
+				ways++
+			}
+		}
+		if ways == 0 {
+			t.Errorf("screen %q has no exit", n)
+		}
 	}
 }

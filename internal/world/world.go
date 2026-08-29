@@ -34,6 +34,7 @@ type World struct {
 	mode Mode
 
 	scene   string           // current scene — inkwell exposes no accessor for it
+	prev    string           // the one before it, for screens with no fixed way out
 	paused  bool             // is the world stopped (during dialogue), for the TopBar suffix
 	pending string           // the tape currently being loaded into slot 2
 	queue   []inkwell.Action // HUD-originated actions waiting to run
@@ -62,6 +63,9 @@ func (w *World) HUDVisible() bool { return w.mode == ModePlay }
 
 // Scene returns the name of the current scene.
 func (w *World) Scene() string { return w.scene }
+
+// Previous returns the screen we came from, empty at the start of the game.
+func (w *World) Previous() string { return w.prev }
 
 // Paused reports whether the world is stopped (during dialogue).
 func (w *World) Paused() bool { return w.paused }

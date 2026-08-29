@@ -7,26 +7,31 @@ package ui
 //	 0 │ ALLEY — paused                              SRP: 1 tape            │ TopBar (20)
 //	20 ├────────────────────────────────────────────────────────────────────┤
 //	   │                                                                    │
-//	   │            scene — hotspots, characters, SpeechBubble              │ Scene (244)
+//	   │            scene — hotspots, characters, SpeechBubble              │ Scene (242)
 //	   │                                                                    │
-//	264├─────────────────────────────────────────┬──────────────────────────┤
+//	262├─────────────────────────────────────────┬──────────────────────────┤
 //	   │ Use hook on: floor grate                │ DEX                      │
-//	   │ ┌───┬───┬───┬───┐   ┌───────┐┌────────┐ │ "The hook is a hand      │ HUD (135)
+//	   │ ┌───┬───┬───┬───┐   ┌───────┐┌────────┐ │ "The hook is a hand      │ HUD (118)
 //	   │ ├───┼───┼───┼───┤   │ 1 DEX ││ 2  —   │ │  shorter than the gap."  │
-//	   │ └───┴───┴───┴───┘   └───────┘└────────┘ │                          │
-//	399└─────────────────────────────────────────┴──────────────────────────┘
+//	379└─────────────────────────────────────────┴──────────────────────────┘
 //	     InventoryBar          TapeSlots           TapeChannel
 //
-// On the resolution: the wiki's art brief asks for a "320×200 VGA look", and
-// inkwell's widget defaults are authored for exactly that. We render at 640×400
-// — the same 16:10, exactly 2× the brief, so art drawn at 320×200 upscales
-// cleanly — because the engine's text is a fixed 6×16 debug font. At 320×200 a
-// 16px glyph is 8% of the screen height and nothing fits; at 640×400 it lands
-// at 4%, which is the proportion the design was drawn for.
+// On the resolution: the screen is exactly one painted background. inkwell
+// stretches a scene background over the WHOLE screen (core.engine.go), not over
+// the region left free by the HUD, so any screen size other than the art's own
+// squashes every painting — and the deck is drawn at 640×380
+// (games/realworld_screen_assets). Hence 640×380: the art lands pixel for
+// pixel, and the HUD is an opaque strip laid over its foot.
 //
-// Everything vertical is derived from LineH below rather than from the
-// wireframe deck's ratios, so the layout cannot drift out of step with the font
-// again.
+// That still satisfies what the wiki's "320×200 VGA look" brief was after — a
+// low, wide VGA frame at an exact 2× of a 320-wide canvas — and it still keeps
+// the engine's fixed 6×16 debug font readable: a 16px glyph is 4% of 380, the
+// proportion the design was drawn for. (At 320×190 it would be 8%, rows would
+// overlap and the top bar could not hold a line.)
+//
+// Everything vertical is derived from LineH and from ScreenH below, never from
+// the wireframe deck's ratios, so the layout cannot drift out of step with the
+// font — or with the art — again.
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
@@ -39,8 +44,11 @@ import (
 
 // Screen and layout, in internal (unscaled) pixels.
 const (
+	// The screen is the size of one painted background, because the engine
+	// scales a background to the full screen: at any other size the art is
+	// squashed. See the note above.
 	ScreenW = 640
-	ScreenH = 400
+	ScreenH = 380
 
 	// LineH is one text row: the glyph cell plus leading. Every text-bearing
 	// box is sized as a multiple of this, so rows can never overlap.
@@ -48,14 +56,21 @@ const (
 	Pad   = 6          // inner padding for every panel
 
 	TopBarH  = LineH + 2 // 20 — one row plus a hairline of breathing room
-	HUDTop   = 264       // the scene | HUD divider
 	DividerX = 394       // world | tape channel (61.6% of the width)
 
+	// The HUD strip is as short as its own contents allow, and is measured
+	// from the bottom of the screen — every pixel it takes is a pixel of the
+	// painting it covers. It has to hold the status row and, under it, the two
+	// rows of inventory slots (the tallest thing in the strip), padded above
+	// and below.
+	HUDH   = Pad + LineH + 4 + invSlot*2 + invGap + Pad // 118
+	HUDTop = ScreenH - HUDH                             // 262 — the scene | HUD divider
+
 	// Derived HUD rows.
-	statusY = HUDTop + Pad         // 270
-	slotsY  = HUDTop + Pad + LineH // 288
+	statusY = HUDTop + Pad         // 268
+	slotsY  = HUDTop + Pad + LineH // 286
 	slotsH  = LineH*2 + Pad*2      // 48 — two rows plus padding
-	invY    = slotsY + 4           // 292
+	invY    = slotsY + 4           // 290
 	invSlot = 40
 	invGap  = 4
 )
@@ -70,6 +85,7 @@ func Register(w *world.World) {
 	// it does, and it only ever catches clicks that land on the scene.
 	g.UIManager.Register(&UseWithGuard{Name: "usewith_guard", W: w})
 	g.UIManager.Register(&world.ActionPump{Name: "pump", W: w})
+	g.UIManager.Register(&screenNav{Name: "screen_nav", W: w})
 	g.UIManager.Register(&windowSizer{Name: "window", Scale: 2})
 	g.UIManager.Register(&inkwell.HotspotDebug{Name: "hotspot_debug"})
 
@@ -129,8 +145,8 @@ func Register(w *world.World) {
 
 // windowSizer resizes the window once, on the first frame.
 //
-// inkwell.Run hardcodes a 4× window (core.dsl.go), which at 640×400 would be
-// 2560×1600 — larger than most laptop screens. Run sets the size before
+// inkwell.Run hardcodes a 4× window (core.dsl.go), which at 640×380 would be
+// 2560×1520 — larger than most laptop screens. Run sets the size before
 // entering the loop, so the only place to override it is the first tick.
 type windowSizer struct {
 	Name  string

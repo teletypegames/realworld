@@ -23,10 +23,18 @@ go run .
 ```
 
 ```bash
-go run .                 # the alley scene (beat 3)
-go run . -finale         # the finale — try the Nokia-punk theme switch
-go run . -scene alley    # pick a starting scene
+go run .                   # the alley (beat 3)
+go run . -finale           # the finale — try the Nokia-punk theme switch
+go run . -screen selector  # the location selector: the map the city hangs off
+go run . -screen hospital  # any screen in the deck, e.g. to look at the art
 ```
+
+Screen names are the constants in `internal/names` (`selector`, `paul_shop`,
+`noodle_house`, `alley`, `norman_apartment`, `police_station`, `hackerspace`,
+`ice_cream_shop`, `trinket_shop`, `small_restaurant`, `secret_club`,
+`bbs_terminal`, `street`, `hospital`, `server_farm`, `secret_lab`,
+`rooftop_hideout`, `public_bbs`, `bvk_branch`, `curator_shop`, `scrap_market`,
+`samizdat_press`, `showroom`, `columbarium`).
 
 To work against a local inkwell checkout, add a `replace` line temporarily —
 and take it out before committing:
@@ -55,41 +63,58 @@ Release metadata lives in `metadata.json`.
 |---|---|
 | left click | run the selected verb |
 | right click | verb coin (Look / Use / Talk / Take) |
+| `←` `→` | previous / next screen, in concept-art order, wrapping |
 | `F1` | toggle hotspot outlines |
 | `SPACE` | during a cutscene: let the tape speak, if it offered |
+
+The screens are connected to each other (see **The map** below); the arrow keys
+are a reviewing tool on top of that, walking the deck in concept-art order. The
+walk is inert during a cutscene, a menu, or a stopped world, so it can never cut
+across an authored beat.
 
 Screenshots: `EBITEN_SCREENSHOT_KEY=q go run .`, then press `q` in the window.
 
 ## Layout
 
-Internal resolution is **640×400** — the same 16:10 as the wiki's "320×200 VGA
-look" brief and exactly 2× it, so art drawn at 320×200 upscales cleanly.
+Internal resolution is **640×380**: the size of one painted background.
 Integer scaling only; the window opens at 2×.
 
-The doubling is forced by type, not taste. inkwell renders text through a fixed
-**6×16** debug font that the domain cannot replace. At 320×200 a 16px glyph is
-8% of the screen height: rows overlap, and a top bar sized from the wireframe
-deck's proportions cannot hold a single line. At 640×400 the same glyph lands
-at 4%, which is the proportion the design was drawn for.
+That size is not a taste call. inkwell scales a scene background over the
+*whole* screen (`core.engine.go`), not over the region the HUD leaves free — so
+at any screen size other than the art's own, every painting is squashed to fit.
+The deck is drawn at 640×380, so the screen is 640×380 and the art lands pixel
+for pixel. `TestSceneBackgroundsResolve` keeps the two in step: a background of
+any other size fails the build.
+
+It still gives the wiki's "320×200 VGA look" brief what it was after — a low,
+wide VGA frame at an exact 2× of a 320-wide canvas — and it still keeps the
+engine's fixed **6×16** debug font readable, at 4% of the screen height. (At
+320×190 it would be 8%: rows overlap and the top bar cannot hold a line.)
+
+The HUD is therefore an opaque strip laid over the foot of the painting, and it
+is measured from the bottom and kept as short as its contents allow — a status
+row, then the two rows of inventory slots, which are the tallest thing in it.
+Every pixel it gives back is a pixel of art.
 
 ```
      0                                     394│396                    639
    ┌────────────────────────────────────────────────────────────────────┐
  0 │ ALLEY — paused                              SRP: 1 tape            │ TopBar (20)
 20 ├────────────────────────────────────────────────────────────────────┤
-   │            scene — hotspots, characters, SpeechBubble              │ Scene (244)
-264├─────────────────────────────────────────┬──────────────────────────┤
+   │            scene — hotspots, characters, SpeechBubble              │ Scene (242)
+262├─────────────────────────────────────────┬──────────────────────────┤
    │ Use hook on: floor grate                │ DEX                      │
-   │ ┌───┬───┬───┬───┐   ┌───────┐┌────────┐ │ "The hook is a hand      │ HUD (136)
+   │ ┌───┬───┬───┬───┐   ┌───────┐┌────────┐ │ "The hook is a hand      │ HUD (118)
    │ └───┴───┴───┴───┘   │ 1 DEX ││ 2  —   │ │  shorter than the gap."  │
-399└─────────────────────────────────────────┴──────────────────────────┘
+379└─────────────────────────────────────────┴──────────────────────────┘
      InventoryBar          TapeSlots           TapeChannel
 ```
 
-Every vertical measurement derives from `ui.LineH` (glyph cell + leading), not
-from the deck's ratios, so the layout cannot drift out of step with the font
-again — `TestLayoutFitsTheFont` guards it. The tape channel comes out at 5 rows
-of 38 columns, which is about two of Dex's remarks on screen at once.
+Every vertical measurement derives from `ui.LineH` (glyph cell + leading) and
+from `ui.ScreenH`, not from the wireframe deck's ratios, so the layout cannot
+drift out of step with the font — or with the art — again;
+`TestLayoutFitsTheFont` guards it. The tape channel comes out at 4 rows of 38
+columns, which is about one and a half of Dex's remarks on screen at once.
 
 The vertical divider at x=394 is the one proportion carried over from the
 wireframe deck: 61.6% world, 38.4% tape channel. The deck's *vertical*
@@ -149,16 +174,56 @@ Content is one registered entity per file, grouped by kind:
 
 ```
 internal/content/
-  asset/      alley_background.go
+  background/ one file per screen: paul_shop.go, noodle_house.go, …
   character/  paul.go  dex.go  mystery_tape.go  support_tape.go
   item/       noodle_letter.go  black_market_armilla.go  mystery_tape.go
   dialog/     dex_talk.go  mystery_tape_silent.go
   script/     tape_insert.go  awakening_finale.go
-  scene/      alley.go
+  screen/     one file per screen: alley.go, trinket_shop.go, … + exit.go
 ```
 
-Adding a scene means adding `scene/<name>.go` and one line in `scene/scene.go`.
-Nothing else moves.
+Adding a screen means adding `screen/<name>.go` and `background/<name>.go`, and
+one line in each package's list. Nothing else moves.
+
+**On the word "screen".** inkwell's entity is called a `Scene`, and that is the
+type every file in `screen/` returns — but the wiki, the concept-art deck and
+the beat tables all count *screens*, so the package, the files and the flag say
+screen. "Scene" survives only where the code is talking to the engine
+(`world.EnterScene`, `SceneManager`).
+
+Art lives in `assets/bg/` and is embedded into the binary (`main.go`), because
+js/wasm has no OS filesystem and `make binaries` packages the executable alone.
+
+## The map
+
+Where a screen leads is recorded **in that screen**, in its own file, and it
+comes from the wiki's location graph
+(`projects/realworld/story#helyszín-gráf-vázlat`). That graph has two kinds of
+edge and so does the code:
+
+- **Physical adjacency** — the alley is behind Noodle's house, the eating place
+  is next door to the trinket shop, the club is through its back room, the roof
+  is up Norman's stairs. Declared with `to:` in the screen's `exits`.
+- **The selector** — the wiki centres its map on a *Helyszínválasztó*, "nem
+  valódi helyszín, hanem a menü-képernyő": a screen every main location connects
+  to both ways. A screen marks itself `onSelector: true`; `screen/selector.go`
+  builds the other half of each of those edges, so the list of locations on the
+  map is never written down twice.
+
+The wiki's conditional arrows survive too: `needs:` holds the flag an exit waits
+for, which is how *Bolt →|beengedés| Klub* is expressed — the way into the club
+is visible and named from the first visit, and stays shut until the shopkeeper
+has been shown the underwater sun.
+
+Until the doors are measured on the paintings, an exit is a strip along one edge
+of the picture (`sideLeft`, `sideRight`, `sideBack`, `sideNear`) — the
+convention every 1990s point & click used, and one field to re-aim later. A
+screen reached from several rooms has no fixed way out: the BBS terminal is the
+same terminal from the club, the flat or the roof, so its exit is `back`.
+
+Three tests keep the map honest: every exit names a registered screen, every
+screen has a way out, and every screen can be walked to from Paul's shop through
+the exits alone — the arrow keys do not count.
 
 ## Engine workarounds
 
@@ -205,7 +270,19 @@ Also: the inkwell README gives the module path as
 
 ## Known gaps
 
-- **No art.** Everything is an inkwell placeholder.
+- **The HUD still covers the foot of every painting.** The art is no longer
+  stretched, but the strip is opaque and 118px of the 380 sit on top of the
+  picture. Either the deck gets recut so nothing that matters lives in its
+  bottom third, or the HUD gets a translucent panel treatment.
+- **The screens are empty.** 22 backgrounds are in and they are wired to each
+  other, but only the alley has hotspots, NPCs and dialogue; everywhere else
+  there is nothing to do but leave again.
+- **The selector has no art.** The wiki's Helyszínválasztó is the centre of the
+  map and the deck does not include it, so it renders as a placeholder with one
+  labelled pin per location on a plain grid.
+- **Two screens are missing from the deck.** The alley (the one authored beat)
+  and deck 05, Norman's workplace — which is in the wiki's catalogue but has no
+  screen file yet, so the workplace thread of the story has nowhere to happen.
 - **Spent dialogue choices are hidden, not struck through.** `DialogueChoice.Once`
   hides them; the deck wanted them struck through but visible, so the list
   becomes a memory of what you already tried. Needs a thin override over
