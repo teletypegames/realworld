@@ -7,7 +7,7 @@ import (
 
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"git.teletypegames.org/games/realworld/internal/boot"
+	"git.teletypegames.org/games/realworld/inc"
 )
 
 // The art ships inside the binary. js/wasm has no OS filesystem, so without
@@ -21,13 +21,13 @@ var assets embed.FS
 func init() { inkwell.AssetFS = assets }
 
 func main() {
-	var o boot.Opts
+	var o inc.Opts
 	flag.StringVar(&o.Screen, "screen", "", "starting screen (empty: the alley)")
 	flag.BoolVar(&o.Finale, "finale", false,
 		"start with the finale, to try the Nokia-punk theme switch")
 	flag.Parse()
 
-	if err := inkwell.Run(boot.New(o)); err != nil {
+	if err := inkwell.Run(inc.New(o)); err != nil {
 		log.Fatal(err)
 	}
 }

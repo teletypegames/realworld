@@ -29,7 +29,7 @@ go run . -screen selector  # the location selector: the map the city hangs off
 go run . -screen hospital  # any screen in the deck, e.g. to look at the art
 ```
 
-Screen names are the constants in `internal/names` (`selector`, `paul_shop`,
+Screen names are the constants in `names.manager.go` (`selector`, `paul_shop`,
 `noodle_house`, `alley`, `norman_apartment`, `police_station`, `hackerspace`,
 `ice_cream_shop`, `trinket_shop`, `small_restaurant`, `secret_club`,
 `bbs_terminal`, `street`, `hospital`, `server_farm`, `secret_lab`,
@@ -151,18 +151,24 @@ licence.
 
 ## Structure
 
+The game is one flat package, `inc`. There are no subdirectories: a file's
+name says where it belongs, in the form `[category].[name].go`. The category is
+always singular, and `[category].manager.go` is the file that ties that category
+together — its `register…`, its shared types, its list.
+
 ```
 main.go                  flags + inkwell.Run
-internal/names/          entity names and world-state keys
-internal/theme/          realworld-93 + nokia-punk
-internal/world/          unsaved runtime state, custom actions, action pump
-internal/ui/             HUD: layout, custom widgets, coloured text
-internal/content/        one file per registered entity, by kind
-internal/boot/           wiring
+inc/names.manager.go     entity names and world-state keys
+inc/theme.manager.go     realworld-93 + nokia-punk
+inc/world.*.go           unsaved runtime state, custom actions, action pump
+inc/ui.*.go              HUD: layout, custom widgets, coloured text
+inc/<kind>.<name>.go     one file per registered entity, by kind
+inc/boot.manager.go      wiring
 ```
 
-`world` deliberately knows nothing about the HUD or the content — both build on
-it, so the reverse would be a cycle:
+Nothing is enforced by the compiler any more, so the layering is a rule the
+code keeps by hand: the world knows nothing about the HUD or the content, and
+both build on it, never the other way round.
 
 ```
 names ← theme ← world ← ui
@@ -170,26 +176,30 @@ names ← theme ← world ← ui
                content ──┴── boot ← main
 ```
 
-Content is one registered entity per file, grouped by kind:
+Content is one registered entity per file, and the category prefix groups them
+the way directories used to:
 
 ```
-internal/content/
-  background/ one file per screen: paul_shop.go, noodle_house.go, …
-  character/  paul.go  dex.go  mystery_tape.go  support_tape.go
-  item/       noodle_letter.go  black_market_armilla.go  mystery_tape.go
-  dialog/     dex_talk.go  mystery_tape_silent.go
-  script/     tape_insert.go  awakening_finale.go
-  screen/     one file per screen: alley.go, trinket_shop.go, … + exit.go
+background.*.go  one file per screen: background.paul_shop.go, …
+character.*.go   character.paul.go  character.dex.go  character.mystery_tape.go
+item.*.go        item.noodle_letter.go  item.black_market_armilla.go  …
+dialog.*.go      dialog.dex_talk.go  dialog.mystery_tape_silent.go
+script.*.go      script.tape_insert.go  script.awakening_finale.go
+screen.*.go      one file per screen: screen.alley.go, … + screen.exit.go
 ```
 
-Adding a screen means adding `screen/<name>.go` and `background/<name>.go`, and
-one line in each package's list. Nothing else moves.
+Adding a screen means adding `screen.<name>.go` and `background.<name>.go`, and
+one line in each category's manager list. Nothing else moves.
+
+Since everything shares one namespace, an entity's constructor carries its
+category: `screenAlley()` is the screen, `backgroundAlley()` the painting behind
+it, `itemMysteryTape()` the prop and `characterMysteryTape()` the voice on it.
 
 **On the word "screen".** inkwell's entity is called a `Scene`, and that is the
-type every file in `screen/` returns — but the wiki, the concept-art deck and
-the beat tables all count *screens*, so the package, the files and the flag say
+type every `screen.*.go` file returns — but the wiki, the concept-art deck and
+the beat tables all count *screens*, so the category, the files and the flag say
 screen. "Scene" survives only where the code is talking to the engine
-(`world.EnterScene`, `SceneManager`).
+(`EnterScene`, `SceneManager`).
 
 Art lives in `assets/bg/` and is embedded into the binary (`main.go`), because
 js/wasm has no OS filesystem and `make binaries` packages the executable alone.
@@ -234,13 +244,13 @@ for a small engine change.
 1. **`drawText` discards colour.** In `asset.text.go` the colour argument is
    `_ = c` and rendering goes through `ebitenutil.DebugPrintAt`, which only
    draws white. Every text colour in `Theme` is therefore inert. *Workaround:*
-   `ui/text.go` renders onto a scratch image and blits it tinted with
+   `ui.text.go` renders onto a scratch image and blits it tinted with
    `ColorScale`. The custom widgets colour correctly; the built-ins
    (`StatusLine`, `DialogBox`, `TopBar`, `InventoryBar`) are still white.
    *Fix:* move `drawText` to `text/v2` — no call site would change.
 
 2. **`queueAction` is unexported**, so a domain widget cannot start an action.
-   *Workaround:* the pump in `world/action.go` drives its own `Runner` through
+   *Workaround:* the pump in `world.action.go` drives its own `Runner` through
    the exported `inkwell.Ctx`. *Caveat:* it runs alongside the engine's script
    runner, not instead of it.
 
@@ -251,7 +261,7 @@ for a small engine change.
    character instead, escalating on repeats.
 
 4. **No exported `CurrentScene()`**, but the pump needs `Ctx.Scene`.
-   *Workaround:* `world.EnterScene` is the first step of every scene's
+   *Workaround:* `EnterScene` is the first step of every scene's
    `OnEnter`; the domain tracks it.
 
 5. **Widgets have no `Visible` field and the `Manager` cannot unregister**, so
