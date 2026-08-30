@@ -8,7 +8,7 @@ import (
 
 type Theme = inkwell.Theme
 
-var ThemeManager = NewManager(func(entity Theme) string { return entity.Name })
+var ThemeManager = inkwell.NewManager[Theme]()
 
 const (
 	RealWorld = "realworld-93"
@@ -34,5 +34,5 @@ func RGBA(hex uint32, a uint8) color.Color {
 }
 
 func registerTheme() {
-	registerAll(ThemeManager, World.G.ThemeManager.Register)
+	ThemeManager.Each(World.G.ThemeManager.Register)
 }

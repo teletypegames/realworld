@@ -58,8 +58,6 @@ file's name carries the structure, in the form `[category].[name].go`.
 
 ```
 main.go                    flags + inkwell.Run
-inc/manager.manager.go     Manager[T]: the generic registry every category uses
-inc/manager.interface.go   ManagerInterface and the compile-time assertions
 inc/boot.manager.go        wiring; New(Opts) builds the game
 inc/names.manager.go       entity names and world-state keys
 inc/theme.manager.go       the theme manager and the colour helpers
@@ -80,43 +78,30 @@ inc/scene.selector.go      the map screen: its pins are derived from the graph
 inc/scene.*.go             one file per scene
 ```
 
-`manager` is the one category with no entities of its own: it holds the registry
-every other category is built from.
-
 ## Managers
 
 Every category that owns a collection of entities has a manager, and they are
-all the same generic type — `Manager[T]` in `manager.manager.go`. It keeps one
-slice in registration order and one `map[string]int` beside it, so `GetByName`
-is a map lookup, not a scan.
+all the engine's own `inkwell.Manager[T]` — the same registry type the `*Game`
+hangs its content off. The game defines no registry of its own.
 
-Since the entity types are aliases of engine structs, no method can be attached
-to them; the manager is told how to read a name instead, which is all it needs:
+The entity types are aliases of engine structs, so they already carry
+`GetName()` and satisfy `inkwell.Named`; the manager needs nothing else:
 
 ```go
 type Character = inkwell.Character
 
-var CharacterManager = NewManager(func(entity Character) string { return entity.Name })
+var CharacterManager = inkwell.NewManager[Character]()
 ```
 
 That is the whole of a category's manager file — an alias and one line. There
 are seven managers: `BackgroundManager`, `CharacterManager`, `DialogManager`,
 `ItemManager`, `ScriptManager`, `SceneManager`, `ThemeManager`.
 
-`manager.interface.go` holds the contract they all keep, and asserts each one
-against it. A new manager goes on that list.
-
-```go
-type ManagerInterface[T any] interface {
-	Register(entity T)
-	GetByName(name string) (T, bool)
-	GetAll() []T
-}
-```
-
-`Register` replaces by name and keeps the entity's position, so registering
-twice is an update, never a duplicate. `GetAll` returns the slice itself, in
-registration order.
+The methods the game uses are `Register`, `Set`, `Get`, `All` and `Each`.
+`Register` panics on a duplicate name — a second registration is a
+construction-time bug, not an update — so rewriting an entity that is already
+in the registry goes through `Set`, which keeps its position in the order.
+`All` and `Each` both hand back the entities in registration order.
 
 Every entity type is an alias, `Scene` included. It was once a struct of our
 own, because inkwell's `Scene` could not carry exits; that gap was closed in the
@@ -150,16 +135,16 @@ which is simply the order the files sit in.
 
 ### Handing a category to the engine
 
-Once the game exists, `registerAll` walks a manager and gives every entity to
-the engine's own manager. `registerContent` is the whole of it:
+Once the game exists, `Each` walks a manager and gives every entity to the
+engine's own manager. `registerContent` is the whole of it:
 
 ```go
 func registerContent() {
-	registerAll(BackgroundManager, World.G.AssetManager.Register)
-	registerAll(CharacterManager, World.G.CharacterManager.Register)
-	registerAll(ItemManager, World.G.ItemManager.Register)
-	registerAll(DialogManager, World.G.DialogueManager.Register)
-	registerAll(ScriptManager, World.G.ScriptManager.Register)
+	BackgroundManager.Each(World.G.AssetManager.Register)
+	CharacterManager.Each(World.G.CharacterManager.Register)
+	ItemManager.Each(World.G.ItemManager.Register)
+	DialogManager.Each(World.G.DialogueManager.Register)
+	ScriptManager.Each(World.G.ScriptManager.Register)
 	registerScene()
 }
 ```

@@ -23,12 +23,12 @@ func init() {
 }
 
 func fillSelectorPins() {
-	selector, ok := SceneManager.GetByName(SceneSelector)
+	selector, ok := SceneManager.Get(SceneSelector)
 	if !ok {
 		return
 	}
 	var exits []inkwell.Exit
-	for _, entity := range SceneManager.GetAll() {
+	for _, entity := range SceneManager.All() {
 		if !leadsToSelector(entity) {
 			continue
 		}
@@ -39,7 +39,7 @@ func fillSelectorPins() {
 		})
 	}
 	selector.Exits = exits
-	SceneManager.Register(selector)
+	SceneManager.Set(selector)
 }
 
 func leadsToSelector(s Scene) bool {

@@ -6,4 +6,4 @@ import (
 
 type Background = inkwell.Asset
 
-var BackgroundManager = NewManager(func(entity Background) string { return entity.Name })
+var BackgroundManager = inkwell.NewManager[Background]()

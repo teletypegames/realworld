@@ -6,4 +6,4 @@ import (
 
 type Script = inkwell.Script
 
-var ScriptManager = NewManager(func(entity Script) string { return entity.Name })
+var ScriptManager = inkwell.NewManager[Script]()

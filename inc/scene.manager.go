@@ -6,11 +6,11 @@ import (
 
 type Scene = inkwell.Scene
 
-var SceneManager = NewManager(func(entity Scene) string { return entity.Name })
+var SceneManager = inkwell.NewManager[Scene]()
 
 func registerScene() {
 	fillSelectorPins()
-	registerAll(SceneManager, func(entity Scene) {
+	SceneManager.Each(func(entity Scene) {
 		World.G.SceneManager.Register(sceneDefaults(entity))
 	})
 }

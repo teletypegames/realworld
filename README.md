@@ -157,8 +157,6 @@ together — its manager, its shared types, its hand-off to the engine.
 
 ```
 main.go                    flags + inkwell.Run
-inc/manager.manager.go     Manager[T], the generic registry
-inc/manager.interface.go   ManagerInterface, the contract every manager keeps
 inc/names.manager.go       entity names and world-state keys
 inc/theme.*.go             realworld-93 + nokia-punk
 inc/world.*.go             unsaved runtime state, custom actions, action pump
@@ -192,27 +190,17 @@ scene.*.go       one file per scene: scene.alley.go, … + scene.selector.go
 Adding a scene means adding `scene.<name>.go` and `background.<name>.go`.
 Nothing else moves.
 
-Every category owns a manager, and they are all the same generic type,
-`Manager[T]` — one slice in registration order, one `map[string]int` beside it,
-so a lookup by name is a map hit rather than a scan. The entity types are
-aliases of engine structs and cannot carry methods, so the manager is handed a
-function that reads the name instead. A category's manager file is an alias and
-one line:
+Every category owns a manager, and they are all the engine's own
+`inkwell.Manager[T]` — the same registry the `*Game` hangs its content off, kept
+in registration order and addressed by name. There is no second registry type
+here: the entity types are aliases of engine structs, so they already satisfy
+`inkwell.Named` and need no help reading their own name. A category's manager
+file is an alias and one line:
 
 ```go
 type Character = inkwell.Character
 
-var CharacterManager = NewManager(func(entity Character) string { return entity.Name })
-```
-
-They all keep the same contract, asserted in `manager.interface.go`:
-
-```go
-type ManagerInterface[T any] interface {
-	Register(entity T)
-	GetByName(name string) (T, bool)
-	GetAll() []T
-}
+var CharacterManager = inkwell.NewManager[Character]()
 ```
 
 An entity file is a literal that hands itself over in an `init()`:
@@ -235,9 +223,9 @@ step with the files by hand, and the deck is a thing to look at, not a thing to
 play through.
 
 The game's own catalogue is readable without going through the engine:
-`SceneManager.GetByName("alley")` answers before a single scene has been handed
-over. `registerContent` is where the hand-off happens, one `registerAll` call
-per category.
+`SceneManager.Get("alley")` answers before a single scene has been handed over.
+`registerContent` is where the hand-off happens, one `Each` call per category —
+the game's manager iterated straight into the engine manager's `Register`.
 
 There is one world, and it is a package-level singleton: `World`. Nothing takes
 a `*world` parameter and no widget holds a back-reference, which is what lets a

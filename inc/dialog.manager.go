@@ -6,4 +6,4 @@ import (
 
 type Dialog = inkwell.Dialogue
 
-var DialogManager = NewManager(func(entity Dialog) string { return entity.Name })
+var DialogManager = inkwell.NewManager[Dialog]()

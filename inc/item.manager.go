@@ -6,4 +6,4 @@ import (
 
 type Item = inkwell.Item
 
-var ItemManager = NewManager(func(entity Item) string { return entity.Name })
+var ItemManager = inkwell.NewManager[Item]()

@@ -6,4 +6,4 @@ import (
 
 type Character = inkwell.Character
 
-var CharacterManager = NewManager(func(entity Character) string { return entity.Name })
+var CharacterManager = inkwell.NewManager[Character]()
