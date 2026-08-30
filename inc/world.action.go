@@ -2,7 +2,6 @@ package inc
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func (w *world) Do(a inkwell.Action) {
@@ -12,15 +11,6 @@ func (w *world) Do(a inkwell.Action) {
 }
 
 func (w *world) PumpTick(dt float64) {
-
-	if w.top != nil {
-		title := w.sceneTitle()
-		if w.paused {
-			title += " — paused"
-		}
-		w.top.LeftText = title
-	}
-
 	if w.running == nil {
 		if len(w.queue) == 0 {
 			return
@@ -40,7 +30,7 @@ func (w *world) PumpTick(dt float64) {
 	}
 }
 
-func (w *world) sceneTitle() string {
+func (w *world) SceneTitle() string {
 	s, ok := w.G.SceneManager.Get(w.G.CurrentScene())
 	if !ok {
 		return ""
@@ -50,14 +40,6 @@ func (w *world) sceneTitle() string {
 	}
 	return s.Name
 }
-
-type actionPump struct {
-	Name string
-}
-
-func (p *actionPump) GetName() string                            { return p.Name }
-func (p *actionPump) Tick(ctx *inkwell.UICtx)                    { World.PumpTick(ctx.DT) }
-func (p *actionPump) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
 
 type fnAction struct{ fn func(*inkwell.Ctx) }
 

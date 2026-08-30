@@ -12,6 +12,7 @@ var (
 	SceneManager      = inkwell.NewManager[Scene]()
 	ScriptManager     = inkwell.NewManager[Script]()
 	ThemeManager      = inkwell.NewManager[Theme]()
+	WidgetManager     = inkwell.NewManager[Widget]()
 )
 
 type Opts struct {
@@ -43,11 +44,11 @@ func New(o Opts) *inkwell.Game {
 	g.ItemManager = ItemManager
 	g.SceneManager = SceneManager
 	g.ScriptManager = ScriptManager
+	g.WidgetManager = WidgetManager
 	ThemeManager.Each(g.ThemeManager.Register)
 
 	World.attach(g)
 	g.UseTheme(RealWorld)
-	registerUI()
 
 	g.StartAt(start)
 	g.OnStart(ScriptOpening)

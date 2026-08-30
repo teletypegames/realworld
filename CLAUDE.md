@@ -49,7 +49,7 @@ All game code lives in one flat package, `inc`. There are no subdirectories: a
 file's name carries the structure, in the form `[category].[name].go`.
 
 - The category is always **singular**: `item`, `scene`, `background`,
-  `character`, `dialog`, `script`, `world`, `ui`, `theme`, `names`.
+  `character`, `dialog`, `script`, `world`, `widget`, `ui`, `theme`, `names`.
 - `[category].manager.go` is the file that ties a category together — its
   entity type and whatever else the category shares.
 - Every other file in a category holds exactly one entity: one scene, one
@@ -65,9 +65,10 @@ inc/theme.manager.go       the Theme alias and the colour helpers
 inc/theme.realworld.go     realworld-93
 inc/theme.nokia_punk.go    nokia-punk
 inc/world.manager.go       unsaved runtime state
-inc/world.action.go        custom actions and the action pump
-inc/ui.manager.go          HUD layout and widget registration
-inc/ui.*.go                custom widgets, coloured text
+inc/world.action.go        custom actions
+inc/widget.manager.go      the Widget alias, HUD layout, the visibility gate
+inc/widget.*.go            one widget per file, registering itself
+inc/ui.text.go             coloured text on a scratch image
 inc/background.*.go        one image asset per scene
 inc/character.*.go         the cast, tapes included
 inc/item.*.go              inventory
@@ -84,7 +85,7 @@ Every category that owns a collection of entities has a manager, and they are
 all the engine's own `inkwell.Manager[T]` — the same registry type the `*Game`
 hangs its content off. The game defines no registry of its own.
 
-All seven are declared together, in `boot.go`, so the list of what the game
+All eight are declared together, in `boot.go`, so the list of what the game
 holds is one block rather than a line hidden in each category file:
 
 ```go
@@ -96,6 +97,7 @@ var (
 	SceneManager      = inkwell.NewManager[Scene]()
 	ScriptManager     = inkwell.NewManager[Script]()
 	ThemeManager      = inkwell.NewManager[Theme]()
+	WidgetManager     = inkwell.NewManager[Widget]()
 )
 ```
 
@@ -146,6 +148,43 @@ into one.
 Nothing may depend on it — including the order the arrow keys walk the scenes,
 which is simply the order the files sit in.
 
+### Widgets name their layer instead of their order
+
+A widget is a file like any other entity — `widget.<name>.go`, one widget,
+registering itself in an `init()` — and that includes the engine's own widgets,
+which the game registers as literals the same way it registers a background:
+
+```go
+func init() {
+	WidgetManager.Register(&inkwell.Cursor{
+		Name: "cursor",
+	})
+}
+```
+
+What a widget cannot take from alphabetical registration is its place in the
+stack: the frame has to be drawn under the slots that sit on it, the cursor over
+everything, and the use-with guard has to see a click after the HUD has had it.
+So a widget declares a layer rather than inheriting one from the order it was
+registered in — `inkwell.LayerScene`, `LayerPanel`, `LayerHUD`, `LayerSpeech`,
+`LayerDialog`, `LayerMenu`, `LayerCurtain`, `LayerCursor`. The engine draws from
+the bottom layer up and ticks from the top layer down, and registration order
+only decides ties inside one layer:
+
+```go
+func (h *hudFrame) Layer() inkwell.Layer { return inkwell.LayerPanel }
+```
+
+A widget that says nothing sits on `LayerHUD`; ours all say it, because the
+layer is the one thing about a widget the file cannot show. `gate`, the wrapper
+that hides a widget outside `ModePlay`, returns `inkwell.LayerOf` of the widget
+it wraps, so wrapping never moves anything.
+
+Two widgets are worth knowing about because they are not decoration: `pump`
+drives `World.PumpTick`, which is what runs every queued action, and
+`usewith_guard` sits on `LayerScene` so that it ticks last and can answer a
+use-with pair nobody authored.
+
 ### Handing a category to the engine
 
 Nothing is copied. `inkwell.NewGame` builds its own empty managers, and `New`
@@ -159,6 +198,7 @@ g.DialogueManager = DialogManager
 g.ItemManager = ItemManager
 g.SceneManager = SceneManager
 g.ScriptManager = ScriptManager
+g.WidgetManager = WidgetManager
 ThemeManager.Each(g.ThemeManager.Register)
 ```
 
@@ -221,7 +261,7 @@ constants in `names.manager.go`, the colour tokens, and the action constructors
 (`TapeSay`, `Paused`, `SetMode`, `EnterScene`, `Back`, `Fn`).
 
 Everything else is machinery and stays unexported: the HUD widgets
-(`tapeSlots`, `letterbox`, `hudFrame`, …), `registerUI`, the runners,
+(`tapeSlots`, `letterbox`, `hudFrame`, …), `gated`, the runners,
 `prepareScene`, `sceneDefaults`, `fillSelectorPins`.
 
 The word is **scene**, the engine's own. The wiki and the concept-art deck count

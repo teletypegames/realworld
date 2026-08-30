@@ -109,9 +109,9 @@ Every pixel it gives back is a pixel of art.
      InventoryBar          TapeSlots           TapeChannel
 ```
 
-Every vertical measurement derives from `ui.LineH` (glyph cell + leading) and
-from `ui.ScreenH`, not from the wireframe deck's ratios, so the layout cannot
-drift out of step with the font — or with the art — again;
+Every vertical measurement derives from `LineH` (glyph cell + leading) and from
+`ScreenH`, both in `widget.manager.go`, not from the wireframe deck's ratios, so
+the layout cannot drift out of step with the font — or with the art — again;
 `TestLayoutFitsTheFont` guards it. The tape channel comes out at 4 rows of 38
 columns, which is about one and a half of Dex's remarks on screen at once.
 
@@ -161,8 +161,10 @@ main.go                    flags + inkwell.Run
 inc/boot.go                the managers, and New(Opts)
 inc/names.manager.go       entity names and world-state keys
 inc/theme.*.go             realworld-93 + nokia-punk
-inc/world.*.go             unsaved runtime state, custom actions, action pump
-inc/ui.*.go                HUD: layout, custom widgets, coloured text
+inc/world.*.go             unsaved runtime state and custom actions
+inc/widget.manager.go      HUD layout and the widget registration list
+inc/widget.*.go            one widget per file
+inc/ui.text.go             coloured text
 inc/<kind>.<name>.go       one file per registered entity, by kind
 ```
 
@@ -195,7 +197,7 @@ Every category owns a manager, and they are all the engine's own
 `inkwell.Manager[T]` — the same registry the `*Game` hangs its content off, kept
 in registration order and addressed by name. There is no second registry type
 here: the entity types are aliases of engine structs, so they already satisfy
-`inkwell.Named` and need no help reading their own name. The seven of them are
+`inkwell.Named` and need no help reading their own name. The eight of them are
 declared as one block in `boot.go`, and a category's manager file is left
 holding the alias:
 
@@ -214,6 +216,17 @@ func init() {
 	})
 }
 ```
+
+Widgets go the same way, the engine's own included: `widget.cursor.go` registers
+an `inkwell.Cursor` exactly as `background.street.go` registers an image. What
+they cannot take from alphabetical order is their place in the stack, so each
+widget names a **layer** — `LayerScene`, `LayerPanel`, `LayerHUD`, `LayerSpeech`,
+`LayerDialog`, `LayerMenu`, `LayerCurtain`, `LayerCursor` — and inkwell draws
+from the bottom layer up, ticks from the top layer down, and lets registration
+order decide only ties inside one layer. That is why the HUD frame comes out
+under the tape slots and the cursor over everything, whatever the file names
+happen to be. The layer was added to inkwell for this; the alternative was a
+registration list, which is the thing this package spent its life deleting.
 
 So adding an entity is adding a file, and there is no second list to keep in
 step. The price is that registration order is file-name order: the arrow keys
@@ -307,8 +320,8 @@ has to shadow where the player is.
    *Fix:* move `drawText` to `text/v2` — no call site would change.
 
 2. **`queueAction` is unexported**, so a domain widget cannot start an action.
-   *Workaround:* the pump in `world.action.go` drives its own `Runner` through
-   the exported `inkwell.Ctx`. *Caveat:* it runs alongside the engine's script
+   *Workaround:* the pump — `widget.action_pump.go` calling `World.PumpTick` —
+   drives its own `Runner` through the exported `inkwell.Ctx`. *Caveat:* it runs alongside the engine's script
    runner, not instead of it.
 
 3. **The `"Nem ehhez."` flash is hardcoded** in `core.engine.go` for an
@@ -319,7 +332,7 @@ has to shadow where the player is.
 
 4. **Widgets have no `Visible` field and the `Manager` cannot unregister**, so
    the built-in HUD cannot be hidden during a cutscene. *Workaround:* the
-   `gate` wrapper in `ui/ui.go` forwards `Tick`/`Draw`/`BlocksClickAt` only
+   `gate` wrapper in `widget.manager.go` forwards `Tick`/`Draw`/`BlocksClickAt` only
    while the HUD is visible.
 
 5. **`Run` hardcodes a 4× window** (`core.dsl.go`), which at 640×400 would be

@@ -6,11 +6,18 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+func init() {
+	WidgetManager.Register(&sceneNav{
+		Name: "scene_nav",
+	})
+}
+
 type sceneNav struct {
 	Name string
 }
 
 func (n *sceneNav) GetName() string                            { return n.Name }
+func (n *sceneNav) Layer() inkwell.Layer                       { return inkwell.LayerScene }
 func (n *sceneNav) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
 
 func (n *sceneNav) Tick(ctx *inkwell.UICtx) {

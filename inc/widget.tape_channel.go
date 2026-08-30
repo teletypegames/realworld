@@ -8,12 +8,20 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
+func init() {
+	WidgetManager.Register(&tapeChannel{
+		Name:   "channel",
+		Bounds: inkwell.Rect(DividerX+2, HUDTop+2, ScreenW-DividerX-4, ScreenH-HUDTop-4),
+	})
+}
+
 type tapeChannel struct {
 	Name   string
 	Bounds inkwell.Rectangle
 }
 
-func (t *tapeChannel) GetName() string { return t.Name }
+func (t *tapeChannel) GetName() string      { return t.Name }
+func (t *tapeChannel) Layer() inkwell.Layer { return inkwell.LayerHUD }
 
 func (t *tapeChannel) Tick(ctx *inkwell.UICtx) {}
 

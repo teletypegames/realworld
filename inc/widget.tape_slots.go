@@ -6,12 +6,20 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
+func init() {
+	WidgetManager.Register(&tapeSlots{
+		Name:   "tapes",
+		Bounds: inkwell.Rect(192, slotsY, 194, slotsH),
+	})
+}
+
 type tapeSlots struct {
 	Name   string
 	Bounds inkwell.Rectangle
 }
 
-func (t *tapeSlots) GetName() string { return t.Name }
+func (t *tapeSlots) GetName() string      { return t.Name }
+func (t *tapeSlots) Layer() inkwell.Layer { return inkwell.LayerHUD }
 
 func (t *tapeSlots) BlocksClickAt(p inkwell.Point) bool {
 	return World.HUDVisible() && t.Bounds.Contains(p)

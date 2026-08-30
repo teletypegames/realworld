@@ -7,11 +7,18 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+func init() {
+	WidgetManager.Register(&useWithGuard{
+		Name: "usewith_guard",
+	})
+}
+
 type useWithGuard struct {
 	Name string
 }
 
 func (u *useWithGuard) GetName() string                            { return u.Name }
+func (u *useWithGuard) Layer() inkwell.Layer                       { return inkwell.LayerScene }
 func (u *useWithGuard) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
 
 func (u *useWithGuard) Tick(ctx *inkwell.UICtx) {

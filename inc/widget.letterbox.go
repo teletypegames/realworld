@@ -7,12 +7,20 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
+func init() {
+	WidgetManager.Register(&letterbox{
+		Name: "letterbox",
+		Bar:  36,
+	})
+}
+
 type letterbox struct {
 	Name string
 	Bar  float64
 }
 
-func (l *letterbox) GetName() string { return l.Name }
+func (l *letterbox) GetName() string      { return l.Name }
+func (l *letterbox) Layer() inkwell.Layer { return inkwell.LayerScene }
 
 func (l *letterbox) Tick(ctx *inkwell.UICtx) {
 	if World.Mode() != ModeCutscene || !World.TapeWaiting() {

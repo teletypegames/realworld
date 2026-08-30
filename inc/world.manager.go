@@ -21,7 +21,6 @@ type world struct {
 	pending string
 	queue   []inkwell.Action
 	running inkwell.Runner
-	top     *inkwell.TopBar
 
 	tapeWaiting bool
 	tapeLine    inkwell.Action
@@ -36,7 +35,6 @@ func (w *world) attach(g *inkwell.Game) {
 	w.pending = ""
 	w.queue = nil
 	w.running = nil
-	w.top = nil
 	w.tapeWaiting = false
 	w.tapeLine = nil
 }
@@ -48,8 +46,6 @@ func (w *world) SetMode(m Mode) { w.mode = m }
 func (w *world) HUDVisible() bool { return w.mode == ModePlay }
 
 func (w *world) Paused() bool { return w.paused }
-
-func (w *world) SetTopBar(t *inkwell.TopBar) { w.top = t }
 
 func (w *world) Slot2() string {
 	if v, ok := w.G.State.Var(VarSlot2).(string); ok {
