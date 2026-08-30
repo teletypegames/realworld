@@ -2,52 +2,11 @@ package inc
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 func init() {
-	WidgetManager.Register(&sceneNav{
+	WidgetManager.Register(&inkwell.SceneNav{
 		Name: "scene_nav",
+		When: whenUnpaused,
 	})
-}
-
-type sceneNav struct {
-	Name string
-}
-
-func (n *sceneNav) GetName() string                            { return n.Name }
-func (n *sceneNav) Layer() inkwell.Layer                       { return inkwell.LayerScene }
-func (n *sceneNav) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {}
-
-func (n *sceneNav) Tick(ctx *inkwell.UICtx) {
-	if !World.HUDVisible() || World.Paused() {
-		return
-	}
-	step := 0
-
-	switch {
-	case inpututil.IsKeyJustPressed(ebiten.KeyArrowRight):
-		step = 1
-	case inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft):
-		step = -1
-	default:
-		return
-	}
-	if next := n.neighbour(ctx.Game, step); next != "" {
-		World.Do(inkwell.GoTo(next))
-	}
-}
-
-func (n *sceneNav) neighbour(g *inkwell.Game, step int) string {
-	deck := g.SceneManager.Names()
-	if len(deck) < 2 {
-		return ""
-	}
-	for i, name := range deck {
-		if name == World.G.CurrentScene() {
-			return deck[((i+step)%len(deck)+len(deck))%len(deck)]
-		}
-	}
-	return deck[0]
 }

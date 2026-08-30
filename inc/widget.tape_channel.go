@@ -20,19 +20,15 @@ type tapeChannel struct {
 	Bounds inkwell.Rectangle
 }
 
-func (t *tapeChannel) GetName() string      { return t.Name }
-func (t *tapeChannel) Layer() inkwell.Layer { return inkwell.LayerHUD }
+func (t *tapeChannel) GetName() string                { return t.Name }
+func (t *tapeChannel) VisibleWhen() inkwell.Condition { return whenPlaying }
+func (t *tapeChannel) Layer() inkwell.Layer           { return inkwell.LayerHUD }
 
 func (t *tapeChannel) Tick(ctx *inkwell.UICtx) {}
 
-func (t *tapeChannel) BlocksClickAt(p inkwell.Point) bool {
-	return World.HUDVisible() && t.Bounds.Contains(p)
-}
+func (t *tapeChannel) BlocksClickAt(p inkwell.Point) bool { return t.Bounds.Contains(p) }
 
 func (t *tapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
-	if !World.HUDVisible() {
-		return
-	}
 	g := ctx.Game
 	th := g.Theme()
 	b := t.Bounds
@@ -44,7 +40,7 @@ func (t *tapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	vector.DrawFilledRect(dst, float32(b.X), float32(b.Y), float32(b.W), float32(b.H), th.ChatLogBG, false)
 
 	speaker, speakerCol := t.lastSpeaker(g, th)
-	drawTextC(dst, speaker, int(b.X)+pad, int(b.Y)+pad, speakerCol)
+	g.DrawText(dst, speaker, int(b.X)+pad, int(b.Y)+pad, speakerCol)
 	hy := float32(b.Y+pad+lh) + 2
 	vector.StrokeLine(dst, float32(b.X)+pad, hy,
 		float32(b.X+b.W)-pad, hy, 1, th.CharacterPanelBorder, false)
@@ -70,7 +66,7 @@ func (t *tapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 		default:
 			col, txt = th.ChatLogSystem, m.Text
 		}
-		for _, wl := range wrap(txt, wrapW) {
+		for _, wl := range inkwell.WrapText(txt, wrapW) {
 			rendered = append(rendered, line{
 				text: wl,
 				col:  col,
@@ -87,7 +83,7 @@ func (t *tapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 		rendered = rendered[start:]
 	}
 	for i, ln := range rendered {
-		drawTextC(dst, ln.text, int(b.X)+pad, top+i*lh, ln.col)
+		g.DrawText(dst, ln.text, int(b.X)+pad, top+i*lh, ln.col)
 	}
 }
 
@@ -96,10 +92,10 @@ func (t *tapeChannel) lastSpeaker(g *inkwell.Game, th inkwell.Theme) (string, co
 	for i := len(msgs) - 1; i >= 0; i-- {
 		m := msgs[i]
 		if m.Kind == inkwell.LogResponse && IsTape(m.Speaker) {
-			return TapeDisplayName(m.Speaker), speechColor(g, m.Speaker, th.ChatLogResponse)
+			return g.CharacterLabel(m.Speaker), speechColor(g, m.Speaker, th.ChatLogResponse)
 		}
 	}
-	return TapeDisplayName(Dex), speechColor(g, Dex, th.ChatLogResponse)
+	return g.CharacterLabel(Dex), speechColor(g, Dex, th.ChatLogResponse)
 }
 
 func speechColor(g *inkwell.Game, name string, fallback color.Color) color.Color {

@@ -5,23 +5,11 @@ import (
 )
 
 func init() {
-	WidgetManager.Register(gated("topbar", &titleBar{
-		TopBar: &inkwell.TopBar{
-			Name:    "topbar",
-			Height:  TopBarH,
-			TimeVar: VarArmillaStrip,
-		},
-	}))
-}
-
-type titleBar struct {
-	*inkwell.TopBar
-}
-
-func (t *titleBar) Tick(ctx *inkwell.UICtx) {
-	t.LeftText = World.SceneTitle()
-	if World.Paused() {
-		t.LeftText += " — paused"
-	}
-	t.TopBar.Tick(ctx)
+	WidgetManager.Register(&inkwell.TopBar{
+		Name:    "topbar",
+		When:    whenPlaying,
+		Height:  TopBarH,
+		TimeVar: VarArmillaStrip,
+		NoteVar: VarNote,
+	})
 }

@@ -10,7 +10,7 @@ func init() {
 		Description: "unmarked Personal Tape",
 		OnUseSelf: inkwell.Seq(
 			inkwell.Say(Paul, "Password-locked. Of course."),
-			TapeSay(Dex, "Put it in the second slot if you care that much. I did warn you."),
+			inkwell.Say(Dex, "Put it in the second slot if you care that much. I did warn you."),
 		),
 	})
 }

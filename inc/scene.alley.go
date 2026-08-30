@@ -47,7 +47,7 @@ func hidingPlace() inkwell.Hotspot {
 					inkwell.Give(ItemMysteryTape),
 					inkwell.SetFlag(FlagHasTape),
 					inkwell.Say(Paul, "A Personal Tape. No label, no seal."),
-					TapeSay(Dex, "Password-locked. And somebody very much did not want it found."),
+					inkwell.Say(Dex, "Password-locked. And somebody very much did not want it found."),
 				),
 			),
 			inkwell.Say(Paul, "One loose brick. I'm not taking the alley apart over it."),
@@ -64,13 +64,13 @@ func backDoor() inkwell.Hotspot {
 		OnLook: inkwell.Say(Paul, "Keypad. Four digits, worn keys."),
 		OnUse: inkwell.Seq(
 			inkwell.Say(Paul, "Locked. And I'm not guessing four digits."),
-			TapeSay(Dex, "The wear is heaviest on the two and the seven. That isn't a code. It's fewer options."),
+			inkwell.Say(Dex, "The wear is heaviest on the two and the seven. That isn't a code. It's fewer options."),
 		),
 		OnTalk: inkwell.Say(Paul, "To the door? I'm not there yet."),
 		OnUseWith: map[string]inkwell.Action{
 			ItemBlackArmilla: inkwell.Seq(
 				inkwell.Say(Paul, "A black-market bracelet doesn't open a keypad."),
-				TapeSay(Dex, "But you do get an advert out of it."),
+				inkwell.Say(Dex, "But you do get an advert out of it."),
 			),
 		},
 	}
@@ -84,7 +84,7 @@ func bin() inkwell.Hotspot {
 		OnLook: inkwell.Say(Paul, "Somebody's been through it. Thoroughly."),
 		OnUse: inkwell.Seq(
 			inkwell.Say(Paul, "Already turned out. I'm not going to be the second one."),
-			TapeSay(Dex, "The police don't go through bins. So who did?"),
+			inkwell.Say(Dex, "The police don't go through bins. So who did?"),
 		),
 	}
 }

@@ -49,7 +49,7 @@ All game code lives in one flat package, `inc`. There are no subdirectories: a
 file's name carries the structure, in the form `[category].[name].go`.
 
 - The category is always **singular**: `item`, `scene`, `background`,
-  `character`, `dialog`, `script`, `world`, `widget`, `ui`, `theme`, `names`.
+  `character`, `tape`, `dialog`, `script`, `world`, `widget`, `theme`, `names`.
 - `[category].manager.go` is the file that ties a category together — its
   entity type and whatever else the category shares.
 - Every other file in a category holds exactly one entity: one scene, one
@@ -66,11 +66,12 @@ inc/theme.realworld.go     realworld-93
 inc/theme.nokia_punk.go    nokia-punk
 inc/world.manager.go       unsaved runtime state
 inc/world.action.go        custom actions
-inc/widget.manager.go      the Widget alias, HUD layout, the visibility gate
+inc/widget.manager.go      the Widget alias, HUD layout, the shared conditions
 inc/widget.*.go            one widget per file, registering itself
-inc/ui.text.go             coloured text on a scratch image
 inc/background.*.go        one image asset per scene
 inc/character.*.go         the cast, tapes included
+inc/tape.manager.go        the Tape entity and the lookups over it
+inc/tape.*.go              one tape per file
 inc/item.*.go              inventory
 inc/dialog.*.go            dialogue trees
 inc/script.*.go            named action sequences
@@ -85,7 +86,7 @@ Every category that owns a collection of entities has a manager, and they are
 all the engine's own `inkwell.Manager[T]` — the same registry type the `*Game`
 hangs its content off. The game defines no registry of its own.
 
-All eight are declared together, in `boot.go`, so the list of what the game
+All nine are declared together, in `boot.go`, so the list of what the game
 holds is one block rather than a line hidden in each category file:
 
 ```go
@@ -96,6 +97,7 @@ var (
 	ItemManager       = inkwell.NewManager[Item]()
 	SceneManager      = inkwell.NewManager[Scene]()
 	ScriptManager     = inkwell.NewManager[Script]()
+	TapeManager       = inkwell.NewManager[Tape]()
 	ThemeManager      = inkwell.NewManager[Theme]()
 	WidgetManager     = inkwell.NewManager[Widget]()
 )
@@ -117,9 +119,17 @@ construction-time bug, not an update — so rewriting an entity that is already
 in the registry goes through `Set`, which keeps its position in the order.
 `All` and `Each` both hand back the entities in registration order.
 
-Every entity type is an alias, `Scene` included. It was once a struct of our
-own, because inkwell's `Scene` could not carry exits; that gap was closed in the
-engine, so there is nothing left for a second type to hold.
+Nearly every entity type is an alias, `Scene` included. It was once a struct of
+our own, because inkwell's `Scene` could not carry exits; that gap was closed in
+the engine, so there is nothing left for a second type to hold.
+
+`Tape` is the exception, and it is a real one: a tape is a cassette that speaks,
+a thing inkwell has no notion of. It names the character whose voice it is, the
+item that carries it and the dialogue it plays, and `tape.manager.go` holds the
+four lookups over the registry — `IsTape`, `TapeOf`, `IsTapeItem`,
+`TapeDialogue`. What a tape *sounds* like is not in it: the display name and the
+log-only voice are `Character.Label` and `Character.Voice`, because those are
+facts about a speaker, not about a cassette.
 
 ### Entities register themselves
 
@@ -176,14 +186,25 @@ func (h *hudFrame) Layer() inkwell.Layer { return inkwell.LayerPanel }
 ```
 
 A widget that says nothing sits on `LayerHUD`; ours all say it, because the
-layer is the one thing about a widget the file cannot show. `gate`, the wrapper
-that hides a widget outside `ModePlay`, returns `inkwell.LayerOf` of the widget
-it wraps, so wrapping never moves anything.
+layer is the one thing about a widget the file cannot show.
 
-Two widgets are worth knowing about because they are not decoration: `pump`
-drives `World.PumpTick`, which is what runs every queued action, and
-`usewith_guard` sits on `LayerScene` so that it ticks last and can answer a
-use-with pair nobody authored.
+The other thing a widget declares is **when it is there at all**. The HUD is
+hidden for a cutscene, and that is a condition over game state, not a wrapper
+and not an `if` at the top of every `Draw`:
+
+```go
+WidgetManager.Register(&inkwell.StatusLine{
+	Name: "status",
+	When: whenPlaying,
+	Y:    statusY,
+})
+```
+
+`whenPlaying`, `whenCutscene` and `whenUnpaused` are in `widget.manager.go`, and
+they read `VarMode` and `VarNote` out of the engine's own `State`. A widget of
+ours says the same thing with a method — `VisibleWhen() inkwell.Condition` —
+because it has no literal to put a field in. A widget that is switched off
+neither ticks nor draws nor blocks a click, so nothing else has to ask.
 
 ### Handing a category to the engine
 
@@ -206,12 +227,16 @@ Themes are the odd one out and stay a copy: `NewGame` puts four preset themes
 into its `ThemeManager`, and replacing it would throw them away. Ours are added
 to that set instead.
 
-Two consequences of not copying. `prepareScene` has to run **before** the
-hand-off, because there is no longer a copy pass to fill in the defaults a
-scene leaves out — it writes them back into `SceneManager` with `Set`, and
-derives the selector's pins by reading the exit graph backwards. And a manager
-swapped in this way must be in place before `inkwell.Run`, which is where the
-engine wires up the parts that hold a registry directly.
+One consequence of not copying: a manager swapped in this way must be in place
+before `inkwell.Run`, which is where the engine wires up the parts that hold a
+registry directly. `fillSelectorPins` runs before the hand-off for the same
+reason — it writes the derived pins back into `SceneManager` with `Set`.
+
+The defaults a scene leaves out are no longer written into it at all. `g.Player`
+names the character a scene with no actors of its own gets, placed at his
+`Start`; `g.Walkboxes` is the floor a scene walks on when it declares none. Both
+are fields on the `*Game`, so a scene file that says nothing about either is
+saying "the usual", and the selector opts out by declaring both empty.
 
 ### What runs at boot
 
@@ -231,14 +256,37 @@ if o.Finale {
 opening. Here it is what `-finale` uses to drop into the ending, which is why it
 is set from `Opts` rather than always.
 
+The rest of `New` is fields on the `*Game`, and every one of them replaces
+something this package used to carry itself:
+
+```go
+g.WindowScale = 2
+g.Player = Paul
+g.Walkboxes = sceneFloor
+g.UseWithFail = useWithFail
+```
+
+`UseWithFail` is the response to a use-with pair nobody authored — the engine
+asks for it the same way it asks for `ExitLook` and `ExitTake`, and the lines
+live with the rest of the writing, in `script.usewith_fail.go`.
+
 ## The world
 
 There is exactly one game, so there is exactly one world: `World`, a
 package-level singleton in `world.manager.go`. Nothing takes a `*world`
-parameter and no widget holds a back-reference — `World.Do(…)`,
-`World.HUDVisible()`, `World.Slot2()` are reachable from anywhere in the
-package. `New` calls `World.attach(g)`, which binds the engine and resets the
-runtime state, so building the game twice is clean.
+parameter and no widget holds a back-reference — `World.Do(…)`, `World.Mode()`,
+`World.Slot2()` are reachable from anywhere in the package. `New` calls
+`World.attach(g)`, which binds the engine and resets the runtime state, so
+building the game twice is clean.
+
+`World` holds as little as it can get away with. The mode and the top bar's
+note are `State` vars (`VarMode`, `VarNote`), because state the engine can see
+is state a `Condition` can read — that is what makes a widget's `When` possible
+and what puts "— paused" in the top bar without anyone pushing it there.
+`World.Do` hands its action to `g.Do`, the engine's queue, so the game runs one
+action at a time without a pump of its own. What is left in the struct is the
+two things the engine has no notion of: the tape waiting to speak, and the
+cassette on its way into slot 2.
 
 This is what lets an entity file be a literal: the tape-insert script closes
 over `World`, not over a parameter it would have had to be handed.
@@ -249,7 +297,7 @@ One package means one namespace, so an entity's constructor carries its
 category as a prefix:
 
 ```go
-sceneFloor  sceneDefaults  prepareScene  fillSelectorPins
+sceneFloor  fillSelectorPins  tapeSlots  useWithFail
 ```
 
 Entities themselves need no name at all — they are anonymous literals inside
@@ -257,12 +305,16 @@ their file's `init()`, and the file name says which one it is.
 
 Exported names are the authoring vocabulary — what a content file spells out:
 `New` and `Opts`, `World`, the managers and the entity types they hold, the
-constants in `names.manager.go`, the colour tokens, and the action constructors
-(`TapeSay`, `Paused`, `SetMode`, `EnterScene`, `Back`, `Fn`).
+constants in `names.manager.go`, the colour tokens, the tape lookups
+(`IsTape`, `TapeOf`, `IsTapeItem`, `TapeDialogue`) and the action constructors
+(`Paused`, `SetMode`, `UseTheme`, `TapeOffer`, `Fn`). A tape's line is
+`inkwell.Say` like anyone else's — the tape voice is on the character, not on a
+second spelling of Say.
 
 Everything else is machinery and stays unexported: the HUD widgets
-(`tapeSlots`, `letterbox`, `hudFrame`, …), `gated`, the runners,
-`prepareScene`, `sceneDefaults`, `fillSelectorPins`.
+(`tapeSlots`, `letterbox`, `hudFrame`, …), the conditions (`whenPlaying`,
+`whenCutscene`, `whenUnpaused`), the runners, `useWithFail`,
+`fillSelectorPins`.
 
 The word is **scene**, the engine's own. The wiki and the concept-art deck count
 *screens*, and this code used to as well, but everything a screen had that a
@@ -275,9 +327,9 @@ Nothing is enforced by the compiler any more, so the layering is a rule kept by
 hand:
 
 ```
-names ← theme ← world ← ui
-                  ↑      ↑
-               content ──┴── boot ← main
+names ← theme ← world ← widget
+                  ↑       ↑
+               content ───┴── boot ← main
 ```
 
 `world` knows nothing about the HUD or the content. Both build on it, never the

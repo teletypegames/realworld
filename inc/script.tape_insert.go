@@ -18,8 +18,8 @@ func init() {
 				ctx.Game.State.SetVar(VarArmillaStrip, "SLOT2: READING")
 			}),
 			inkwell.Say(Paul, "Right. Let's see who you are."),
-			TapeSay(Dex, "Clicked in. Spinning. And now: nothing."),
-			TapeSay(Dex, "A stranger's tape in your own Armilla, Paul. I hope you know what you're doing."),
+			inkwell.Say(Dex, "Clicked in. Spinning. And now: nothing."),
+			inkwell.Say(Dex, "A stranger's tape in your own Armilla, Paul. I hope you know what you're doing."),
 		),
 	})
 }

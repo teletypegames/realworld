@@ -15,12 +15,7 @@ const (
 type world struct {
 	G *inkwell.Game
 
-	mode Mode
-
-	paused  bool
 	pending string
-	queue   []inkwell.Action
-	running inkwell.Runner
 
 	tapeWaiting bool
 	tapeLine    inkwell.Action
@@ -30,22 +25,25 @@ var World = &world{}
 
 func (w *world) attach(g *inkwell.Game) {
 	w.G = g
-	w.mode = ModePlay
-	w.paused = false
 	w.pending = ""
-	w.queue = nil
-	w.running = nil
 	w.tapeWaiting = false
 	w.tapeLine = nil
+	w.SetMode(ModePlay)
+	w.SetNote("")
 }
 
-func (w *world) Mode() Mode { return w.mode }
+func (w *world) Mode() Mode {
+	if v, ok := w.G.State.Var(VarMode).(string); ok {
+		return Mode(v)
+	}
+	return ModePlay
+}
 
-func (w *world) SetMode(m Mode) { w.mode = m }
+func (w *world) SetMode(m Mode) { w.G.State.SetVar(VarMode, string(m)) }
 
-func (w *world) HUDVisible() bool { return w.mode == ModePlay }
+func (w *world) SetNote(text string) { w.G.State.SetVar(VarNote, text) }
 
-func (w *world) Paused() bool { return w.paused }
+func (w *world) Paused() bool { return w.G.State.Var(VarNote) == NotePaused }
 
 func (w *world) Slot2() string {
 	if v, ok := w.G.State.Var(VarSlot2).(string); ok {

@@ -15,7 +15,7 @@ func init() {
 			UseTheme(NokiaPunk),
 			inkwell.Say("norman", "No — this isn't what you were supposed to do!"),
 			inkwell.Wait(0.6),
-			TapeSay(TapeMystery, "Thank you, Paul. You did exactly what I asked, the whole way through."),
+			inkwell.Say(TapeMystery, "Thank you, Paul. You did exactly what I asked, the whole way through."),
 			inkwell.Wait(1.0),
 			inkwell.ShowEnd("REAL WORLD — end of game two"),
 		),

@@ -162,9 +162,8 @@ inc/boot.go                the managers, and New(Opts)
 inc/names.manager.go       entity names and world-state keys
 inc/theme.*.go             realworld-93 + nokia-punk
 inc/world.*.go             unsaved runtime state and custom actions
-inc/widget.manager.go      HUD layout and the widget registration list
+inc/widget.manager.go      HUD layout and the shared visibility conditions
 inc/widget.*.go            one widget per file
-inc/ui.text.go             coloured text
 inc/<kind>.<name>.go       one file per registered entity, by kind
 ```
 
@@ -173,9 +172,9 @@ code keeps by hand: the world holds no opinion about the HUD or the content, and
 both build on it, never the other way round.
 
 ```
-names ← theme ← world ← ui
-                  ↑      ↑
-               content ──┴── boot ← main
+names ← theme ← world ← widget
+                  ↑       ↑
+               content ───┴── boot ← main
 ```
 
 Content is one registered entity per file, and the category prefix groups them
@@ -228,6 +227,19 @@ under the tape slots and the cursor over everything, whatever the file names
 happen to be. The layer was added to inkwell for this; the alternative was a
 registration list, which is the thing this package spent its life deleting.
 
+The second thing a widget declares is when it is on screen at all: `When` is an
+`inkwell.Condition` over game state, and the HUD's is `whenPlaying`, which reads
+`VarMode` out of the engine's `State`. Hiding the HUD for a cutscene is
+therefore one word per widget rather than a wrapper around each of them and an
+`if` at the top of every `Draw`.
+
+Tapes are the one entity type this game invents. `Tape` names the character
+whose voice it is, the cassette that carries it and the dialogue it plays, one
+file each — what a tape *sounds* like stays on the character, as
+`Character.Label` and `Character.Voice`, because that is a fact about a speaker.
+A tape's line is `inkwell.Say` like anybody else's; the engine sends it to the
+log instead of a speech bubble because the character says so.
+
 So adding an entity is adding a file, and there is no second list to keep in
 step. The price is that registration order is file-name order: the arrow keys
 walk the scenes alphabetically rather than in the concept-art deck's order.
@@ -243,11 +255,13 @@ share one registry per category instead of keeping two of them in step. Themes
 are the exception: `NewGame` seeds its theme manager with four presets, so ours
 are added to that set rather than replacing it.
 
-The price of not copying is that the defaults a scene may leave out — Paul's
-starting position, the floor walkbox — have to be written back into
-`SceneManager` before the hand-off rather than filled in on the way past.
-`prepareScene` does that with `Set`, and derives the selector's pins in the same
-pass by reading the exit graph backwards.
+The defaults a scene may leave out are not written into it at all any more:
+`g.Player` names the character a scene with no actors of its own receives, at
+his `Start`, and `g.Walkboxes` is the floor a scene without one walks on. Both
+are fields on the `*Game`, so a scene file that says nothing about either means
+"the usual", and the selector opts out by declaring both empty. What is still
+written back before the hand-off is the derived half of the map:
+`fillSelectorPins` reads the exit graph backwards and `Set`s the selector.
 
 There is one world, and it is a package-level singleton: `World`. Nothing takes
 a `*world` parameter and no widget holds a back-reference, which is what lets a
@@ -300,45 +314,25 @@ The graph stays machine-readable: exit hotspots are named `exit:<target>`, so
 the connections can be read straight back out of the registered scenes — and
 `Validate` rejects an exit that names a scene nobody registered.
 
-## Engine workarounds
+## What this game pushed into the engine
 
-Four inkwell limits turned up during implementation that the engine README does
-not mention. All four are worked around on the domain side; each is a candidate
-for a small engine change.
+Everything below started as a workaround in this package and ended up in
+inkwell, because in each case the thing being worked around was a fact an
+entity should have carried in the first place. The domain side of each is now a
+field in a literal:
 
-Two others have been fixed in the engine since: exits are now
-[`inkwell.Exit`](https://git.teletypegames.org/engines/inkwell) on the scene
-itself, and `Game.CurrentScene()` / `PreviousScene()` mean the domain no longer
-has to shadow where the player is.
-
-1. **`drawText` discards colour.** In `asset.text.go` the colour argument is
-   `_ = c` and rendering goes through `ebitenutil.DebugPrintAt`, which only
-   draws white. Every text colour in `Theme` is therefore inert. *Workaround:*
-   `ui.text.go` renders onto a scratch image and blits it tinted with
-   `ColorScale`. The custom widgets colour correctly; the built-ins
-   (`StatusLine`, `DialogBox`, `TopBar`, `InventoryBar`) are still white.
-   *Fix:* move `drawText` to `text/v2` — no call site would change.
-
-2. **`queueAction` is unexported**, so a domain widget cannot start an action.
-   *Workaround:* the pump — `widget.action_pump.go` calling `World.PumpTick` —
-   drives its own `Runner` through the exported `inkwell.Ctx`. *Caveat:* it runs alongside the engine's script
-   runner, not instead of it.
-
-3. **The `"Nem ehhez."` flash is hardcoded** in `core.engine.go` for an
-   item/hotspot pair with no `OnUseWith`, and cannot be replaced from the
-   domain. *Workaround:* `UseWithGuard` — widgets tick before the engine's
-   `handleSceneInput` and can consume the click, so unauthored pairs fail in
-   character instead, escalating on repeats.
-
-4. **Widgets have no `Visible` field and the `Manager` cannot unregister**, so
-   the built-in HUD cannot be hidden during a cutscene. *Workaround:* the
-   `gate` wrapper in `widget.manager.go` forwards `Tick`/`Draw`/`BlocksClickAt` only
-   while the HUD is visible.
-
-5. **`Run` hardcodes a 4× window** (`core.dsl.go`), which at 640×400 would be
-   2560×1600 — bigger than most laptop screens. *Workaround:* the `windowSizer`
-   widget resizes once on the first tick, since Run sets the size before
-   entering the loop.
+| was worked around here | is now |
+|---|---|
+| a scratch-image text blitter, because `drawText` dropped the colour | `Game.DrawText` renders in colour; `inkwell.TextWidth`, `WrapText`, `ClipText`, `GlyphW/H` are the library's |
+| a pump widget driving its own `Runner`, because `queueAction` was unexported | `g.Do(action)` — one queue, in order, engine-side |
+| `TapeSay`, a second spelling of `Say` that skipped the speech bubble | `Character.Voice` — `VoiceLog` sends a character's lines to the log |
+| a `Tapes` map of display names | `Character.Label` |
+| a `gate` wrapper and `if !World.HUDVisible()` at the top of every `Draw` | `Widget.When`, an `inkwell.Condition` the engine evaluates |
+| a `titleBar` widget that pushed the scene title into the top bar | `TopBar` already discovers the title; `NoteVar` adds the "— paused" |
+| a `UseWithGuard` widget stealing clicks to answer unauthored use-with pairs | `Game.UseWithFail`, beside `ExitLook` and `ExitTake` |
+| a `windowSizer` widget resizing the window on its first tick | `Game.WindowScale` |
+| a `sceneNav` widget walking the scene catalogue | `inkwell.SceneNav`, a built-in dev widget |
+| `sceneDefaults` rewriting every scene with Paul and a floor | `Game.Player` and `Game.Walkboxes` |
 
 Also: the inkwell README gives the module path as
 `git.teletypegames.org/games/inkwell`; the real path per its `go.mod` is

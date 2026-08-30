@@ -10,7 +10,7 @@ func init() {
 		Description: "Noodle's letter",
 		OnUseSelf: inkwell.Seq(
 			inkwell.Say(Paul, "“Come out, Paul. Not a phone conversation.” That's all it says."),
-			TapeSay(Dex, "And now you're here. And he isn't."),
+			inkwell.Say(Dex, "And now you're here. And he isn't."),
 		),
 	})
 }

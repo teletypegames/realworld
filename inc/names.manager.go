@@ -34,6 +34,10 @@ const (
 	VarSlot2        = "armilla.slot2"
 	VarArmillaStrip = "armilla.strip"
 	VarDecay        = "decay_level"
+	VarMode         = "mode"
+	VarNote         = "note"
+
+	NotePaused = "paused"
 )
 
 const (
@@ -89,32 +93,3 @@ const (
 	BgShowroom        = "bg_showroom"
 	BgColumbarium     = "bg_columbarium"
 )
-
-var Tapes = map[string]string{
-	Dex:         "DEX",
-	TapeMystery: "UNKNOWN TAPE",
-	TapeSupport: "TECH SUPPORT",
-}
-
-func IsTape(name string) bool { _, ok := Tapes[name]; return ok }
-
-func TapeDisplayName(name string) string {
-	if d, ok := Tapes[name]; ok {
-		return d
-	}
-	return name
-}
-
-var TapeItems = map[string]string{
-	ItemMysteryTape: TapeMystery,
-}
-
-func IsTapeItem(item string) bool { _, ok := TapeItems[item]; return ok }
-
-func TapeDialogue(item string) string {
-	switch item {
-	case ItemMysteryTape:
-		return DlgMysteryTape
-	}
-	return DlgDex
-}

@@ -5,8 +5,9 @@ import (
 )
 
 func init() {
-	WidgetManager.Register(gated("inventory", &inkwell.InventoryBar{
+	WidgetManager.Register(&inkwell.InventoryBar{
 		Name: "inventory",
+		When: whenPlaying,
 		Origin: inkwell.Point{
 			X: Pad + 2,
 			Y: invY,
@@ -15,5 +16,5 @@ func init() {
 		Cols:     4,
 		SlotSize: invSlot,
 		Gap:      invGap,
-	}))
+	})
 }

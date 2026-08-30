@@ -11,7 +11,7 @@ func init() {
 		W:     28,
 		H:     68,
 		Start: inkwell.Point{
-			X: 120,
+			X: 320,
 			Y: 232,
 		},
 		SpeechColor: Ink,

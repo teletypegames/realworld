@@ -5,10 +5,11 @@ import (
 )
 
 func init() {
-	WidgetManager.Register(gated("status", &inkwell.StatusLine{
+	WidgetManager.Register(&inkwell.StatusLine{
 		Name:        "status",
+		When:        whenPlaying,
 		Y:           statusY,
 		Align:       inkwell.AlignLeft,
 		ScreenWidth: DividerX,
-	}))
+	})
 }

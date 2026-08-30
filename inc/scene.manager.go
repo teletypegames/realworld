@@ -6,13 +6,6 @@ import (
 
 type Scene = inkwell.Scene
 
-func prepareScene() {
-	fillSelectorPins()
-	for _, entity := range SceneManager.All() {
-		SceneManager.Set(sceneDefaults(entity))
-	}
-}
-
 var sceneFloor = []inkwell.Polygon{
 	inkwell.Poly(
 		inkwell.Point{
@@ -30,24 +23,6 @@ var sceneFloor = []inkwell.Polygon{
 			Y: 258,
 		},
 	),
-}
-
-func sceneDefaults(s Scene) Scene {
-	if s.Actors == nil {
-		s.Actors = []inkwell.SceneActor{
-			{
-				CharacterName: Paul,
-				At: inkwell.Point{
-					X: 320,
-					Y: 232,
-				},
-			},
-		}
-	}
-	if s.Walkboxes == nil {
-		s.Walkboxes = sceneFloor
-	}
-	return s
 }
 
 func setVarIfEmpty(name string, v any) inkwell.Action {
