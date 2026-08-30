@@ -49,25 +49,25 @@ All game code lives in one flat package, `inc`. There are no subdirectories: a
 file's name carries the structure, in the form `[category].[name].go`.
 
 - The category is always **singular**: `item`, `scene`, `background`,
-  `character`, `dialog`, `script`, `world`, `ui`, `theme`, `names`, `boot`,
-  `content`.
+  `character`, `dialog`, `script`, `world`, `ui`, `theme`, `names`.
 - `[category].manager.go` is the file that ties a category together — its
-  manager, its entity type, whatever the category shares.
+  entity type and whatever else the category shares.
 - Every other file in a category holds exactly one entity: one scene, one
   background, one item. The file registers it itself, in an `init()`.
+- `boot.go` is the exception that has no category: it declares every manager
+  and builds the game.
 
 ```
 main.go                    flags + inkwell.Run
-inc/boot.manager.go        wiring; New(Opts) builds the game
+inc/boot.go                the managers; New(Opts) builds the game
 inc/names.manager.go       entity names and world-state keys
-inc/theme.manager.go       the theme manager and the colour helpers
+inc/theme.manager.go       the Theme alias and the colour helpers
 inc/theme.realworld.go     realworld-93
 inc/theme.nokia_punk.go    nokia-punk
 inc/world.manager.go       unsaved runtime state
 inc/world.action.go        custom actions and the action pump
 inc/ui.manager.go          HUD layout and widget registration
 inc/ui.*.go                custom widgets, coloured text
-inc/content.manager.go     composition root; calls every register…
 inc/background.*.go        one image asset per scene
 inc/character.*.go         the cast, tapes included
 inc/item.*.go              inventory
@@ -84,18 +84,30 @@ Every category that owns a collection of entities has a manager, and they are
 all the engine's own `inkwell.Manager[T]` — the same registry type the `*Game`
 hangs its content off. The game defines no registry of its own.
 
-The entity types are aliases of engine structs, so they already carry
-`GetName()` and satisfy `inkwell.Named`; the manager needs nothing else:
+All seven are declared together, in `boot.go`, so the list of what the game
+holds is one block rather than a line hidden in each category file:
+
+```go
+var (
+	BackgroundManager = inkwell.NewManager[Background]()
+	CharacterManager  = inkwell.NewManager[Character]()
+	DialogManager     = inkwell.NewManager[Dialog]()
+	ItemManager       = inkwell.NewManager[Item]()
+	SceneManager      = inkwell.NewManager[Scene]()
+	ScriptManager     = inkwell.NewManager[Script]()
+	ThemeManager      = inkwell.NewManager[Theme]()
+)
+```
+
+The entity types stay in their own category files, one alias each, and that is
+all a manager file holds now:
 
 ```go
 type Character = inkwell.Character
-
-var CharacterManager = inkwell.NewManager[Character]()
 ```
 
-That is the whole of a category's manager file — an alias and one line. There
-are seven managers: `BackgroundManager`, `CharacterManager`, `DialogManager`,
-`ItemManager`, `ScriptManager`, `SceneManager`, `ThemeManager`.
+Aliases of engine structs already carry `GetName()` and satisfy
+`inkwell.Named`, which is the whole of what a manager asks of them.
 
 The methods the game uses are `Register`, `Set`, `Get`, `All` and `Each`.
 `Register` panics on a duplicate name — a second registration is a
@@ -126,8 +138,9 @@ func init() {
 ```
 
 Adding an entity is adding a file. Deleting one is deleting a file. Package-level
-variables are initialised before any `init()` runs, so the managers exist by the
-time the first file registers into one.
+variables are initialised before any `init()` runs, whatever file each sits in,
+so the managers in `boot.go` exist by the time the first entity file registers
+into one.
 
 `init()` order is file-name order, so **registration order is alphabetical**.
 Nothing may depend on it — including the order the arrow keys walk the scenes,
@@ -135,23 +148,30 @@ which is simply the order the files sit in.
 
 ### Handing a category to the engine
 
-Once the game exists, `Each` walks a manager and gives every entity to the
-engine's own manager. `registerContent` is the whole of it:
+Nothing is copied. `inkwell.NewGame` builds its own empty managers, and `New`
+hands ours over in their place — the types are identical, so the engine and the
+game end up sharing one registry per category rather than two in step:
 
 ```go
-func registerContent() {
-	BackgroundManager.Each(World.G.AssetManager.Register)
-	CharacterManager.Each(World.G.CharacterManager.Register)
-	ItemManager.Each(World.G.ItemManager.Register)
-	DialogManager.Each(World.G.DialogueManager.Register)
-	ScriptManager.Each(World.G.ScriptManager.Register)
-	registerScene()
-}
+g.AssetManager = BackgroundManager
+g.CharacterManager = CharacterManager
+g.DialogueManager = DialogManager
+g.ItemManager = ItemManager
+g.SceneManager = SceneManager
+g.ScriptManager = ScriptManager
+ThemeManager.Each(g.ThemeManager.Register)
 ```
 
-`registerScene` is the one that needs its own function: it fills in the defaults
-a scene may leave out (Paul's starting position, the floor walkbox), and it
-derives the selector's pins by reading the exit graph backwards.
+Themes are the odd one out and stay a copy: `NewGame` puts four preset themes
+into its `ThemeManager`, and replacing it would throw them away. Ours are added
+to that set instead.
+
+Two consequences of not copying. `prepareScene` has to run **before** the
+hand-off, because there is no longer a copy pass to fill in the defaults a
+scene leaves out — it writes them back into `SceneManager` with `Set`, and
+derives the selector's pins by reading the exit graph backwards. And a manager
+swapped in this way must be in place before `inkwell.Run`, which is where the
+engine wires up the parts that hold a registry directly.
 
 ## The world
 
@@ -171,7 +191,7 @@ One package means one namespace, so an entity's constructor carries its
 category as a prefix:
 
 ```go
-sceneFloor  sceneDefaults  registerScene  fillSelectorPins
+sceneFloor  sceneDefaults  prepareScene  fillSelectorPins
 ```
 
 Entities themselves need no name at all — they are anonymous literals inside
@@ -183,8 +203,8 @@ constants in `names.manager.go`, the colour tokens, and the action constructors
 (`TapeSay`, `Paused`, `SetMode`, `EnterScene`, `Back`, `Fn`).
 
 Everything else is machinery and stays unexported: the HUD widgets
-(`tapeSlots`, `letterbox`, `hudFrame`, …), the `register…` functions, the
-runners, `sceneDefaults`, `fillSelectorPins`.
+(`tapeSlots`, `letterbox`, `hudFrame`, …), `registerUI`, the runners,
+`prepareScene`, `sceneDefaults`, `fillSelectorPins`.
 
 The word is **scene**, the engine's own. The wiki and the concept-art deck count
 *screens*, and this code used to as well, but everything a screen had that a

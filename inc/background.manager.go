@@ -5,5 +5,3 @@ import (
 )
 
 type Background = inkwell.Asset
-
-var BackgroundManager = inkwell.NewManager[Background]()

@@ -153,16 +153,17 @@ licence.
 The game is one flat package, `inc`. There are no subdirectories: a file's
 name says where it belongs, in the form `[category].[name].go`. The category is
 always singular, and `[category].manager.go` is the file that ties that category
-together — its manager, its shared types, its hand-off to the engine.
+together — its entity type and whatever else the category shares. `boot.go` is
+the one file with no category: it declares every manager and builds the game.
 
 ```
 main.go                    flags + inkwell.Run
+inc/boot.go                the managers, and New(Opts)
 inc/names.manager.go       entity names and world-state keys
 inc/theme.*.go             realworld-93 + nokia-punk
 inc/world.*.go             unsaved runtime state, custom actions, action pump
 inc/ui.*.go                HUD: layout, custom widgets, coloured text
 inc/<kind>.<name>.go       one file per registered entity, by kind
-inc/boot.manager.go        wiring
 ```
 
 Nothing is enforced by the compiler any more, so the layering is a rule the
@@ -194,13 +195,12 @@ Every category owns a manager, and they are all the engine's own
 `inkwell.Manager[T]` — the same registry the `*Game` hangs its content off, kept
 in registration order and addressed by name. There is no second registry type
 here: the entity types are aliases of engine structs, so they already satisfy
-`inkwell.Named` and need no help reading their own name. A category's manager
-file is an alias and one line:
+`inkwell.Named` and need no help reading their own name. The seven of them are
+declared as one block in `boot.go`, and a category's manager file is left
+holding the alias:
 
 ```go
 type Character = inkwell.Character
-
-var CharacterManager = inkwell.NewManager[Character]()
 ```
 
 An entity file is a literal that hands itself over in an `init()`:
@@ -223,9 +223,18 @@ step with the files by hand, and the deck is a thing to look at, not a thing to
 play through.
 
 The game's own catalogue is readable without going through the engine:
-`SceneManager.Get("alley")` answers before a single scene has been handed over.
-`registerContent` is where the hand-off happens, one `Each` call per category —
-the game's manager iterated straight into the engine manager's `Register`.
+`SceneManager.Get("alley")` answers long before there is a `*Game` to ask. And
+when the game is built, nothing is copied into it — `New` assigns our managers
+onto the `*Game` in place of the empty ones `NewGame` made, so engine and game
+share one registry per category instead of keeping two of them in step. Themes
+are the exception: `NewGame` seeds its theme manager with four presets, so ours
+are added to that set rather than replacing it.
+
+The price of not copying is that the defaults a scene may leave out — Paul's
+starting position, the floor walkbox — have to be written back into
+`SceneManager` before the hand-off rather than filled in on the way past.
+`prepareScene` does that with `Set`, and derives the selector's pins in the same
+pass by reading the exit graph backwards.
 
 There is one world, and it is a package-level singleton: `World`. Nothing takes
 a `*world` parameter and no widget holds a back-reference, which is what lets a

@@ -6,13 +6,11 @@ import (
 
 type Scene = inkwell.Scene
 
-var SceneManager = inkwell.NewManager[Scene]()
-
-func registerScene() {
+func prepareScene() {
 	fillSelectorPins()
-	SceneManager.Each(func(entity Scene) {
-		World.G.SceneManager.Register(sceneDefaults(entity))
-	})
+	for _, entity := range SceneManager.All() {
+		SceneManager.Set(sceneDefaults(entity))
+	}
 }
 
 var sceneFloor = []inkwell.Polygon{

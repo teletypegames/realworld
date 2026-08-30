@@ -5,5 +5,3 @@ import (
 )
 
 type Dialog = inkwell.Dialogue
-
-var DialogManager = inkwell.NewManager[Dialog]()

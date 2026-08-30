@@ -5,5 +5,3 @@ import (
 )
 
 type Item = inkwell.Item
-
-var ItemManager = inkwell.NewManager[Item]()

@@ -8,8 +8,6 @@ import (
 
 type Theme = inkwell.Theme
 
-var ThemeManager = inkwell.NewManager[Theme]()
-
 const (
 	RealWorld = "realworld-93"
 	NokiaPunk = "nokia-punk"
@@ -31,8 +29,4 @@ func RGBA(hex uint32, a uint8) color.Color {
 		B: uint8(hex),
 		A: a,
 	}
-}
-
-func registerTheme() {
-	ThemeManager.Each(World.G.ThemeManager.Register)
 }
