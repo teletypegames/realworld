@@ -214,6 +214,35 @@ other way round.
 
 Nothing else moves. There is no list to update.
 
+## The engine next door
+
+inkwell is checked out beside this repository, and so is the wiki that
+documents it. Paths are relative to the game's root:
+
+```
+../../engines/inkwell                                           the engine source
+../../services/wiki-pages/pages/engines/inkwell/default.en.md   the manual, English
+../../services/wiki-pages/pages/engines/inkwell/default.hu.md   the manual, Hungarian
+```
+
+The engine's module path is `git.teletypegames.org/engines/inkwell` and `go.mod`
+pins a pseudo-version of it, so a local edit is invisible here until it is
+pushed:
+
+```
+git -C ../../engines/inkwell commit … && git -C ../../engines/inkwell push
+go get git.teletypegames.org/engines/inkwell@master
+```
+
+A `replace` directive is fine while trying something out, but it never survives
+into a commit — drop it and bump the pin instead.
+
+Three things move together when the engine changes: the code, `README.md` in
+the inkwell checkout, and **both** wiki pages. The two pages are a translation
+pair, section for section — an edit to one is an edit to the other. The
+no-comment rule stops at the module boundary: inkwell's own source is commented,
+and edits there follow its style, not this one's.
+
 ## Commands
 
 ```
