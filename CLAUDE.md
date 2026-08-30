@@ -45,40 +45,47 @@ This holds for nested literals too, including small ones such as
 
 ## Layout
 
-All game code lives in one flat package, `inc`. There are no subdirectories: a
-file's name carries the structure, in the form `[category].[name].go`.
+One category, one package, one directory. A file keeps the category in its own
+name anyway — `[category].[name].go` inside `inc/[category]/` — because the
+prefix is what makes a file findable in a list of editor tabs, a grep, or a
+diff, where the directory has already fallen off.
 
 - The category is always **singular**: `item`, `scene`, `background`,
-  `character`, `tape`, `dialog`, `script`, `world`, `widget`, `theme`, `names`.
-- `[category].manager.go` is the file that ties a category together — its
-  entity type and whatever else the category shares.
-- Every other file in a category holds exactly one entity: one scene, one
+  `character`, `tape`, `dialog`, `script`, `world`, `widget`, `theme`.
+- `[category].manager.go` is the file that ties a package together — its entity
+  type, its `Manager`, and whatever else the category shares.
+- Every other file in a package holds exactly one entity: one scene, one
   background, one item. The file registers it itself, in an `init()`.
-- `boot.go` is the exception that has no category: it declares every manager
-  and builds the game.
+- Two files have no category. `inc/constants.go` is the vocabulary every
+  package imports, and `inc/boot/boot.go` builds the game.
 
 ```
-main.go                    flags + inkwell.Run
-inc/boot.go                the managers; New(Opts) builds the game
-inc/names.manager.go       entity names and world-state keys
-inc/theme.manager.go       the Theme alias and the colour helpers
-inc/theme.realworld.go     realworld-93
-inc/theme.nokia_punk.go    nokia-punk
-inc/world.manager.go       unsaved runtime state
-inc/world.action.go        custom actions
-inc/widget.manager.go      the Widget alias, HUD layout, the shared conditions
-inc/widget.*.go            one widget per file, registering itself
-inc/background.*.go        one image asset per scene
-inc/character.*.go         the cast, tapes included
-inc/tape.manager.go        the Tape entity and the lookups over it
-inc/tape.*.go              one tape per file
-inc/item.*.go              inventory
-inc/dialog.*.go            dialogue trees
-inc/script.*.go            named action sequences
-inc/scene.manager.go       the Scene alias, the defaults every scene gets
-inc/scene.selector.go      the map screen: its pins are derived from the graph
-inc/scene.*.go             one file per scene
+main.go                                  flags + inkwell.Run
+inc/constants.go                         entity names and world-state keys
+inc/boot/boot.go                         New(Opts) builds the game
+inc/theme/theme.manager.go               the Theme alias, its Manager, RGB/RGBA
+inc/theme/theme.realworld.go             realworld-93
+inc/theme/theme.nokia_punk.go            nokia-punk
+inc/world/world.manager.go               unsaved runtime state
+inc/world/world.action.go                custom actions
+inc/tape/tape.manager.go                 the Tape entity and the lookups over it
+inc/tape/tape.*.go                       one tape per file
+inc/widget/widget.manager.go             the Widget alias, HUD layout, the conditions
+inc/widget/widget.*.go                   one widget per file, registering itself
+inc/background/background.*.go           one image asset per scene
+inc/character/character.*.go             the cast, tapes included
+inc/item/item.*.go                       inventory
+inc/dialog/dialog.*.go                   dialogue trees
+inc/script/script.*.go                   named action sequences
+inc/scene/scene.manager.go               the Scene alias, its Manager, the floor
+inc/scene/scene.selector.go              the map screen: pins derived from the graph
+inc/scene/scene.*.go                     one file per scene
 ```
+
+`inc` is constants and nothing else, so every package can import it and it can
+import none of them. That is also why `New` sits in `inc/boot` rather than in
+`inc`: a package cannot be imported by what it imports, and the assembly is the
+one thing that has to name every package at once.
 
 ## Managers
 
@@ -86,29 +93,23 @@ Every category that owns a collection of entities has a manager, and they are
 all the engine's own `inkwell.Manager[T]` — the same registry type the `*Game`
 hangs its content off. The game defines no registry of its own.
 
-All nine are declared together, in `boot.go`, so the list of what the game
-holds is one block rather than a line hidden in each category file:
+Each one is declared in its own package's manager file, beside the alias it
+holds, and it needs no prefix because the package already is one:
 
 ```go
-var (
-	BackgroundManager = inkwell.NewManager[Background]()
-	CharacterManager  = inkwell.NewManager[Character]()
-	DialogManager     = inkwell.NewManager[Dialog]()
-	ItemManager       = inkwell.NewManager[Item]()
-	SceneManager      = inkwell.NewManager[Scene]()
-	ScriptManager     = inkwell.NewManager[Script]()
-	TapeManager       = inkwell.NewManager[Tape]()
-	ThemeManager      = inkwell.NewManager[Theme]()
-	WidgetManager     = inkwell.NewManager[Widget]()
-)
-```
+// inc/character/character.manager.go
+package character
 
-The entity types stay in their own category files, one alias each, and that is
-all a manager file holds now:
-
-```go
 type Character = inkwell.Character
+
+var Manager = inkwell.NewManager[Character]()
 ```
+
+Read from `inc/boot` the nine of them still line up as a list —
+`background.Manager`, `character.Manager`, `dialog.Manager`, `item.Manager`,
+`scene.Manager`, `script.Manager`, `tape.Manager`, `theme.Manager`,
+`widget.Manager` — only now the list is a consequence of the imports rather
+than a block someone has to keep in step.
 
 Aliases of engine structs already carry `GetName()` and satisfy
 `inkwell.Named`, which is the whole of what a manager asks of them.
@@ -126,8 +127,8 @@ the engine, so there is nothing left for a second type to hold.
 `Tape` is the exception, and it is a real one: a tape is a cassette that speaks,
 a thing inkwell has no notion of. It names the character whose voice it is, the
 item that carries it and the dialogue it plays, and `tape.manager.go` holds the
-four lookups over the registry — `IsTape`, `TapeOf`, `IsTapeItem`,
-`TapeDialogue`. What a tape *sounds* like is not in it: the display name and the
+four lookups over the registry — `tape.Is`, `tape.Of`, `tape.IsItem`,
+`tape.Dialogue`. What a tape *sounds* like is not in it: the display name and the
 log-only voice are `Character.Label` and `Character.Voice`, because those are
 facts about a speaker, not about a cassette.
 
@@ -138,11 +139,11 @@ somewhere else to keep in step — the file hands itself to its manager in an
 `init()`:
 
 ```go
-package inc
+package background
 
 func init() {
-	BackgroundManager.Register(Background{
-		Name: BgServerFarm,
+	Manager.Register(Background{
+		Name: inc.BgServerFarm,
 		Path: "assets/bg/server_farm.png",
 		Kind: inkwell.AssetImage,
 	})
@@ -151,12 +152,17 @@ func init() {
 
 Adding an entity is adding a file. Deleting one is deleting a file. Package-level
 variables are initialised before any `init()` runs, whatever file each sits in,
-so the managers in `boot.go` exist by the time the first entity file registers
-into one.
+so a package's `Manager` exists by the time its first entity file registers into
+one.
 
 `init()` order is file-name order, so **registration order is alphabetical**.
 Nothing may depend on it — including the order the arrow keys walk the scenes,
 which is simply the order the files sit in.
+
+An `init()` only runs if something imports the package. `inc/boot` names eight
+of the nine for their `Manager`, which is import enough; `tape` is the one
+nobody names, so it is there as a blank import. That list is **per package, not
+per entity** — a new scene file still touches nothing but itself.
 
 ### Widgets name their layer instead of their order
 
@@ -166,7 +172,7 @@ which the game registers as literals the same way it registers a background:
 
 ```go
 func init() {
-	WidgetManager.Register(&inkwell.Cursor{
+	Manager.Register(&inkwell.Cursor{
 		Name: "cursor",
 	})
 }
@@ -193,7 +199,7 @@ hidden for a cutscene, and that is a condition over game state, not a wrapper
 and not an `if` at the top of every `Draw`:
 
 ```go
-WidgetManager.Register(&inkwell.StatusLine{
+Manager.Register(&inkwell.StatusLine{
 	Name: "status",
 	When: whenPlaying,
 	Y:    statusY,
@@ -201,7 +207,7 @@ WidgetManager.Register(&inkwell.StatusLine{
 ```
 
 `whenPlaying`, `whenCutscene` and `whenUnpaused` are in `widget.manager.go`, and
-they read `VarMode` and `VarNote` out of the engine's own `State`. A widget of
+they read `inc.VarMode` and `inc.VarNote` out of the engine's own `State`. A widget of
 ours says the same thing with a method — `VisibleWhen() inkwell.Condition` —
 because it has no literal to put a field in. A widget that is switched off
 neither ticks nor draws nor blocks a click, so nothing else has to ask.
@@ -213,14 +219,14 @@ hands ours over in their place — the types are identical, so the engine and th
 game end up sharing one registry per category rather than two in step:
 
 ```go
-g.AssetManager = BackgroundManager
-g.CharacterManager = CharacterManager
-g.DialogueManager = DialogManager
-g.ItemManager = ItemManager
-g.SceneManager = SceneManager
-g.ScriptManager = ScriptManager
-g.WidgetManager = WidgetManager
-ThemeManager.Each(g.ThemeManager.Register)
+g.AssetManager = background.Manager
+g.CharacterManager = character.Manager
+g.DialogueManager = dialog.Manager
+g.ItemManager = item.Manager
+g.SceneManager = scene.Manager
+g.ScriptManager = script.Manager
+g.WidgetManager = widget.Manager
+theme.Manager.Each(g.ThemeManager.Register)
 ```
 
 Themes are the odd one out and stay a copy: `NewGame` puts four preset themes
@@ -241,14 +247,14 @@ saying "the usual", and the selector opts out by declaring both empty.
 ### What runs at boot
 
 `New` names two scripts and nothing else — the opening a player sees is content
-like every other script, in `script.opening.go`, not a slice built in the
+like every other script, in `script/script.opening.go`, not a slice built in the
 wiring:
 
 ```go
 g.StartAt(start)
-g.OnStart(ScriptOpening)
+g.OnStart(inc.ScriptOpening)
 if o.Finale {
-	g.OnFinale(ScriptFinale)
+	g.OnFinale(inc.ScriptFinale)
 }
 ```
 
@@ -261,60 +267,64 @@ something this package used to carry itself:
 
 ```go
 g.WindowScale = 2
-g.Player = Paul
-g.Walkboxes = sceneFloor
-g.UseWithFail = useWithFail
+g.Player = inc.Paul
+g.Walkboxes = scene.Floor
+g.UseWithFail = script.UseWithFail
 ```
 
 `UseWithFail` is the response to a use-with pair nobody authored — the engine
 asks for it the same way it asks for `ExitLook` and `ExitTake`, and the lines
-live with the rest of the writing, in `script.usewith_fail.go`.
+live with the rest of the writing, in `script/script.usewith_fail.go`.
 
 ## The world
 
-There is exactly one game, so there is exactly one world: `World`, a
-package-level singleton in `world.manager.go`. Nothing takes a `*world`
-parameter and no widget holds a back-reference — `World.Do(…)`, `World.Mode()`,
-`World.Slot2()` are reachable from anywhere in the package. `New` calls
-`World.attach(g)`, which binds the engine and resets the runtime state, so
-building the game twice is clean.
+There is exactly one game, so there is exactly one world — and since there is
+exactly one, the **package is the singleton**. There is no `World` value to pass
+around and no back-reference for a widget to hold: `world.Do(…)`,
+`world.Slot2()`, `world.SetPending(…)` are reachable from anywhere that imports
+`world`. `New` calls `world.Attach(g)`, which binds the engine and resets the
+run state, so building the game twice is clean.
 
-`World` holds as little as it can get away with. The mode and the top bar's
-note are `State` vars (`VarMode`, `VarNote`), because state the engine can see
-is state a `Condition` can read — that is what makes a widget's `When` possible
-and what puts "— paused" in the top bar without anyone pushing it there.
-`World.Do` hands its action to `g.Do`, the engine's queue, so the game runs one
-action at a time without a pump of its own. What is left in the struct is the
-two things the engine has no notion of: the tape waiting to speak, and the
-cassette on its way into slot 2.
+`world` holds as little as it can get away with. The mode and the top bar's note
+are `State` vars (`inc.VarMode`, `inc.VarNote`), because state the engine can
+see is state a `Condition` can read — that is what makes a widget's `When`
+possible and what puts "— paused" in the top bar without anyone pushing it
+there. `world.Do` hands its action to `g.Do`, the engine's queue, so the game
+runs one action at a time without a pump of its own. What is left in package
+variables is the two things the engine has no notion of: the tape waiting to
+speak, and the cassette on its way into slot 2. Only `world.Attach` resets them.
 
 This is what lets an entity file be a literal: the tape-insert script closes
-over `World`, not over a parameter it would have had to be handed.
+over the `world` package, not over a parameter it would have had to be handed.
 
 ## Naming
 
-One package means one namespace, so an entity's constructor carries its
-category as a prefix:
+The package is the namespace now, so an identifier never repeats what the
+package already says. It is `scene.Floor`, not `scene.SceneFloor`;
+`tape.Dialogue`, not `tape.TapeDialogue`; `widget.Manager`, not
+`widget.WidgetManager`; `world.Do`, not `world.WorldDo`. Read the call site, not
+the declaration, when choosing a name:
 
 ```go
-sceneFloor  fillSelectorPins  tapeSlots  useWithFail
+scene.FillSelectorPins()   tape.Is(speaker)   world.Do(a)   widget.ScreenW
 ```
 
 Entities themselves need no name at all — they are anonymous literals inside
 their file's `init()`, and the file name says which one it is.
 
 Exported names are the authoring vocabulary — what a content file spells out:
-`New` and `Opts`, `World`, the managers and the entity types they hold, the
-constants in `names.manager.go`, the colour tokens, the tape lookups
-(`IsTape`, `TapeOf`, `IsTapeItem`, `TapeDialogue`) and the action constructors
-(`Paused`, `SetMode`, `UseTheme`, `TapeOffer`, `Fn`). A tape's line is
-`inkwell.Say` like anyone else's — the tape voice is on the character, not on a
-second spelling of Say.
+`boot.New` and `boot.Opts`, the constants in `inc/constants.go`, each package's
+`Manager` and entity type, the colour tokens, the tape lookups (`tape.Is`,
+`tape.Of`, `tape.IsItem`, `tape.Dialogue`), the world (`world.Do`,
+`world.Slot2`, …) and the action constructors (`world.Paused`, `world.SetMode`,
+`world.UseTheme`, `world.TapeOffer`, `world.Fn`). A tape's line is `inkwell.Say`
+like anyone else's — the tape voice is on the character, not on a second
+spelling of Say.
 
-Everything else is machinery and stays unexported: the HUD widgets
-(`tapeSlots`, `letterbox`, `hudFrame`, …), the conditions (`whenPlaying`,
-`whenCutscene`, `whenUnpaused`), the runners, `useWithFail`,
-`fillSelectorPins`.
+Everything else stays unexported, and now the compiler holds the line: the HUD
+widgets (`tapeSlots`, `letterbox`, `hudFrame`, …), the conditions
+(`whenPlaying`, `whenCutscene`, `whenUnpaused`), the runners, `setMode`,
+`setNote`, `setVarIfEmpty`.
 
 The word is **scene**, the engine's own. The wiki and the concept-art deck count
 *screens*, and this code used to as well, but everything a screen had that a
@@ -323,23 +333,25 @@ display: `ScreenW`, `ScreenH`.
 
 ## Layering
 
-Nothing is enforced by the compiler any more, so the layering is a rule kept by
-hand:
+The layering is the import graph, so the compiler keeps it:
 
 ```
-names ← theme ← world ← widget
-                  ↑       ↑
-               content ───┴── boot ← main
+inc ← theme ← world ← tape ← widget ← boot ← main
+        ↑        ↑                      ↑
+        └── content ───────────────────-┘
 ```
 
-`world` knows nothing about the HUD or the content. Both build on it, never the
-other way round.
+`inc` imports nothing and everything imports it. `world` knows nothing about the
+HUD or the content; both build on it, never the other way round — and an arrow
+pointing back is now an import cycle, not a review comment. The one edge worth
+knowing is `widget → tape`: the tape slots ask which cassette a tape is in, so
+the tape concept sits below the HUD rather than beside it.
 
 ## Adding a scene
 
-1. Constants in `inc/names.manager.go`: `Scene<Name>`, `Bg<Name>`
-2. `inc/scene.<name>.go` — an `init()` registering a `Scene`
-3. `inc/background.<name>.go` — an `init()` registering a `Background`
+1. Constants in `inc/constants.go`: `Scene<Name>`, `Bg<Name>`
+2. `inc/scene/scene.<name>.go` — an `init()` registering a `Scene`
+3. `inc/background/background.<name>.go` — an `init()` registering a `Background`
 4. A 640×380 PNG in `assets/bg/`
 
 Nothing else moves. There is no list to update.

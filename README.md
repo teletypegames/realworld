@@ -110,7 +110,7 @@ Every pixel it gives back is a pixel of art.
 ```
 
 Every vertical measurement derives from `LineH` (glyph cell + leading) and from
-`ScreenH`, both in `widget.manager.go`, not from the wireframe deck's ratios, so
+`ScreenH`, both in `widget/widget.manager.go`, not from the wireframe deck's ratios, so
 the layout cannot drift out of step with the font — or with the art — again;
 `TestLayoutFitsTheFont` guards it. The tape channel comes out at 4 rows of 38
 columns, which is about one and a half of Dex's remarks on screen at once.
@@ -150,74 +150,76 @@ licence.
 
 ## Structure
 
-The game is one flat package, `inc`. There are no subdirectories: a file's
-name says where it belongs, in the form `[category].[name].go`. The category is
-always singular, and `[category].manager.go` is the file that ties that category
-together — its entity type and whatever else the category shares. `boot.go` is
-the one file with no category: it declares every manager and builds the game.
+One category, one package, one directory. A file still says which entity it
+holds in its own name — `[category].[name].go`, the prefix repeated inside the
+directory that already carries it, because a file called `alley.go` tells you
+nothing in a list of open editor tabs.
 
 ```
-main.go                    flags + inkwell.Run
-inc/boot.go                the managers, and New(Opts)
-inc/names.manager.go       entity names and world-state keys
-inc/theme.*.go             realworld-93 + nokia-punk
-inc/world.*.go             unsaved runtime state and custom actions
-inc/widget.manager.go      HUD layout and the shared visibility conditions
-inc/widget.*.go            one widget per file
-inc/<kind>.<name>.go       one file per registered entity, by kind
+main.go                          flags + inkwell.Run
+inc/constants.go                 every name and state key; imports nothing
+inc/boot/                        New(Opts): the hand-off to the engine
+inc/theme/                       the Theme alias, RGB, realworld-93, nokia-punk
+inc/world/                       the run state and the custom actions
+inc/tape/                        the Tape entity and the lookups over it
+inc/widget/                      HUD layout, the visibility conditions, 14 widgets
+inc/scene/  inc/background/      one file per location, twice
+inc/item/  inc/character/  inc/dialog/  inc/script/
 ```
 
-Nothing is enforced by the compiler any more, so the layering is a rule the
-code keeps by hand: the world holds no opinion about the HUD or the content, and
-both build on it, never the other way round.
+`inc` itself holds nothing but constants, which is why every package can import
+it and it can import none of them. The consequence is that the assembly moved
+down rather than up: `New` lives in `inc/boot`, because a package cannot be
+imported by what it imports.
+
+The layering is no longer a rule kept by hand — it is the import graph, and the
+compiler rejects the arrow that points the wrong way:
 
 ```
-names ← theme ← world ← widget
-                  ↑       ↑
-               content ───┴── boot ← main
+inc ← theme ← world ← tape ← widget ← boot ← main
+        ↑        ↑                      ↑
+        └── content ───────────────────-┘
 ```
 
-Content is one registered entity per file, and the category prefix groups them
-the way directories used to:
-
-```
-background.*.go  one file per scene: background.paul_shop.go, …
-character.*.go   character.paul.go  character.dex.go  character.mystery_tape.go
-item.*.go        item.noodle_letter.go  item.black_market_armilla.go  …
-dialog.*.go      dialog.dex_talk.go  dialog.mystery_tape_silent.go
-script.*.go      script.tape_insert.go  script.awakening_finale.go
-scene.*.go       one file per scene: scene.alley.go, … + scene.selector.go
-```
-
-Adding a scene means adding `scene.<name>.go` and `background.<name>.go`.
-Nothing else moves.
+Adding a scene means adding `inc/scene/scene.<name>.go` and
+`inc/background/background.<name>.go`. Nothing else moves.
 
 Every category owns a manager, and they are all the engine's own
 `inkwell.Manager[T]` — the same registry the `*Game` hangs its content off, kept
 in registration order and addressed by name. There is no second registry type
 here: the entity types are aliases of engine structs, so they already satisfy
-`inkwell.Named` and need no help reading their own name. The eight of them are
-declared as one block in `boot.go`, and a category's manager file is left
-holding the alias:
+`inkwell.Named` and need no help reading their own name. Each one lives in its
+own package's manager file, next to the alias it holds, and it needs no prefix
+because the package already is one:
 
 ```go
+// inc/character/character.manager.go
 type Character = inkwell.Character
+
+var Manager = inkwell.NewManager[Character]()
 ```
 
 An entity file is a literal that hands itself over in an `init()`:
 
 ```go
+package background
+
 func init() {
-	BackgroundManager.Register(Background{
-		Name: BgServerFarm,
+	Manager.Register(Background{
+		Name: inc.BgServerFarm,
 		Path: "assets/bg/server_farm.png",
 		Kind: inkwell.AssetImage,
 	})
 }
 ```
 
-Widgets go the same way, the engine's own included: `widget.cursor.go` registers
-an `inkwell.Cursor` exactly as `background.street.go` registers an image. What
+The `init()` only runs if something imports the package, so a package whose
+entities nobody names by symbol needs a blank import in `inc/boot`. Exactly one
+does — `tape`, everything else is imported for its `Manager` — and the list is
+per package, not per entity, so adding a file is still adding a file.
+
+Widgets go the same way, the engine's own included: `widget/widget.cursor.go` registers
+an `inkwell.Cursor` exactly as `background/background.street.go` registers an image. What
 they cannot take from alphabetical order is their place in the stack, so each
 widget names a **layer** — `LayerScene`, `LayerPanel`, `LayerHUD`, `LayerSpeech`,
 `LayerDialog`, `LayerMenu`, `LayerCurtain`, `LayerCursor` — and inkwell draws
@@ -248,7 +250,7 @@ step with the files by hand, and the deck is a thing to look at, not a thing to
 play through.
 
 The game's own catalogue is readable without going through the engine:
-`SceneManager.Get("alley")` answers long before there is a `*Game` to ask. And
+`scene.Manager.Get("alley")` answers long before there is a `*Game` to ask. And
 when the game is built, nothing is copied into it — `New` assigns our managers
 onto the `*Game` in place of the empty ones `NewGame` made, so engine and game
 share one registry per category instead of keeping two of them in step. Themes
@@ -261,12 +263,16 @@ his `Start`, and `g.Walkboxes` is the floor a scene without one walks on. Both
 are fields on the `*Game`, so a scene file that says nothing about either means
 "the usual", and the selector opts out by declaring both empty. What is still
 written back before the hand-off is the derived half of the map:
-`fillSelectorPins` reads the exit graph backwards and `Set`s the selector.
+`scene.FillSelectorPins` reads the exit graph backwards and `Set`s the selector.
 
-There is one world, and it is a package-level singleton: `World`. Nothing takes
-a `*world` parameter and no widget holds a back-reference, which is what lets a
-script file be a literal — the tape-insert script closes over `World` rather
-than over a parameter someone would have had to thread to it.
+There is one world, and now the package *is* the singleton: `world.Do(…)`,
+`world.Slot2()`, `world.SetPending(…)`. Nothing takes a world parameter and no
+widget holds a back-reference, which is what lets a script file be a literal —
+the tape-insert script closes over the `world` package rather than over a
+parameter someone would have had to thread to it. What little it still keeps is
+in package-level variables that only `world.Attach` may reset; the mode and the
+top bar's note are not among them, because those are `State` vars the engine
+itself can see.
 
 **On the word "scene".** The wiki, the concept-art deck and the beat tables all
 count *screens*, and this code used to as well: it carried its own `Screen`
@@ -293,7 +299,7 @@ edge and so does the code:
 - **The selector** — the wiki centres its map on a *Helyszínválasztó*, "nem
   valódi helyszín, hanem a menü-képernyő": a scene every main location connects
   to both ways. A main location lists `exitToSelector` among its exits, and
-  `scene.selector.go` derives the other half of each edge by reading the graph
+  `scene/scene.selector.go` derives the other half of each edge by reading the graph
   backwards — every scene with an exit to the selector gets a pin on it. The
   list of locations on the map is never written down twice.
 
