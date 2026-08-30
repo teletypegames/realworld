@@ -350,8 +350,8 @@ Also: the inkwell README gives the module path as
   hides them; the deck wanted them struck through but visible, so the list
   becomes a memory of what you already tried. Needs a thin override over
   `DialogBox`.
-- **Only beat 3 exists.** The alley is a vertical slice; `bootOpening` sets the
-  police-tip flag that beat 2 will eventually set.
+- **Only beat 3 exists.** The alley is a vertical slice; the opening script sets
+  the police-tip flag that beat 2 will eventually set.
 - **The render has only been inspected once, by the author of this repo.**
   Geometry is derived from one font cell and one screen size, but this
   environment cannot take a screenshot (both synthetic keystrokes and screen

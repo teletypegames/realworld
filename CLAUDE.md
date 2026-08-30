@@ -173,6 +173,24 @@ derives the selector's pins by reading the exit graph backwards. And a manager
 swapped in this way must be in place before `inkwell.Run`, which is where the
 engine wires up the parts that hold a registry directly.
 
+### What runs at boot
+
+`New` names two scripts and nothing else — the opening a player sees is content
+like every other script, in `script.opening.go`, not a slice built in the
+wiring:
+
+```go
+g.StartAt(start)
+g.OnStart(ScriptOpening)
+if o.Finale {
+	g.OnFinale(ScriptFinale)
+}
+```
+
+`OnFinale` is the engine's hook for a closing script, queued straight after the
+opening. Here it is what `-finale` uses to drop into the ending, which is why it
+is set from `Opts` rather than always.
+
 ## The world
 
 There is exactly one game, so there is exactly one world: `World`, a

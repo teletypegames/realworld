@@ -50,18 +50,9 @@ func New(o Opts) *inkwell.Game {
 	registerUI()
 
 	g.StartAt(start)
-	g.OnStart(inkwell.Seq(bootOpening(start, o.Finale)...))
+	g.OnStart(ScriptOpening)
+	if o.Finale {
+		g.OnFinale(ScriptFinale)
+	}
 	return g
-}
-
-func bootOpening(start string, finale bool) []inkwell.Action {
-	acts := []inkwell.Action{
-		inkwell.SetFlag(FlagPoliceTip),
-		inkwell.Say(Paul, "Back alley. Just like the clerk said."),
-		TapeSay(Dex, "A government office tipped you off to remove something from a scene. That doesn't strike you as odd?"),
-	}
-	if finale {
-		acts = append(acts, inkwell.RunScript(ScriptFinale))
-	}
-	return acts
 }

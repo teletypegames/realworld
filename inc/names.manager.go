@@ -20,6 +20,7 @@ const (
 )
 
 const (
+	ScriptOpening    = "opening"
 	ScriptTapeInsert = "tape_insert"
 	ScriptFinale     = "awakening_finale"
 )
