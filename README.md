@@ -194,27 +194,44 @@ licence.
 
 ## Structure
 
-One category, one package, one directory. A file still says which entity it
-holds in its own name — `[category].[name].go`, the prefix repeated inside the
-directory that already carries it, because a file called `alley.go` tells you
-nothing in a list of open editor tabs.
+One category, one package, one directory, under one of two groups: `inc/system/`
+is the machinery, `inc/content/` is what the game is made of. A file still says
+which entity it holds in its own name — `[category].[name].go`, the prefix
+repeated inside the directory that already carries it, because a file called
+`alley.go` tells you nothing in a list of open editor tabs.
 
 ```
-main.go                          flags + inkwell.Run
-inc/constants.go                 every name and state key; imports nothing
-inc/boot/                        New(Opts): the hand-off to the engine
-inc/theme/                       the Theme alias, RGB, realworld-93, nokia-punk
-inc/world/                       the run state and the custom actions
-inc/tape/                        the Tape entity and the lookups over it
-inc/widget/                      HUD layout, the visibility conditions, 14 widgets
-inc/scene/  inc/background/      one file per location, twice
-inc/item/  inc/character/  inc/dialog/  inc/script/
+main.go                                flags + inkwell.Run
+inc/constants.go                       every name and state key; imports nothing
+
+inc/system/boot/                       New(Opts): the hand-off to the engine
+inc/system/widget/                     HUD layout, visibility conditions, 14 widgets
+inc/system/world/                      the run state and the custom actions
+inc/system/theme/                      the Theme alias, RGB, realworld-93, nokia-punk
+
+inc/content/scene/  …/background/       one file per location, twice
+inc/content/tape/                      the Tape entity and the lookups over it
+inc/content/item/  …/character/  …/dialog/  …/script/
 ```
 
 `inc` itself holds nothing but constants, which is why every package can import
 it and it can import none of them. The consequence is that the assembly moved
-down rather than up: `New` lives in `inc/boot`, because a package cannot be
-imported by what it imports.
+down rather than up: `New` lives in `inc/system/boot`, because a package cannot
+be imported by what it imports.
+
+The groups say who writes a file rather than which way an import points:
+`content` is what a writer adds a file to, `system` is the machine that runs it.
+Mostly that agrees with the graph — a character names a `theme` colour, a scene
+names a `world` action, and neither knows the caller back — but two edges cross
+the other way on purpose. `boot` names every content package at once, which is
+what assembly is, and `widget` reads `tape`, because the tape slots ask which
+cassette a tape is in. The layering itself is still the import graph, and the
+compiler keeps it whichever directory a package sits in.
+
+The module is plain `realworld` — no host in front of it, because nothing
+imports this repository; it is an executable, not a library. Own packages read
+`realworld/inc/system/widget`, and since that sorts after `github.com/…` they
+take their own import group under the dependencies.
 
 The layering is no longer a rule kept by hand — it is the import graph, and the
 compiler rejects the arrow that points the wrong way:
@@ -225,8 +242,8 @@ inc ← theme ← world ← tape ← widget ← boot ← main
         └── content ───────────────────-┘
 ```
 
-Adding a scene means adding `inc/scene/scene.<name>.go` and
-`inc/background/background.<name>.go`. Nothing else moves.
+Adding a scene means adding `inc/content/scene/scene.<name>.go` and
+`inc/content/background/background.<name>.go`. Nothing else moves.
 
 Every category owns a manager, and they are all the engine's own
 `inkwell.Manager[T]` — the same registry the `*Game` hangs its content off, kept
@@ -237,7 +254,7 @@ own package's manager file, next to the alias it holds, and it needs no prefix
 because the package already is one:
 
 ```go
-// inc/character/character.manager.go
+// inc/content/character/character.manager.go
 type Character = inkwell.Character
 
 var Manager = inkwell.NewManager[Character]()
@@ -258,9 +275,10 @@ func init() {
 ```
 
 The `init()` only runs if something imports the package, so a package whose
-entities nobody names by symbol needs a blank import in `inc/boot`. Exactly one
-does — `tape`, everything else is imported for its `Manager` — and the list is
-per package, not per entity, so adding a file is still adding a file.
+entities nobody names by symbol needs a blank import in `inc/system/boot`.
+Exactly one does — `tape`, everything else is imported for its `Manager` — and
+the list is per package, not per entity, so adding a file is still adding a
+file.
 
 Widgets go the same way, the engine's own included: `widget/widget.cursor.go` registers
 an `inkwell.Cursor` exactly as `background/background.street.go` registers an image. What

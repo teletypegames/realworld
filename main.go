@@ -7,7 +7,7 @@ import (
 
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"git.teletypegames.org/games/realworld/inc/boot"
+	"realworld/inc/system/boot"
 )
 
 //go:embed assets

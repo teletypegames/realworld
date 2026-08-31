@@ -76,10 +76,12 @@ implied and left off, which is what `gofmt -s` produces.
 
 ## Layout
 
-One category, one package, one directory. A file keeps the category in its own
-name anyway — `[category].[name].go` inside `inc/[category]/` — because the
-prefix is what makes a file findable in a list of editor tabs, a grep, or a
-diff, where the directory has already fallen off.
+One category, one package, one directory, and every category sits in one of two
+groups: `inc/system/` is the machinery, `inc/content/` is what the game is made
+of. A file keeps the category in its own name anyway — `[category].[name].go`
+inside `inc/[group]/[category]/` — because the prefix is what makes a file
+findable in a list of editor tabs, a grep, or a diff, where the directory has
+already fallen off, and now two directories have.
 
 - The category is always **singular**: `item`, `scene`, `background`,
   `character`, `tape`, `dialog`, `script`, `world`, `widget`, `theme`.
@@ -88,35 +90,57 @@ diff, where the directory has already fallen off.
 - Every other file in a package holds exactly one entity: one scene, one
   background, one item. The file registers it itself, in an `init()`.
 - Two files have no category. `inc/constants.go` is the vocabulary every
-  package imports, and `inc/boot/boot.go` builds the game.
+  package imports, and `inc/system/boot/boot.go` builds the game.
 
 ```
 main.go                                  flags + inkwell.Run
 inc/constants.go                         entity names and world-state keys
-inc/boot/boot.go                         New(Opts) builds the game
-inc/theme/theme.manager.go               the Theme alias, its Manager, RGB/RGBA
-inc/theme/theme.realworld.go             realworld-93
-inc/theme/theme.nokia_punk.go            nokia-punk
-inc/world/world.manager.go               unsaved runtime state
-inc/world/world.action.go                custom actions
-inc/tape/tape.manager.go                 the Tape entity and the lookups over it
-inc/tape/tape.*.go                       one tape per file
-inc/widget/widget.manager.go             the Widget alias, HUD layout, the conditions
-inc/widget/widget.*.go                   one widget per file, registering itself
-inc/background/background.*.go           one image asset per scene
-inc/character/character.*.go             the cast, tapes included
-inc/item/item.*.go                       inventory
-inc/dialog/dialog.*.go                   dialogue trees
-inc/script/script.*.go                   named action sequences
-inc/scene/scene.manager.go               the Scene alias, its Manager, the floor
-inc/scene/scene.selector.go              the map screen: pins derived from the graph
-inc/scene/scene.*.go                     one file per scene
+
+inc/system/boot/boot.go                  New(Opts) builds the game
+inc/system/widget/widget.manager.go      the Widget alias, HUD layout, the conditions
+inc/system/widget/widget.*.go            one widget per file, registering itself
+inc/system/world/world.manager.go        unsaved runtime state
+inc/system/world/world.action.go         custom actions
+inc/system/theme/theme.manager.go        the Theme alias, its Manager, RGB/RGBA
+inc/system/theme/theme.realworld.go      realworld-93
+inc/system/theme/theme.nokia_punk.go     nokia-punk
+
+inc/content/scene/scene.manager.go       the Scene alias, its Manager, the floor
+inc/content/scene/scene.selector.go      the map screen: pins derived from the graph
+inc/content/scene/scene.*.go             one file per scene
+inc/content/background/background.*.go   one image asset per scene
+inc/content/character/character.*.go     the cast, tapes included
+inc/content/item/item.*.go               inventory
+inc/content/dialog/dialog.*.go           dialogue trees
+inc/content/script/script.*.go           named action sequences
+inc/content/tape/tape.manager.go         the Tape entity and the lookups over it
+inc/content/tape/tape.*.go               one tape per file
 ```
 
 `inc` is constants and nothing else, so every package can import it and it can
-import none of them. That is also why `New` sits in `inc/boot` rather than in
-`inc`: a package cannot be imported by what it imports, and the assembly is the
-one thing that has to name every package at once.
+import none of them. That is also why `New` sits in `inc/system/boot` rather than
+in `inc`: a package cannot be imported by what it imports, and the assembly is
+the one thing that has to name every package at once.
+
+The two groups say who writes a file, not which way an import points. `content`
+is what a writer adds a file to; `system` is the machine that runs it. Mostly
+that agrees with the graph — a character names a `theme` colour, a scene names a
+`world` action, and neither `theme` nor `world` knows the caller back — but two
+edges cross the other way, and both are meant to. `boot` names every content
+package at once, which is what assembly *is*. And `widget` reads `tape`, because
+the tape slots ask which cassette a tape is in.
+
+So the grouping is not the layering. The layering is the import graph and the
+compiler keeps it on its own, whichever directory a package sits in; the
+directories are there so that opening `content/` shows the game and opening
+`system/` shows the machine. A cassette is something somebody writes — a voice,
+an item, a dialogue — so `tape` is content, even though the HUD reaches across
+for it.
+
+The module is plain `realworld`, with no host in front of it, because nothing
+imports this repository — it is an executable, not a library. Own packages are
+therefore `realworld/inc/system/widget`, and since that sorts after
+`github.com/…`, they go in their own import group, below the dependencies.
 
 ## Managers
 
@@ -128,7 +152,7 @@ Each one is declared in its own package's manager file, beside the alias it
 holds, and it needs no prefix because the package already is one:
 
 ```go
-// inc/character/character.manager.go
+// inc/content/character/character.manager.go
 package character
 
 type Character = inkwell.Character
@@ -136,7 +160,7 @@ type Character = inkwell.Character
 var Manager = inkwell.NewManager[Character]()
 ```
 
-Read from `inc/boot` the nine of them still line up as a list —
+Read from `inc/system/boot` the nine of them still line up as a list —
 `background.Manager`, `character.Manager`, `dialog.Manager`, `item.Manager`,
 `scene.Manager`, `script.Manager`, `tape.Manager`, `theme.Manager`,
 `widget.Manager` — only now the list is a consequence of the imports rather
@@ -190,8 +214,8 @@ one.
 Nothing may depend on it — including the order the arrow keys walk the scenes,
 which is simply the order the files sit in.
 
-An `init()` only runs if something imports the package. `inc/boot` names eight
-of the nine for their `Manager`, which is import enough; `tape` is the one
+An `init()` only runs if something imports the package. `inc/system/boot` names
+eight of the nine for their `Manager`, which is import enough; `tape` is the one
 nobody names, so it is there as a blank import. That list is **per package, not
 per entity** — a new scene file still touches nothing but itself.
 
@@ -378,12 +402,18 @@ pointing back is now an import cycle, not a review comment. The one edge worth
 knowing is `widget → tape`: the tape slots ask which cassette a tape is in, so
 the tape concept sits below the HUD rather than beside it.
 
+`theme`, `world` and `widget` are `inc/system/`, and so is `boot` — not because
+it sits low, it sits at the very top, but because nobody authors anything in it.
+The other seven, `tape` among them, are `inc/content/`, which makes `widget →
+tape` the one edge that leaves `system` for `content`.
+
 ## Adding a scene
 
 1. Constants in `inc/constants.go`: `Scene<Name>`, `Bg<Name>`
-2. `inc/scene/scene.<name>.go` — an `init()` registering a `Scene`, its
+2. `inc/content/scene/scene.<name>.go` — an `init()` registering a `Scene`, its
    `Title` and every `Label` written in both languages
-3. `inc/background/background.<name>.go` — an `init()` registering a `Background`
+3. `inc/content/background/background.<name>.go` — an `init()` registering a
+   `Background`
 4. A 640×380 PNG in `assets/bg/`
 
 Nothing else moves. There is no list to update.

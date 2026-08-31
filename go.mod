@@ -1,4 +1,4 @@
-module git.teletypegames.org/games/realworld
+module realworld
 
 go 1.26.3
 

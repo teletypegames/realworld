@@ -1,0 +1,20 @@
+package character
+
+import (
+	inkwell "git.teletypegames.org/engines/inkwell"
+
+	"realworld/inc"
+	"realworld/inc/system/theme"
+)
+
+func init() {
+	Manager.Register(Character{
+		Name: inc.TapeMystery,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "UNKNOWN TAPE"},
+			{Lang: "hu", Text: "ISMERETLEN KAZETTA"},
+		},
+		Voice:       inkwell.VoiceLog,
+		SpeechColor: theme.RGB(0xB9A98A),
+	})
+}
