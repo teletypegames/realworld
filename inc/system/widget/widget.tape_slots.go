@@ -7,8 +7,8 @@ import (
 
 	"realworld/inc"
 	"realworld/inc/content/tape"
+	"realworld/inc/system"
 	"realworld/inc/system/armilla"
-	"realworld/inc/system/world"
 )
 
 func init() {
@@ -69,10 +69,10 @@ func (slots *tapeSlots) Tick(context *inkwell.UICtx) {
 		game.Inventory.Select("")
 		if tape.IsItem(selected) {
 			armilla.SetPending(selected)
-			world.Do(inkwell.RunScript(inc.ScriptTapeInsert))
+			system.System.Do(inkwell.RunScript(inc.ScriptTapeInsert))
 			return
 		}
-		world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+		system.System.Do(inkwell.Say(inc.Dex, inkwell.Text{
 			{Lang: "en", Text: "That isn't a tape, Paul. That's an object. There is a difference."},
 			{Lang: "hu", Text: "Az nem kazetta, Paul. Az egy tárgy. Van különbség."},
 		}))
@@ -80,7 +80,7 @@ func (slots *tapeSlots) Tick(context *inkwell.UICtx) {
 	}
 	if !clickedSecond && selected != "" {
 		game.Inventory.Select("")
-		world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+		system.System.Do(inkwell.Say(inc.Dex, inkwell.Text{
 			{Lang: "en", Text: "The first slot is mine. I'm not moving."},
 			{Lang: "hu", Text: "Az első foglalat az enyém. Nem megyek sehová."},
 		}))
@@ -90,33 +90,33 @@ func (slots *tapeSlots) Tick(context *inkwell.UICtx) {
 	switch game.SelectedVerb() {
 	case "talk":
 		if !clickedSecond {
-			world.Do(world.Paused(inkwell.RunDialogue(inc.DialogDex)))
+			system.System.Do(system.System.Paused(inkwell.RunDialogue(inc.DialogDex)))
 			return
 		}
 		if loaded := armilla.Slot2(); loaded != "" {
-			world.Do(world.Paused(inkwell.RunDialogue(tape.Dialogue(loaded))))
+			system.System.Do(system.System.Paused(inkwell.RunDialogue(tape.Dialogue(loaded))))
 			return
 		}
-		world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+		system.System.Do(inkwell.Say(inc.Dex, inkwell.Text{
 			{Lang: "en", Text: "Empty. Nobody to talk to."},
 			{Lang: "hu", Text: "Üres. Nincs kivel beszélni."},
 		}))
 	default:
 		if !clickedSecond {
-			world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+			system.System.Do(inkwell.Say(inc.Dex, inkwell.Text{
 				{Lang: "en", Text: "Me. Four kilobytes of a dead man. Be grateful."},
 				{Lang: "hu", Text: "Én. Egy halott ember négy kilobájtja. Légy hálás."},
 			}))
 			return
 		}
 		if loaded := armilla.Slot2(); loaded != "" {
-			world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+			system.System.Do(inkwell.Say(inc.Dex, inkwell.Text{
 				{Lang: "en", Text: "That is the second slot. Be careful what you let in."},
 				{Lang: "hu", Text: "Az a második foglalat. Vigyázz, mit engedsz be."},
 			}))
 			return
 		}
-		world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+		system.System.Do(inkwell.Say(inc.Dex, inkwell.Text{
 			{Lang: "en", Text: "The second slot is empty. That's the rarer state."},
 			{Lang: "hu", Text: "A második foglalat üres. Ez a ritkább állapot."},
 		}))

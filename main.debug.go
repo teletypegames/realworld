@@ -1,5 +1,5 @@
 //go:build debug
 
-package boot
+package main
 
 const debugBuild = true

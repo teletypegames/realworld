@@ -177,7 +177,7 @@ go run . -lang en    # the language it was authored in, and the fallback
 go run . -lang hu
 ```
 
-`boot.New` sets `inkwell.Lang` from the flag and `inkwell.Fallback` to `"en"`,
+`main` sets `inkwell.Lang` from the flag and `inkwell.Fallback` to `"en"`,
 so a language a line has not been translated into yet still reaches the player
 in English rather than vanishing. Resolution happens at the moment of display,
 never at construction, so the `init()` that registers an entity does not care
@@ -231,13 +231,13 @@ repeated inside the directory that already carries it, because a file called
 `alley.go` tells you nothing in a list of open editor tabs.
 
 ```
-main.go                                flags + inkwell.Run
+main.go                                flags, the assembly, inkwell.Run
+main.debug.go  main.release.go         debugBuild, the -tags debug pair
 inc/constants.go                       every name and state key; imports nothing
 inc/util/                              RGB and RGBA over image/color; imports nothing
 
-inc/system/boot/                       New(Options): the hand-off to the engine
+inc/system/system.go                   System: the binding, the mode, the note, the actions
 inc/system/widget/                     HUD layout, visibility conditions, 14 widgets
-inc/system/world/                      the engine binding, the mode, the note
 inc/system/armilla/                    Paul's Armilla: two slots, the strip, the offer
 inc/system/theme/                      the Theme alias, realworld-93, nokia-punk
 
@@ -248,18 +248,20 @@ inc/content/item/  …/character/  …/dialog/  …/script/
 
 `inc` itself holds nothing but constants, which is why every package can import
 it and it can import none of them; `inc/util` is in neither group for the same
-reason, a helper over `image/color` that names nothing of the game's. The consequence is that the assembly moved
-down rather than up: `New` lives in `inc/system/boot`, because a package cannot
-be imported by what it imports.
+reason, a helper over `image/color` that names nothing of the game's. The
+consequence at the other end is that the assembly cannot sit in `inc/system`
+beside `System`: half the game imports `system`, and a package cannot be imported
+by what it imports, so the wiring is `main.go`.
 
 The groups say who writes a file rather than which way an import points:
 `content` is what a writer adds a file to, `system` is the machine that runs it.
 Mostly that agrees with the graph — a character names a `theme` colour, a scene
-names a `world` action, and neither knows the caller back — but two edges cross
-the other way on purpose. `boot` names every content package at once, which is
-what assembly is, and `widget` reads `tape`, because the tape slots ask which
+names a `system` action, and neither knows the caller back — but one edge crosses
+the other way on purpose: `widget` reads `tape`, because the tape slots ask which
 cassette a tape is in. The layering itself is still the import graph, and the
-compiler keeps it whichever directory a package sits in.
+compiler keeps it whichever directory a package sits in. `inc/system` is the one
+directory that is both a group and a package — the group is its subdirectories,
+the package is `System`.
 
 The module is plain `realworld` — no host in front of it, because nothing
 imports this repository; it is an executable, not a library. Own packages read
@@ -270,9 +272,9 @@ The layering is no longer a rule kept by hand — it is the import graph, and th
 compiler rejects the arrow that points the wrong way:
 
 ```
-inc ← theme ← world ← armilla ← tape ← widget ← boot ← main
+inc ← theme ← system ← armilla ← tape ← widget ← main
         ↑        ↑                              ↑
-        └── content ───────────────────────────-┘
+        └── content ──────────────────────────--┘
 ```
 
 Adding a scene means adding `inc/content/scene/scene.<name>.go` and
@@ -310,7 +312,7 @@ func init() {
 ```
 
 The `init()` only runs if something imports the package, so a package whose
-entities nobody names by symbol needs a blank import in `inc/system/boot`.
+entities nobody names by symbol needs a blank import in `main.go`.
 Exactly one does — `tape`, everything else is imported for its manager — and
 the list is per package, not per entity, so adding a file is still adding a
 file.
@@ -363,13 +365,20 @@ are fields on the `*Game`, so a scene file that says nothing about either means
 written back before the hand-off is the derived half of the map:
 `scene.FillSelectorPins` reads the exit graph backwards and `Set`s the selector.
 
-There is one world, and now the package *is* the singleton: `world.Do(…)`,
-`world.Game()`, `world.Func(…)`. Nothing takes a world parameter and no widget
-holds a back-reference, which is what lets a script file be a literal — the
-tape-insert script closes over the package rather than over a parameter someone
-would have had to thread to it. `world` itself is down to the binding: the
-engine pointer, the mode and the top bar's note, the last two being `State` vars
-the engine can see for itself.
+There is one game, so there is one system, and it is a value rather than a type
+anyone constructs: `var System = &system{}`, with `system` unexported so no
+second one can exist. Everything the package offers is a method on it —
+`System.Do(…)`, `System.Game()`, `System.Func(…)`, `System.Paused(…)` — and there
+are no package functions beside them, and no hand-written `Action` or `Runner`
+types either — `Func` and `Paused` are `inkwell.Custom` closures, which is what
+keeps the package to one file. Nothing takes a system parameter and no
+widget holds a back-reference, which is what lets a script file be a literal: the
+tape-insert script closes over `system.System` rather than over a parameter
+someone would have had to thread to it. `System` itself is down to the binding:
+the engine pointer, the mode and the top bar's note, the last two being `State`
+vars the engine can see for itself. What it deliberately does not hold is the
+assembly — every content package imports `system`, so the wiring lives in
+`main.go`.
 
 The device came out of it. **Armilla** is the wiki's word for the wrist-worn
 runtime a Personal Tape snaps into, and Paul's is the one piece of the fiction

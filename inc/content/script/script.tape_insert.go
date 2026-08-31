@@ -4,15 +4,15 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/system"
 	"realworld/inc/system/armilla"
-	"realworld/inc/system/world"
 )
 
 func init() {
 	ScriptManager.Register(Script{
 		Name: inc.ScriptTapeInsert,
 		Actions: inkwell.Seq(
-			world.Func(func(context *inkwell.Ctx) {
+			system.System.Func(func(context *inkwell.Ctx) {
 				item := armilla.TakePending()
 				if item == "" {
 					return

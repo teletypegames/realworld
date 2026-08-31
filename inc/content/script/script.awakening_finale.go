@@ -4,21 +4,21 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
-	"realworld/inc/system/world"
+	"realworld/inc/system"
 )
 
 func init() {
 	ScriptManager.Register(Script{
 		Name: inc.ScriptFinale,
 		Actions: inkwell.Seq(
-			world.SetMode(world.ModeCutscene),
+			system.System.SetMode(system.ModeCutscene),
 			inkwell.Wait(0.6),
 			inkwell.Say(inc.Paul, inkwell.Text{
 				{Lang: "en", Text: "I'm putting it in. That's all this is."},
 				{Lang: "hu", Text: "Beteszem. Ennyi az egész."},
 			}),
 			inkwell.Wait(0.4),
-			world.UseTheme(inc.NokiaPunk),
+			system.System.UseTheme(inc.NokiaPunk),
 			inkwell.Say("norman", inkwell.Text{
 				{Lang: "en", Text: "No — this isn't what you were supposed to do!"},
 				{Lang: "hu", Text: "Ne — nem ezt kellett volna tenned!"},

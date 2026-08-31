@@ -6,7 +6,7 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
-	"realworld/inc/system/world"
+	"realworld/inc/system"
 )
 
 type useWithFail struct {
@@ -63,8 +63,8 @@ var fail = useWithFail{
 
 func UseWithFail(item string, hotspot *inkwell.Hotspot) inkwell.Action {
 	key := "fail." + item + "." + hotspot.Name
-	world.Game().State.NoteTalked(key)
-	count := world.Game().State.Talked(key)
+	system.System.Game().State.NoteTalked(key)
+	count := system.System.Game().State.Talked(key)
 
 	return inkwell.Seq(
 		inkwell.Say(inc.Paul, fail.paul(count)),

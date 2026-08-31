@@ -27,6 +27,11 @@ does not apply here: `func (frame *hudFrame)`, `func (channel *tapeChannel)`,
 `func (slots *tapeSlots)`. The receiver takes the noun the type is *an instance
 of*, so it never has to repeat the type name and never shadows it.
 
+`func (system *system)` is the one place the two words are the same, and it is
+not an oversight: there is exactly one system, so the noun an instance of it
+takes *is* "system". Nothing inside the methods needs to name the type, so the
+shadowing costs nothing.
+
 Three things keep their short form, and all three for the same reason — they are
 somebody else's word, not ours:
 
@@ -108,15 +113,18 @@ findable in a list of editor tabs, a grep, or a diff, where the directory has
 already fallen off, and now two directories have.
 
 - The category is always **singular**: `item`, `scene`, `background`,
-  `character`, `tape`, `dialog`, `script`, `world`, `armilla`, `widget`,
-  `theme`.
+  `character`, `tape`, `dialog`, `script`, `armilla`, `widget`, `theme`.
 - `[category].manager.go` is the file that ties a package together — its entity
   type, its `Manager`, and whatever else the category shares.
 - Every other file in a package holds exactly one entity: one scene, one
   background, one item. The file registers it itself, in an `init()`.
 - Two things have no category. `inc/constants.go` is the vocabulary every
-  package imports, and `inc/system/boot/` builds the game — `boot.go`, plus the
-  two one-line files a `-tags debug` build picks between.
+  package imports, and `main.go` builds the game — flags, the assembly, and
+  `inkwell.Run` — beside the two one-line files a `-tags debug` build picks
+  between.
+- `inc/system/` is the one directory that is a group *and* a package. The group
+  is its subdirectories; the package is the single file `system.go`, which holds
+  `System`, the singleton every other package reaches through.
 - `inc/util` is in neither group, beside `inc/constants.go` rather than under
   one of them, for the same reason: it is a helper over the standard library
   with no game in it, so it imports nothing of ours and anything may import it.
@@ -124,17 +132,15 @@ already fallen off, and now two directories have.
   themes are written in.
 
 ```
-main.go                                  flags + inkwell.Run
+main.go                                  flags, the assembly, inkwell.Run
+main.debug.go                            debugBuild = true, behind -tags debug
+main.release.go                          debugBuild = false, without it
 inc/constants.go                         entity names and world-state keys
 inc/util/util.color.go                   RGB and RGBA, hex to color.Color
 
-inc/system/boot/boot.go                  New(Options) builds the game
-inc/system/boot/boot.debug.go            debugBuild = true, behind -tags debug
-inc/system/boot/boot.release.go          debugBuild = false, without it
+inc/system/system.go                     System: the binding, the mode, the note, the actions
 inc/system/widget/widget.manager.go      the Widget alias, HUD layout, the conditions
 inc/system/widget/widget.*.go            one widget per file, registering itself
-inc/system/world/world.manager.go        the engine binding, the mode, the note
-inc/system/world/world.action.go         custom actions
 inc/system/armilla/armilla.manager.go    Paul's Armilla: two slots, the strip
 inc/system/theme/theme.manager.go        the Theme alias and its Manager
 inc/system/theme/theme.realworld.go      realworld-93
@@ -153,16 +159,16 @@ inc/content/tape/tape.*.go               one tape per file
 ```
 
 `inc` is constants and nothing else, so every package can import it and it can
-import none of them. That is also why `New` sits in `inc/system/boot` rather than
-in `inc`: a package cannot be imported by what it imports, and the assembly is
-the one thing that has to name every package at once.
+import none of them. The assembly is the other end of that: it is the one thing
+that has to name every package at once, so it can be named by none of them, and
+it sits in `main.go`. It cannot live in `system` beside `System` — half the game
+imports `system`, and a package cannot be imported by what it imports.
 
 The two groups say who writes a file, not which way an import points. `content`
 is what a writer adds a file to; `system` is the machine that runs it. Mostly
 that agrees with the graph — a character names a `theme` colour, a scene names a
-`world` action, and neither `theme` nor `world` knows the caller back — but two
-edges cross the other way, and both are meant to. `boot` names every content
-package at once, which is what assembly *is*. And `widget` reads `tape`, because
+`system` action, and neither `theme` nor `system` knows the caller back — but one
+edge crosses the other way, and it is meant to: `widget` reads `tape`, because
 the tape slots ask which cassette a tape is in.
 
 So the grouping is not the layering. The layering is the import graph and the
@@ -197,7 +203,7 @@ type Character = inkwell.Character
 var CharacterManager = inkwell.NewManager[Character]()
 ```
 
-Read from `inc/system/boot` the nine of them still line up as a list —
+Read from `main.go` the nine of them still line up as a list —
 `background.BackgroundManager`, `character.CharacterManager`,
 `dialog.DialogManager`, `item.ItemManager`, `scene.SceneManager`,
 `script.ScriptManager`, `tape.TapeManager`, `theme.ThemeManager`,
@@ -277,17 +283,18 @@ data rather than build it, the type is not empty and the data are its fields:
 `script.usewith_fail.go` carries the four line-sets as fields of `useWithFail`
 and answers with `fail.paul(n)` and `fail.dex(n)`.
 
-The rule stops at the package's own API. `world.Do`, `armilla.Slot2`,
-`tape.Dialogue` and `boot.New` stay functions, because there the package is
-already the namespace and the receiver would be an empty word.
+The rule stops where the package is already the namespace: `armilla.Slot2`,
+`tape.Dialogue` and `scene.FillSelectorPins` stay functions, because a receiver
+there would be an empty word. `system` is the other way round — the receiver is
+the whole point, so everything it offers is a method on `System`.
 
 `init()` order is file-name order, so **registration order is alphabetical**.
 Nothing may depend on it — including the order the debug menu lists the scenes
 in, which is simply the order the files sit in.
 
-An `init()` only runs if something imports the package. `inc/system/boot` names
-eight of the nine for their manager, which is import enough; `tape` is the one
-nobody names, so it is there as a blank import. That list is **per package, not
+An `init()` only runs if something imports the package. `main.go` names eight of
+the nine for their manager, which is import enough; `tape` is the one nobody
+names, so it is there as a blank import. That list is **per package, not
 per entity** — a new scene file still touches nothing but itself.
 
 ### Widgets name their layer instead of their order
@@ -361,69 +368,84 @@ to that set instead.
 
 One consequence of not copying: a manager swapped in this way must be in place
 before `inkwell.Run`, which is where the engine wires up the parts that hold a
-registry directly. `fillSelectorPins` runs before the hand-off for the same
+registry directly. `scene.FillSelectorPins` runs before the hand-off for the same
 reason — it writes the derived pins back into `SceneManager` with `Set`.
 
-The defaults a scene leaves out are no longer written into it at all. `g.Player`
-names the character a scene with no actors of its own gets, placed at his
-`Start`; `g.Walkboxes` is the floor a scene walks on when it declares none. Both
+The defaults a scene leaves out are no longer written into it at all.
+`game.Player` names the character a scene with no actors of its own gets, placed
+at his `Start`; `game.Walkboxes` is the floor a scene walks on when none. Both
 are fields on the `*Game`, so a scene file that says nothing about either is
 saying "the usual", and the selector opts out by declaring both empty.
 
 ### What runs at boot
 
-`New` names two scripts and nothing else — the opening a player sees is content
+`main` names two scripts and nothing else — the opening a player sees is content
 like every other script, in `script/script.opening.go`, not a slice built in the
 wiring:
 
 ```go
-g.StartAt(start)
-g.OnStart(inc.ScriptOpening)
-if o.Finale {
-	g.OnFinale(inc.ScriptFinale)
+game.StartAt(*start)
+game.OnStart(inc.ScriptOpening)
+if *finale {
+	game.OnFinale(inc.ScriptFinale)
 }
 ```
 
 `OnFinale` is the engine's hook for a closing script, queued straight after the
 opening. Here it is what `-finale` uses to drop into the ending, which is why it
-is set from `Options` rather than always.
+is set from the flag rather than always.
 
-The rest of `New` is fields on the `*Game`, and every one of them replaces
-something this package used to carry itself:
+The rest of the assembly is fields on the `*Game`, and every one of them replaces
+something the game used to carry itself:
 
 ```go
-g.WindowScale = 2
-g.Player = inc.Paul
-g.Walkboxes = scene.Floor
-g.UseWithFail = script.UseWithFail
+game.WindowScale = 2
+game.Player = inc.Paul
+game.Walkboxes = scene.Floor
+game.UseWithFail = script.UseWithFail
 ```
 
 `UseWithFail` is the response to a use-with pair nobody authored — the engine
 asks for it the same way it asks for `ExitLook` and `ExitTake`, and the lines
 live with the rest of the writing, in `script/script.usewith_fail.go`.
 
-## The world
+## The system
 
-There is exactly one game, so there is exactly one world — and since there is
-exactly one, the **package is the singleton**. What the singleton holds is a
-`state` struct with one unexported instance, so the mutable fields sit together
-and `Attach` resets them in a single assignment rather than one line per field —
-a fifth field cannot be forgotten. `armilla` does the same. Only the state is a
-struct: the exported names stay package functions, because a `*World` threaded
-to every widget and script is the thing this design removed. There is no `World` value to pass
-around and no back-reference for a widget to hold: `world.Do(…)`,
-`world.Game()`, `world.Func(…)` are reachable from anywhere that imports `world`.
-`New` calls `world.Attach(g)`, which binds the engine and resets the run state,
-so building the game twice is clean.
+There is exactly one game, so there is exactly one system — and since there is
+exactly one, it is a value, not a type anyone constructs:
 
-`world` holds as little as it can get away with, and after the Armilla moved out
+```go
+type system struct {
+	game *inkwell.Game
+}
+
+var System = &system{}
+```
+
+The type is unexported, so `System` is the only instance that can exist, and
+every name the package offers is a method on it: `System.Do(…)`, `System.Game()`,
+`System.Func(…)`, `System.Paused(…)`, `System.SetMode(…)`, `System.UseTheme(…)`.
+There are no package functions beside it, and no `Action` or `Runner` types of
+its own either: `Func` and `Paused` are `inkwell.Custom` closures, so one file
+holds the whole package. The mutable state is the struct's
+fields rather than package variables, so `Attach` is a hand-off to one value and
+not a sweep over several — and nothing is threaded anywhere: a widget holds no
+back-reference and a script takes no parameter, because `system.System` is
+reachable from anywhere that imports `system`. `main` calls
+`System.Attach(game)`, which binds the engine and resets the run state, so
+building the game twice is clean.
+
+`system` holds as little as it can get away with, and after the Armilla moved out
 it holds nothing but the binding: the engine pointer, the mode, and the top
 bar's note. The mode and the note are `State` vars (`inc.VarMode`,
 `inc.VarNote`), because state the engine can see is state a `Condition` can read
 — that is what makes a widget's `When` possible and what puts "— paused" in the
-top bar without anyone pushing it there. `world.Do` hands its action to `g.Do`,
-the engine's queue, so the game runs one action at a time without a pump of its
-own.
+top bar without anyone pushing it there. `System.Do` hands its action to
+`game.Do`, the engine's queue, so the game runs one action at a time without a
+pump of its own.
+
+What `system` cannot hold is the assembly. Every content package imports it, so
+it can import none of them, and the wiring lives in `main.go` instead.
 
 ## The Armilla
 
@@ -443,26 +465,28 @@ Slot 2 and the strip are `State` vars — `inc.VarSlot2` and `inc.VarArmillaStri
 both spelled `armilla.…`, so the save file says the same word the package does.
 The other two are the things the engine has no notion of: the cassette on its way
 into the slot, and the tape waiting to speak. Only `armilla.Reset()` clears them,
-and `New` calls it straight after `world.Attach`.
+and `main` calls it straight after `System.Attach`.
 
-`armilla` builds on `world` — slot 2 and the strip go through `world.Game()`, and
-`TakeOffer` hands its line to `world.Do` — and it knows nothing of `tape`: which
-dialogue a cassette plays is `tape.Dialogue`, asked by the HUD, not by the
-device. It is `inc/system/` because nobody authors a file into it, diegetic
-object or not.
+`armilla` builds on `system` — slot 2 and the strip go through
+`system.System.Game()`, and `TakeOffer` hands its line to `system.System.Do` —
+and it knows nothing of `tape`: which dialogue a cassette plays is
+`tape.Dialogue`, asked by the HUD, not by the device. It is `inc/system/` because
+nobody authors a file into it, diegetic object or not. Its own names stay package
+functions, because `armilla` holds no `Armilla` value the way `system` holds
+`System` — there is one wrist, and the package is it.
 
 This is what lets an entity file be a literal: the tape-insert script closes
-over the `world` package, not over a parameter it would have had to be handed.
+over `system.System`, not over a parameter it would have had to be handed.
 
 ## Naming
 
 The package is the namespace, so an identifier never repeats what the package
 already says. It is `scene.Floor`, not `scene.SceneFloor`; `tape.Dialogue`, not
-`tape.TapeDialogue`; `world.Do`, not `world.WorldDo`. Read the call site, not
+`tape.TapeDialogue`; `System.Do`, not `System.DoAction`. Read the call site, not
 the declaration, when choosing a name:
 
 ```go
-scene.FillSelectorPins()   tape.Is(speaker)   world.Do(action)   widget.ScreenWidth
+scene.FillSelectorPins()   tape.Is(speaker)   system.System.Do(action)   widget.ScreenWidth
 ```
 
 The manager is the one exception, and it keeps its prefix on purpose:
@@ -476,12 +500,13 @@ Entities themselves need no name at all — they are anonymous literals inside
 their file's `init()`, and the file name says which one it is.
 
 Exported names are the authoring vocabulary — what a content file spells out:
-`boot.New` and `boot.Options`, the constants in `inc/constants.go`, each package's
+the constants in `inc/constants.go`, each package's
 `<Category>Manager` and entity type, the colour tokens, the tape lookups
-(`tape.Is`, `tape.Of`, `tape.IsItem`, `tape.Dialogue`), the world (`world.Do`,
-`world.Game`, …), the Armilla (`armilla.Slot2`, `armilla.SetStrip`, …) and the
-action constructors (`world.Paused`, `world.SetMode`,
-`world.UseTheme`, `armilla.Offer`, `world.Func`). A tape's line is `inkwell.Say`
+(`tape.Is`, `tape.Of`, `tape.IsItem`, `tape.Dialogue`), the system
+(`system.System` and its methods `Do`, `Game`, `Attach`, …), the Armilla
+(`armilla.Slot2`, `armilla.SetStrip`, …) and the action constructors
+(`System.Paused`, `System.SetMode`, `System.UseTheme`, `System.Func`,
+`armilla.Offer`). A tape's line is `inkwell.Say`
 like anyone else's — the tape voice is on the character, not on a second
 spelling of Say.
 
@@ -500,22 +525,22 @@ display: `ScreenWidth`, `ScreenHeight`.
 The layering is the import graph, so the compiler keeps it:
 
 ```
-inc ← theme ← world ← armilla ← tape ← widget ← boot ← main
+inc ← theme ← system ← armilla ← tape ← widget ← main
  ↑      ↑        ↑                              ↑
-util    └── content ───────────────────────────-┘
+util    └── content ──────────────────────────--┘
 ```
 
 `inc` imports nothing and everything imports it, and `util` sits beside it on
-the same footing — standard library only, no game in it. `world` knows nothing about the
-HUD or the content; both build on it, never the other way round — and an arrow
-pointing back is now an import cycle, not a review comment. The one edge worth
-knowing is `widget → tape`: the tape slots ask which cassette a tape is in, so
-the tape concept sits below the HUD rather than beside it.
+the same footing — standard library only, no game in it. `system` knows nothing
+about the HUD or the content; both build on it, never the other way round — and
+an arrow pointing back is now an import cycle, not a review comment. The one edge
+worth knowing is `widget → tape`: the tape slots ask which cassette a tape is in,
+so the tape concept sits below the HUD rather than beside it.
 
-`theme`, `world`, `armilla` and `widget` are `inc/system/`, and so is `boot` —
-not because it sits low, it sits at the very top, but because nobody authors
-anything in it. The other seven, `tape` among them, are `inc/content/`, which
-makes `widget → tape` the one edge that leaves `system` for `content`.
+`main` is at the very top, and it is the only place that names every package at
+once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other six,
+`tape` among them, are `inc/content/`, which makes `widget → tape` the one edge
+that leaves `system` for `content`.
 
 ## Adding a scene
 
