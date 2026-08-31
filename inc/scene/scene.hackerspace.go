@@ -7,8 +7,11 @@ import (
 
 func init() {
 	Manager.Register(Scene{
-		Name:       inc.SceneHackerspace,
-		Title:      "HACKERSPACE",
+		Name: inc.SceneHackerspace,
+		Title: inkwell.Text{
+			{Lang: "en", Text: "HACKERSPACE"},
+			{Lang: "hu", Text: "HACKERSPACE"},
+		},
 		Background: inc.BgHackerspace,
 		Exits: []inkwell.Exit{
 			exitToSelector,

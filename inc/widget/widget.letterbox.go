@@ -22,6 +22,11 @@ type letterbox struct {
 	Bar  float64
 }
 
+var tapeWaitingHint = inkwell.Text{
+	{Lang: "en", Text: "SPACE — %s has something to say"},
+	{Lang: "hu", Text: "SZÓKÖZ — %s mondani akar valamit"},
+}
+
 func (l *letterbox) GetName() string                { return l.Name }
 func (l *letterbox) VisibleWhen() inkwell.Condition { return whenCutscene }
 func (l *letterbox) Layer() inkwell.Layer           { return inkwell.LayerScene }
@@ -48,7 +53,7 @@ func (l *letterbox) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	vector.DrawFilledRect(dst, 0, h-float32(bar), w, float32(bar), black, false)
 
 	if world.TapeWaiting() {
-		msg := "SPACE — " + g.CharacterLabel(inc.Dex) + " has something to say"
+		msg := inkwell.Format(tapeWaitingHint, g.CharacterLabel(inc.Dex)).String()
 		g.DrawText(dst, msg, g.Width-inkwell.TextWidth(msg)-4, g.Height-int(bar)+4, th.ChatLogResponse)
 	}
 }

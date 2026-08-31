@@ -24,6 +24,7 @@ go run .
 
 ```bash
 go run .                   # the alley (beat 3)
+go run . -lang hu          # the same game in Hungarian
 go run . -finale           # the finale — try the Nokia-punk theme switch
 go run . -scene selector   # the location selector: the map the city hangs off
 go run . -scene hospital   # any scene in the deck, e.g. to look at the art
@@ -87,7 +88,7 @@ any other size fails the build.
 
 It still gives the wiki's "320×200 VGA look" brief what it was after — a low,
 wide VGA frame at an exact 2× of a 320-wide canvas — and it still keeps the
-engine's fixed **6×16** debug font readable, at 4% of the screen height. (At
+engine's fixed **6×16** font readable, at 4% of the screen height. (At
 320×190 it would be 8%: rows overlap and the top bar cannot hold a line.)
 
 The HUD is therefore an opaque strip laid over the foot of the painting, and it
@@ -121,6 +122,49 @@ proportions are not carried over.
 
 The dialogue box deliberately spans only the left region, so a tape can comment
 *alongside* a conversation.
+
+## Languages
+
+The game is written twice, in place. Every string the player reads is an
+`inkwell.Text` — the same string in as many languages as somebody has written
+it in — and it stays in the file that owns the thing it names:
+
+```go
+OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+	{Lang: "en", Text: "Keypad. Four digits, worn keys."},
+	{Lang: "hu", Text: "Billentyűzet. Négy számjegy, kopott gombok."},
+}),
+```
+
+One translation per line, stacked, so the languages read as a table. There is
+no catalogue and no message id: a line lives beside the hotspot it answers, so
+a translator reading `scene.alley.go` can see what Paul is looking at while he
+says it. Adding a third language is adding one more line to each array, and it
+touches nothing else. `-lang` picks which one is spoken:
+
+```bash
+go run . -lang en    # the language it was authored in, and the fallback
+go run . -lang hu
+```
+
+`boot.New` sets `inkwell.Lang` from the flag and `inkwell.Fallback` to `"en"`,
+so a language a line has not been translated into yet still reaches the player
+in English rather than vanishing. Resolution happens at the moment of display,
+never at construction, so the `init()` that registers an entity does not care
+when the language was set.
+
+Two things do **not** get translated, and both are load-bearing:
+
+- **Names.** `inc.SceneAlley`, `inc.FlagHasTape`, `inc.NotePaused` are
+  identifiers the engine and the conditions compare against. `inc.NotePaused`
+  is the one that looks like prose — it is a `State` var `whenUnpaused` reads,
+  so the value stays `"paused"` in every language and `TopBar.Notes` in
+  `widget.top_bar.go` maps it to what the top bar shows.
+- **Sentence frames built around another string.** `inkwell.Format` resolves
+  the frame and its arguments in one language, because English puts the
+  preposition between the verb and its object and Hungarian puts it after
+  them — "Use hook on grate" against "Használd a kampót ezen: rács". A join
+  cannot say both; a frame per language can.
 
 ## The rule everything follows
 
@@ -339,6 +383,8 @@ field in a literal:
 | a `windowSizer` widget resizing the window on its first tick | `Game.WindowScale` |
 | a `sceneNav` widget walking the scene catalogue | `inkwell.SceneNav`, a built-in dev widget |
 | `sceneDefaults` rewriting every scene with Paul and a floor | `Game.Player` and `Game.Walkboxes` |
+| nothing yet — but a second language would have meant a parallel catalogue keyed by id | `inkwell.Text`: every displayed field carries its own languages, in place |
+| nothing yet — the debug font's atlas stops at U+00FF, so `ő` and `ű` drew as blanks (and so did the em dashes already in these scene titles) | inkwell bakes its own atlas through Latin Extended-A |
 
 Also: the inkwell README gives the module path as
 `git.teletypegames.org/games/inkwell`; the real path per its `go.mod` is

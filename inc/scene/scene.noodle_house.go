@@ -7,15 +7,21 @@ import (
 
 func init() {
 	Manager.Register(Scene{
-		Name:       inc.SceneNoodleHouse,
-		Title:      "NOODLE'S HOUSE — SEALED",
+		Name: inc.SceneNoodleHouse,
+		Title: inkwell.Text{
+			{Lang: "en", Text: "NOODLE'S HOUSE — SEALED"},
+			{Lang: "hu", Text: "NOODLE HÁZA — LEPECSÉTELVE"},
+		},
 		Background: inc.BgNoodleHouse,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 			{
-				To:    inc.SceneAlley,
-				Label: "the alley behind the house",
-				Side:  inkwell.ExitRight,
+				To: inc.SceneAlley,
+				Label: inkwell.Text{
+					{Lang: "en", Text: "the alley behind the house"},
+					{Lang: "hu", Text: "a sikátor a ház mögött"},
+				},
+				Side: inkwell.ExitRight,
 			},
 		},
 	})

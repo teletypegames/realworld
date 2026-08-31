@@ -40,12 +40,12 @@ func (t *tapeSlots) Tick(ctx *inkwell.UICtx) {
 
 	switch {
 	case r1.Contains(mp):
-		g.SetHoverLabel(g.CharacterLabel(inc.Dex))
+		g.SetHoverLabel(g.CharacterLabel(inc.Dex).String())
 	case r2.Contains(mp):
 		if s := world.Slot2(); s != "" {
-			g.SetHoverLabel(itemLabel(g, s))
+			g.SetHoverLabel(g.ItemLabel(s).String())
 		} else {
-			g.SetHoverLabel("empty tape slot")
+			g.SetHoverLabel(slotEmptyLabel.String())
 		}
 	}
 
@@ -67,12 +67,18 @@ func (t *tapeSlots) Tick(ctx *inkwell.UICtx) {
 			world.Do(inkwell.RunScript(inc.ScriptTapeInsert))
 			return
 		}
-		world.Do(inkwell.Say(inc.Dex, "That isn't a tape, Paul. That's an object. There is a difference."))
+		world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+			{Lang: "en", Text: "That isn't a tape, Paul. That's an object. There is a difference."},
+			{Lang: "hu", Text: "Az nem kazetta, Paul. Az egy tárgy. Van különbség."},
+		}))
 		return
 	}
 	if !slot2 && sel != "" {
 		g.Inventory.Select("")
-		world.Do(inkwell.Say(inc.Dex, "The first slot is mine. I'm not moving."))
+		world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+			{Lang: "en", Text: "The first slot is mine. I'm not moving."},
+			{Lang: "hu", Text: "Az első foglalat az enyém. Nem megyek sehová."},
+		}))
 		return
 	}
 
@@ -86,17 +92,29 @@ func (t *tapeSlots) Tick(ctx *inkwell.UICtx) {
 			world.Do(world.Paused(inkwell.RunDialogue(tape.Dialogue(s))))
 			return
 		}
-		world.Do(inkwell.Say(inc.Dex, "Empty. Nobody to talk to."))
+		world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+			{Lang: "en", Text: "Empty. Nobody to talk to."},
+			{Lang: "hu", Text: "Üres. Nincs kivel beszélni."},
+		}))
 	default:
 		if !slot2 {
-			world.Do(inkwell.Say(inc.Dex, "Me. Four kilobytes of a dead man. Be grateful."))
+			world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+				{Lang: "en", Text: "Me. Four kilobytes of a dead man. Be grateful."},
+				{Lang: "hu", Text: "Én. Egy halott ember négy kilobájtja. Légy hálás."},
+			}))
 			return
 		}
 		if s := world.Slot2(); s != "" {
-			world.Do(inkwell.Say(inc.Dex, "That is the second slot. Be careful what you let in."))
+			world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+				{Lang: "en", Text: "That is the second slot. Be careful what you let in."},
+				{Lang: "hu", Text: "Az a második foglalat. Vigyázz, mit engedsz be."},
+			}))
 			return
 		}
-		world.Do(inkwell.Say(inc.Dex, "The second slot is empty. That's the rarer state."))
+		world.Do(inkwell.Say(inc.Dex, inkwell.Text{
+			{Lang: "en", Text: "The second slot is empty. That's the rarer state."},
+			{Lang: "hu", Text: "A második foglalat üres. Ez a ritkább állapot."},
+		}))
 	}
 }
 
@@ -118,17 +136,29 @@ func (t *tapeSlots) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 		g.DrawText(dst, inkwell.ClipText(body, inner), x, int(r.Y)+Pad/2+LineH, col)
 	}
 
-	drawSlot(r1, "SLOT 1", g.CharacterLabel(inc.Dex), true)
+	drawSlot(r1, slot1.String(), g.CharacterLabel(inc.Dex).String(), true)
 	if s := world.Slot2(); s != "" {
-		drawSlot(r2, "SLOT 2", itemLabel(g, s), true)
+		drawSlot(r2, slot2Label.String(), g.ItemLabel(s).String(), true)
 	} else {
-		drawSlot(r2, "SLOT 2", "empty", false)
+		drawSlot(r2, slot2Label.String(), slotEmpty.String(), false)
 	}
 }
 
-func itemLabel(g *inkwell.Game, name string) string {
-	if it, ok := g.ItemManager.Get(name); ok && it.Description != "" {
-		return it.Description
+var (
+	slot1 = inkwell.Text{
+		{Lang: "en", Text: "SLOT 1"},
+		{Lang: "hu", Text: "1. FOGLALAT"},
 	}
-	return name
-}
+	slot2Label = inkwell.Text{
+		{Lang: "en", Text: "SLOT 2"},
+		{Lang: "hu", Text: "2. FOGLALAT"},
+	}
+	slotEmpty = inkwell.Text{
+		{Lang: "en", Text: "empty"},
+		{Lang: "hu", Text: "üres"},
+	}
+	slotEmptyLabel = inkwell.Text{
+		{Lang: "en", Text: "empty tape slot"},
+		{Lang: "hu", Text: "üres kazettafoglalat"},
+	}
+)

@@ -8,15 +8,21 @@ import (
 )
 
 var exitToSelector = inkwell.Exit{
-	To:    inc.SceneSelector,
-	Label: "the rest of the city",
-	Side:  inkwell.ExitNear,
+	To: inc.SceneSelector,
+	Label: inkwell.Text{
+		{Lang: "en", Text: "the rest of the city"},
+		{Lang: "hu", Text: "a város többi része"},
+	},
+	Side: inkwell.ExitNear,
 }
 
 func init() {
 	Manager.Register(Scene{
-		Name:       inc.SceneSelector,
-		Title:      "SAN FRANCISCO",
+		Name: inc.SceneSelector,
+		Title: inkwell.Text{
+			{Lang: "en", Text: "SAN FRANCISCO"},
+			{Lang: "hu", Text: "SAN FRANCISCO"},
+		},
 		Background: inc.BgSelector,
 		Actors:     []inkwell.SceneActor{},
 		Walkboxes:  []inkwell.Polygon{},
@@ -67,7 +73,9 @@ func pin(i int) inkwell.Shape {
 	return inkwell.Rect(pinX+float64(col)*pinGapX, pinY+float64(row)*pinGapY, pinW, pinH)
 }
 
-func pinLabel(title string) string {
-	name, _, _ := strings.Cut(title, " — ")
-	return name
+func pinLabel(title inkwell.Text) inkwell.Text {
+	return title.Map(func(s string) string {
+		name, _, _ := strings.Cut(s, " — ")
+		return name
+	})
 }

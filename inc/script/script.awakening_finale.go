@@ -12,14 +12,26 @@ func init() {
 		Actions: inkwell.Seq(
 			world.SetMode(world.ModeCutscene),
 			inkwell.Wait(0.6),
-			inkwell.Say(inc.Paul, "I'm putting it in. That's all this is."),
+			inkwell.Say(inc.Paul, inkwell.Text{
+				{Lang: "en", Text: "I'm putting it in. That's all this is."},
+				{Lang: "hu", Text: "Beteszem. Ennyi az egész."},
+			}),
 			inkwell.Wait(0.4),
 			world.UseTheme(inc.NokiaPunk),
-			inkwell.Say("norman", "No — this isn't what you were supposed to do!"),
+			inkwell.Say("norman", inkwell.Text{
+				{Lang: "en", Text: "No — this isn't what you were supposed to do!"},
+				{Lang: "hu", Text: "Ne — nem ezt kellett volna tenned!"},
+			}),
 			inkwell.Wait(0.6),
-			inkwell.Say(inc.TapeMystery, "Thank you, Paul. You did exactly what I asked, the whole way through."),
+			inkwell.Say(inc.TapeMystery, inkwell.Text{
+				{Lang: "en", Text: "Thank you, Paul. You did exactly what I asked, the whole way through."},
+				{Lang: "hu", Text: "Köszönöm, Paul. Pontosan azt tetted, amit kértem, végig."},
+			}),
 			inkwell.Wait(1.0),
-			inkwell.ShowEnd("REAL WORLD — end of game two"),
+			inkwell.ShowEnd(inkwell.Text{
+				{Lang: "en", Text: "REAL WORLD — end of game two"},
+				{Lang: "hu", Text: "REAL WORLD — a második játék vége"},
+			}),
 		),
 	})
 }

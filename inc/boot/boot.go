@@ -18,6 +18,12 @@ import (
 type Opts struct {
 	Scene  string
 	Finale bool
+	Lang   string
+}
+
+var exitLook = inkwell.Text{
+	{Lang: "en", Text: "That way: %s."},
+	{Lang: "hu", Text: "Arra van: %s."},
 }
 
 func New(o Opts) *inkwell.Game {
@@ -25,6 +31,9 @@ func New(o Opts) *inkwell.Game {
 	if start == "" {
 		start = inc.SceneAlley
 	}
+
+	inkwell.Fallback = "en"
+	inkwell.Lang = o.Lang
 
 	scene.FillSelectorPins()
 
@@ -35,10 +44,13 @@ func New(o Opts) *inkwell.Game {
 	g.Player = inc.Paul
 	g.Walkboxes = scene.Floor
 	g.ExitLook = func(e inkwell.Exit) inkwell.Action {
-		return inkwell.Say(inc.Paul, "That way: "+e.Label+".")
+		return inkwell.Say(inc.Paul, inkwell.Format(exitLook, e.Label))
 	}
 	g.ExitTake = func(inkwell.Exit) inkwell.Action {
-		return inkwell.Say(inc.Paul, "It's a way out, not a thing.")
+		return inkwell.Say(inc.Paul, inkwell.Text{
+			{Lang: "en", Text: "It's a way out, not a thing."},
+			{Lang: "hu", Text: "Az egy kijárat, nem egy tárgy."},
+		})
 	}
 	g.UseWithFail = script.UseWithFail
 

@@ -19,9 +19,18 @@ func init() {
 				ctx.Game.Inventory.Remove(item)
 				ctx.Game.State.SetVar(inc.VarArmillaStrip, "SLOT2: READING")
 			}),
-			inkwell.Say(inc.Paul, "Right. Let's see who you are."),
-			inkwell.Say(inc.Dex, "Clicked in. Spinning. And now: nothing."),
-			inkwell.Say(inc.Dex, "A stranger's tape in your own Armilla, Paul. I hope you know what you're doing."),
+			inkwell.Say(inc.Paul, inkwell.Text{
+				{Lang: "en", Text: "Right. Let's see who you are."},
+				{Lang: "hu", Text: "Jól van. Lássuk, ki vagy."},
+			}),
+			inkwell.Say(inc.Dex, inkwell.Text{
+				{Lang: "en", Text: "Clicked in. Spinning. And now: nothing."},
+				{Lang: "hu", Text: "Bekattant. Forog. És most: semmi."},
+			}),
+			inkwell.Say(inc.Dex, inkwell.Text{
+				{Lang: "en", Text: "A stranger's tape in your own Armilla, Paul. I hope you know what you're doing."},
+				{Lang: "hu", Text: "Egy idegen kazettája a saját Armilládban, Paul. Remélem, tudod, mit csinálsz."},
+			}),
 		),
 	})
 }

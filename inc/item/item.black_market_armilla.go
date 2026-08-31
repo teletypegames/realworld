@@ -7,16 +7,31 @@ import (
 
 func init() {
 	Manager.Register(Item{
-		Name:        inc.ItemBlackArmilla,
-		Description: "black-market Armilla",
+		Name: inc.ItemBlackArmilla,
+		Description: inkwell.Text{
+			{Lang: "en", Text: "black-market Armilla"},
+			{Lang: "hu", Text: "feketepiaci Armilla"},
+		},
 		OnUseSelf: inkwell.Seq(
-			inkwell.Say(inc.Paul, "Jailbroken. Pushes ads, but it was cheap."),
-			inkwell.Say(inc.Dex, "Two slots, and both of them lie about the temperature. Don't trade me in for it."),
+			inkwell.Say(inc.Paul, inkwell.Text{
+				{Lang: "en", Text: "Jailbroken. Pushes ads, but it was cheap."},
+				{Lang: "hu", Text: "Feltört. Reklámokat tol, de olcsó volt."},
+			}),
+			inkwell.Say(inc.Dex, inkwell.Text{
+				{Lang: "en", Text: "Two slots, and both of them lie about the temperature. Don't trade me in for it."},
+				{Lang: "hu", Text: "Két foglalat, és mindkettő hazudik a hőmérsékletről. Ne cserélj be érte."},
+			}),
 		),
 		OnUseWith: map[string]inkwell.Action{
 			inc.ItemNoodleLetter: inkwell.Seq(
-				inkwell.Say(inc.Paul, "A letter and a bracelet. Brilliant."),
-				inkwell.Say(inc.Dex, "Nothing. Which is what I'd charge for it."),
+				inkwell.Say(inc.Paul, inkwell.Text{
+					{Lang: "en", Text: "A letter and a bracelet. Brilliant."},
+					{Lang: "hu", Text: "Egy levél és egy karperec. Zseniális."},
+				}),
+				inkwell.Say(inc.Dex, inkwell.Text{
+					{Lang: "en", Text: "Nothing. Which is what I'd charge for it."},
+					{Lang: "hu", Text: "Semmi. Ennyit is kérnék érte."},
+				}),
 			),
 		},
 	})

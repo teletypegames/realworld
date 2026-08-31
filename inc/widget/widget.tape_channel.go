@@ -94,10 +94,10 @@ func (t *tapeChannel) lastSpeaker(g *inkwell.Game, th inkwell.Theme) (string, co
 	for i := len(msgs) - 1; i >= 0; i-- {
 		m := msgs[i]
 		if m.Kind == inkwell.LogResponse && tape.Is(m.Speaker) {
-			return g.CharacterLabel(m.Speaker), speechColor(g, m.Speaker, th.ChatLogResponse)
+			return g.CharacterLabel(m.Speaker).String(), speechColor(g, m.Speaker, th.ChatLogResponse)
 		}
 	}
-	return g.CharacterLabel(inc.Dex), speechColor(g, inc.Dex, th.ChatLogResponse)
+	return g.CharacterLabel(inc.Dex).String(), speechColor(g, inc.Dex, th.ChatLogResponse)
 }
 
 func speechColor(g *inkwell.Game, name string, fallback color.Color) color.Color {

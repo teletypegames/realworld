@@ -7,14 +7,20 @@ import (
 
 func init() {
 	Manager.Register(Scene{
-		Name:       inc.ScenePaulShop,
-		Title:      "PAUL'S SHOP — JUNK AND GARAGE",
+		Name: inc.ScenePaulShop,
+		Title: inkwell.Text{
+			{Lang: "en", Text: "PAUL'S SHOP — JUNK AND GARAGE"},
+			{Lang: "hu", Text: "PAUL BOLTJA — ÓCSKAVAS ÉS MŰHELY"},
+		},
 		Background: inc.BgPaulShop,
 		Exits: []inkwell.Exit{
 			{
-				To:    inc.SceneNoodleHouse,
-				Label: "the bus to San Francisco",
-				Side:  inkwell.ExitNear,
+				To: inc.SceneNoodleHouse,
+				Label: inkwell.Text{
+					{Lang: "en", Text: "the bus to San Francisco"},
+					{Lang: "hu", Text: "a busz San Franciscóba"},
+				},
+				Side: inkwell.ExitNear,
 			},
 		},
 	})

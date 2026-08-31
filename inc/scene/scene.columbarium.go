@@ -7,8 +7,11 @@ import (
 
 func init() {
 	Manager.Register(Scene{
-		Name:       inc.SceneColumbarium,
-		Title:      "COLUMBARIUM — DEX'S MEMORIAL",
+		Name: inc.SceneColumbarium,
+		Title: inkwell.Text{
+			{Lang: "en", Text: "COLUMBARIUM — DEX'S MEMORIAL"},
+			{Lang: "hu", Text: "KOLUMBÁRIUM — DEX EMLÉKHELYE"},
+		},
 		Background: inc.BgColumbarium,
 		Exits: []inkwell.Exit{
 			exitToSelector,

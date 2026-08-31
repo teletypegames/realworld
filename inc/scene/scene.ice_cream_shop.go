@@ -7,8 +7,11 @@ import (
 
 func init() {
 	Manager.Register(Scene{
-		Name:       inc.SceneIceCreamShop,
-		Title:      "ICE CREAM SHOP — WHERE THE BAR WAS",
+		Name: inc.SceneIceCreamShop,
+		Title: inkwell.Text{
+			{Lang: "en", Text: "ICE CREAM SHOP — WHERE THE BAR WAS"},
+			{Lang: "hu", Text: "FAGYIZÓ — A RÉGI BÁR HELYÉN"},
+		},
 		Background: inc.BgIceCreamShop,
 		Exits: []inkwell.Exit{
 			exitToSelector,

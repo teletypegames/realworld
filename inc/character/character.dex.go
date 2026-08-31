@@ -8,8 +8,11 @@ import (
 
 func init() {
 	Manager.Register(Character{
-		Name:        inc.Dex,
-		Label:       "DEX",
+		Name: inc.Dex,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "DEX"},
+			{Lang: "hu", Text: "DEX"},
+		},
 		Voice:       inkwell.VoiceLog,
 		SpeechColor: theme.Amber,
 	})

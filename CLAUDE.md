@@ -13,12 +13,29 @@ it until it does not, and put the reasoning in `README.md` instead.
 The single exception is compiler directives (`//go:embed`, `//go:build`), which
 are instructions to the toolchain rather than prose.
 
-### English only
+### English first, then every other language beside it
 
-Everything written in the repository is in English: identifiers, string
-literals, commit messages, `README.md`, this file. The design wiki is in
-Hungarian; when a concept crosses over, translate it and keep the mapping
-one-to-one.
+Identifiers, commit messages, `README.md` and this file are English and only
+English. A string the **player** reads is different: it is an `inkwell.Text`,
+carrying English first and every other language the game speaks after it, in
+the same file, at the same place:
+
+```go
+OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+	{Lang: "en", Text: "Keypad. Four digits, worn keys."},
+	{Lang: "hu", Text: "Billentyűzet. Négy számjegy, kopott gombok."},
+}),
+```
+
+One translation per line, stacked, and English first because it is the
+fallback — a line nobody has translated yet still reaches the player. Never
+leave a new player-visible string with only one language, and never lift one
+out into a catalogue: the wording belongs beside the thing it names, which is
+what lets a translator see what a line is answering. `README.md` has the rest,
+under **Languages**.
+
+The design wiki is in Hungarian; when a concept crosses over, translate it and
+keep the mapping one-to-one.
 
 ### No tests
 
@@ -42,6 +59,20 @@ Not `inkwell.Asset{Name: BgStreet, Path: "...", Kind: inkwell.AssetImage}`.
 
 This holds for nested literals too, including small ones such as
 `inkwell.Point`. Slice and map literals are not covered by the rule.
+
+An `inkwell.Translation` is the one exception the other way: the two fields
+stay on **one** line, so the translations of a string stack into a table and
+the eye can run down a single column to compare them.
+
+```go
+Title: inkwell.Text{
+	{Lang: "en", Text: "ALLEY — BEHIND NOODLE'S HOUSE"},
+	{Lang: "hu", Text: "SIKÁTOR — NOODLE HÁZA MÖGÖTT"},
+},
+```
+
+Inside a `[]inkwell.Text` or a `map[string]inkwell.Text` the element type is
+implied and left off, which is what `gofmt -s` produces.
 
 ## Layout
 
@@ -350,7 +381,8 @@ the tape concept sits below the HUD rather than beside it.
 ## Adding a scene
 
 1. Constants in `inc/constants.go`: `Scene<Name>`, `Bg<Name>`
-2. `inc/scene/scene.<name>.go` — an `init()` registering a `Scene`
+2. `inc/scene/scene.<name>.go` — an `init()` registering a `Scene`, its
+   `Title` and every `Label` written in both languages
 3. `inc/background/background.<name>.go` — an `init()` registering a `Background`
 4. A 640×380 PNG in `assets/bg/`
 

@@ -7,14 +7,20 @@ import (
 
 func init() {
 	Manager.Register(Scene{
-		Name:       inc.SceneSmallRestaurant,
-		Title:      "SMALL RESTAURANT — NEXT DOOR",
+		Name: inc.SceneSmallRestaurant,
+		Title: inkwell.Text{
+			{Lang: "en", Text: "SMALL RESTAURANT — NEXT DOOR"},
+			{Lang: "hu", Text: "KIS ÉTTEREM — A SZOMSZÉDBAN"},
+		},
 		Background: inc.BgSmallRestaurant,
 		Exits: []inkwell.Exit{
 			{
-				To:    inc.SceneTrinketShop,
-				Label: "back to the trinket shop",
-				Side:  inkwell.ExitLeft,
+				To: inc.SceneTrinketShop,
+				Label: inkwell.Text{
+					{Lang: "en", Text: "back to the trinket shop"},
+					{Lang: "hu", Text: "vissza a csecsebecseboltba"},
+				},
+				Side: inkwell.ExitLeft,
 			},
 		},
 	})

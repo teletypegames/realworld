@@ -12,5 +12,11 @@ func init() {
 		Height:  TopBarH,
 		TimeVar: inc.VarArmillaStrip,
 		NoteVar: inc.VarNote,
+		Notes: map[string]inkwell.Text{
+			inc.NotePaused: {
+				{Lang: "en", Text: "paused"},
+				{Lang: "hu", Text: "szünet"},
+			},
+		},
 	})
 }

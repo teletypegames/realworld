@@ -7,13 +7,19 @@ import (
 
 func init() {
 	Manager.Register(Scene{
-		Name:       inc.SceneBBSTerminal,
-		Title:      "TERMINAL — BBS ACCESS POINT",
+		Name: inc.SceneBBSTerminal,
+		Title: inkwell.Text{
+			{Lang: "en", Text: "TERMINAL — BBS ACCESS POINT"},
+			{Lang: "hu", Text: "TERMINÁL — BBS HOZZÁFÉRÉSI PONT"},
+		},
 		Background: inc.BgBBSTerminal,
 		Exits: []inkwell.Exit{
 			{
-				Label: "step back from the terminal",
-				Side:  inkwell.ExitNear,
+				Label: inkwell.Text{
+					{Lang: "en", Text: "step back from the terminal"},
+					{Lang: "hu", Text: "hátrébb lépni a terminálról"},
+				},
+				Side: inkwell.ExitNear,
 			},
 		},
 	})

@@ -7,19 +7,28 @@ import (
 
 func init() {
 	Manager.Register(Scene{
-		Name:       inc.SceneRooftopHideout,
-		Title:      "NORMAN'S ROOFTOP HIDEOUT",
+		Name: inc.SceneRooftopHideout,
+		Title: inkwell.Text{
+			{Lang: "en", Text: "NORMAN'S ROOFTOP HIDEOUT"},
+			{Lang: "hu", Text: "NORMAN BÚVÓHELYE A TETŐN"},
+		},
 		Background: inc.BgRooftopHideout,
 		Exits: []inkwell.Exit{
 			{
-				To:    inc.SceneNormanApartment,
-				Label: "back down into the flat",
-				Side:  inkwell.ExitNear,
+				To: inc.SceneNormanApartment,
+				Label: inkwell.Text{
+					{Lang: "en", Text: "back down into the flat"},
+					{Lang: "hu", Text: "vissza le a lakásba"},
+				},
+				Side: inkwell.ExitNear,
 			},
 			{
-				To:    inc.SceneBBSTerminal,
-				Label: "the old terminal",
-				Side:  inkwell.ExitRight,
+				To: inc.SceneBBSTerminal,
+				Label: inkwell.Text{
+					{Lang: "en", Text: "the old terminal"},
+					{Lang: "hu", Text: "a régi terminál"},
+				},
+				Side: inkwell.ExitRight,
 			},
 		},
 	})
