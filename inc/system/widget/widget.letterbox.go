@@ -7,8 +7,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 
 	"realworld/inc"
-	"realworld/inc/system/theme"
 	"realworld/inc/system/world"
+	"realworld/inc/util"
 )
 
 func init() {
@@ -49,7 +49,7 @@ func (l *letterbox) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 		bar = 18
 	}
 	w, h := float32(g.Width), float32(g.Height)
-	black := theme.RGB(0x000000)
+	black := util.RGB(0x000000)
 	vector.DrawFilledRect(dst, 0, 0, w, float32(bar), black, false)
 	vector.DrawFilledRect(dst, 0, h-float32(bar), w, float32(bar), black, false)
 

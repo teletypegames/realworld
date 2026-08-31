@@ -91,17 +91,23 @@ already fallen off, and now two directories have.
   background, one item. The file registers it itself, in an `init()`.
 - Two files have no category. `inc/constants.go` is the vocabulary every
   package imports, and `inc/system/boot/boot.go` builds the game.
+- `inc/util` is in neither group, beside `inc/constants.go` rather than under
+  one of them, for the same reason: it is a helper over the standard library
+  with no game in it, so it imports nothing of ours and anything may import it.
+  `util.color.go` holds `RGB` and `RGBA`, the hex-to-`color.Color` pair the
+  themes are written in.
 
 ```
 main.go                                  flags + inkwell.Run
 inc/constants.go                         entity names and world-state keys
+inc/util/util.color.go                   RGB and RGBA, hex to color.Color
 
 inc/system/boot/boot.go                  New(Opts) builds the game
 inc/system/widget/widget.manager.go      the Widget alias, HUD layout, the conditions
 inc/system/widget/widget.*.go            one widget per file, registering itself
 inc/system/world/world.manager.go        unsaved runtime state
 inc/system/world/world.action.go         custom actions
-inc/system/theme/theme.manager.go        the Theme alias, its Manager, RGB/RGBA
+inc/system/theme/theme.manager.go        the Theme alias and its Manager
 inc/system/theme/theme.realworld.go      realworld-93
 inc/system/theme/theme.nokia_punk.go     nokia-punk
 
@@ -401,11 +407,12 @@ The layering is the import graph, so the compiler keeps it:
 
 ```
 inc ← theme ← world ← tape ← widget ← boot ← main
-        ↑        ↑                      ↑
-        └── content ───────────────────-┘
+ ↑      ↑        ↑                      ↑
+util    └── content ───────────────────-┘
 ```
 
-`inc` imports nothing and everything imports it. `world` knows nothing about the
+`inc` imports nothing and everything imports it, and `util` sits beside it on
+the same footing — standard library only, no game in it. `world` knows nothing about the
 HUD or the content; both build on it, never the other way round — and an arrow
 pointing back is now an import cycle, not a review comment. The one edge worth
 knowing is `widget → tape`: the tape slots ask which cassette a tape is in, so

@@ -4,7 +4,7 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
-	"realworld/inc/system/theme"
+	"realworld/inc/util"
 )
 
 func init() {
@@ -15,6 +15,6 @@ func init() {
 			{Lang: "hu", Text: "ISMERETLEN KAZETTA"},
 		},
 		Voice:       inkwell.VoiceLog,
-		SpeechColor: theme.RGB(0xB9A98A),
+		SpeechColor: util.RGB(0xB9A98A),
 	})
 }

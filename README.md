@@ -203,11 +203,12 @@ repeated inside the directory that already carries it, because a file called
 ```
 main.go                                flags + inkwell.Run
 inc/constants.go                       every name and state key; imports nothing
+inc/util/                              RGB and RGBA over image/color; imports nothing
 
 inc/system/boot/                       New(Opts): the hand-off to the engine
 inc/system/widget/                     HUD layout, visibility conditions, 14 widgets
 inc/system/world/                      the run state and the custom actions
-inc/system/theme/                      the Theme alias, RGB, realworld-93, nokia-punk
+inc/system/theme/                      the Theme alias, realworld-93, nokia-punk
 
 inc/content/scene/  …/background/       one file per location, twice
 inc/content/tape/                      the Tape entity and the lookups over it
@@ -215,7 +216,8 @@ inc/content/item/  …/character/  …/dialog/  …/script/
 ```
 
 `inc` itself holds nothing but constants, which is why every package can import
-it and it can import none of them. The consequence is that the assembly moved
+it and it can import none of them; `inc/util` is in neither group for the same
+reason, a helper over `image/color` that names nothing of the game's. The consequence is that the assembly moved
 down rather than up: `New` lives in `inc/system/boot`, because a package cannot
 be imported by what it imports.
 
