@@ -4,6 +4,7 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/system/armilla"
 	"realworld/inc/system/world"
 )
 
@@ -12,13 +13,13 @@ func init() {
 		Name: inc.ScriptTapeInsert,
 		Actions: inkwell.Seq(
 			world.Fn(func(ctx *inkwell.Ctx) {
-				item := world.TakePending()
+				item := armilla.TakePending()
 				if item == "" {
 					return
 				}
-				world.SetSlot2(item)
+				armilla.SetSlot2(item)
 				ctx.Game.Inventory.Remove(item)
-				ctx.Game.State.SetVar(inc.VarArmillaStrip, "SLOT2: READING")
+				armilla.SetStrip("SLOT2: READING")
 			}),
 			inkwell.Say(inc.Paul, inkwell.Text{
 				{Lang: "en", Text: "Right. Let's see who you are."},

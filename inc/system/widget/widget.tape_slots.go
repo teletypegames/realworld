@@ -7,6 +7,7 @@ import (
 
 	"realworld/inc"
 	"realworld/inc/content/tape"
+	"realworld/inc/system/armilla"
 	"realworld/inc/system/world"
 )
 
@@ -43,7 +44,7 @@ func (t *tapeSlots) Tick(ctx *inkwell.UICtx) {
 	case r1.Contains(mp):
 		g.SetHoverLabel(g.CharacterLabel(inc.Dex).String())
 	case r2.Contains(mp):
-		if s := world.Slot2(); s != "" {
+		if s := armilla.Slot2(); s != "" {
 			g.SetHoverLabel(g.ItemLabel(s).String())
 		} else {
 			g.SetHoverLabel(slotEmptyLabel.String())
@@ -64,7 +65,7 @@ func (t *tapeSlots) Tick(ctx *inkwell.UICtx) {
 	if slot2 && sel != "" {
 		g.Inventory.Select("")
 		if tape.IsItem(sel) {
-			world.SetPending(sel)
+			armilla.SetPending(sel)
 			world.Do(inkwell.RunScript(inc.ScriptTapeInsert))
 			return
 		}
@@ -89,7 +90,7 @@ func (t *tapeSlots) Tick(ctx *inkwell.UICtx) {
 			world.Do(world.Paused(inkwell.RunDialogue(inc.DlgDex)))
 			return
 		}
-		if s := world.Slot2(); s != "" {
+		if s := armilla.Slot2(); s != "" {
 			world.Do(world.Paused(inkwell.RunDialogue(tape.Dialogue(s))))
 			return
 		}
@@ -105,7 +106,7 @@ func (t *tapeSlots) Tick(ctx *inkwell.UICtx) {
 			}))
 			return
 		}
-		if s := world.Slot2(); s != "" {
+		if s := armilla.Slot2(); s != "" {
 			world.Do(inkwell.Say(inc.Dex, inkwell.Text{
 				{Lang: "en", Text: "That is the second slot. Be careful what you let in."},
 				{Lang: "hu", Text: "Az a második foglalat. Vigyázz, mit engedsz be."},
@@ -138,7 +139,7 @@ func (t *tapeSlots) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	}
 
 	drawSlot(r1, slot1.String(), g.CharacterLabel(inc.Dex).String(), true)
-	if s := world.Slot2(); s != "" {
+	if s := armilla.Slot2(); s != "" {
 		drawSlot(r2, slot2Label.String(), g.ItemLabel(s).String(), true)
 	} else {
 		drawSlot(r2, slot2Label.String(), slotEmpty.String(), false)

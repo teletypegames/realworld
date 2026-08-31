@@ -7,7 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 
 	"realworld/inc"
-	"realworld/inc/system/world"
+	"realworld/inc/system/armilla"
 	"realworld/inc/util"
 )
 
@@ -33,11 +33,11 @@ func (l *letterbox) VisibleWhen() inkwell.Condition { return whenCutscene }
 func (l *letterbox) Layer() inkwell.Layer           { return inkwell.LayerScene }
 
 func (l *letterbox) Tick(ctx *inkwell.UICtx) {
-	if !world.TapeWaiting() {
+	if !armilla.Waiting() {
 		return
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		world.TakeTapeOffer()
+		armilla.TakeOffer()
 	}
 }
 
@@ -53,7 +53,7 @@ func (l *letterbox) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 	vector.DrawFilledRect(dst, 0, 0, w, float32(bar), black, false)
 	vector.DrawFilledRect(dst, 0, h-float32(bar), w, float32(bar), black, false)
 
-	if world.TapeWaiting() {
+	if armilla.Waiting() {
 		msg := inkwell.Format(tapeWaitingHint, g.CharacterLabel(inc.Dex)).String()
 		g.DrawText(dst, msg, g.Width-inkwell.TextWidth(msg)-4, g.Height-int(bar)+4, th.ChatLogResponse)
 	}

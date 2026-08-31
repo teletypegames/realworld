@@ -84,7 +84,8 @@ findable in a list of editor tabs, a grep, or a diff, where the directory has
 already fallen off, and now two directories have.
 
 - The category is always **singular**: `item`, `scene`, `background`,
-  `character`, `tape`, `dialog`, `script`, `world`, `widget`, `theme`.
+  `character`, `tape`, `dialog`, `script`, `world`, `armilla`, `widget`,
+  `theme`.
 - `[category].manager.go` is the file that ties a package together — its entity
   type, its `Manager`, and whatever else the category shares.
 - Every other file in a package holds exactly one entity: one scene, one
@@ -105,8 +106,9 @@ inc/util/util.color.go                   RGB and RGBA, hex to color.Color
 inc/system/boot/boot.go                  New(Opts) builds the game
 inc/system/widget/widget.manager.go      the Widget alias, HUD layout, the conditions
 inc/system/widget/widget.*.go            one widget per file, registering itself
-inc/system/world/world.manager.go        unsaved runtime state
+inc/system/world/world.manager.go        the engine binding, the mode, the note
 inc/system/world/world.action.go         custom actions
+inc/system/armilla/armilla.manager.go    Paul's Armilla: two slots, the strip
 inc/system/theme/theme.manager.go        the Theme alias and its Manager
 inc/system/theme/theme.realworld.go      realworld-93
 inc/system/theme/theme.nokia_punk.go     nokia-punk
@@ -345,18 +347,44 @@ live with the rest of the writing, in `script/script.usewith_fail.go`.
 There is exactly one game, so there is exactly one world — and since there is
 exactly one, the **package is the singleton**. There is no `World` value to pass
 around and no back-reference for a widget to hold: `world.Do(…)`,
-`world.Slot2()`, `world.SetPending(…)` are reachable from anywhere that imports
-`world`. `New` calls `world.Attach(g)`, which binds the engine and resets the
-run state, so building the game twice is clean.
+`world.Game()`, `world.Fn(…)` are reachable from anywhere that imports `world`.
+`New` calls `world.Attach(g)`, which binds the engine and resets the run state,
+so building the game twice is clean.
 
-`world` holds as little as it can get away with. The mode and the top bar's note
-are `State` vars (`inc.VarMode`, `inc.VarNote`), because state the engine can
-see is state a `Condition` can read — that is what makes a widget's `When`
-possible and what puts "— paused" in the top bar without anyone pushing it
-there. `world.Do` hands its action to `g.Do`, the engine's queue, so the game
-runs one action at a time without a pump of its own. What is left in package
-variables is the two things the engine has no notion of: the tape waiting to
-speak, and the cassette on its way into slot 2. Only `world.Attach` resets them.
+`world` holds as little as it can get away with, and after the Armilla moved out
+it holds nothing but the binding: the engine pointer, the mode, and the top
+bar's note. The mode and the note are `State` vars (`inc.VarMode`,
+`inc.VarNote`), because state the engine can see is state a `Condition` can read
+— that is what makes a widget's `When` possible and what puts "— paused" in the
+top bar without anyone pushing it there. `world.Do` hands its action to `g.Do`,
+the engine's queue, so the game runs one action at a time without a pump of its
+own.
+
+## The Armilla
+
+The Armilla is the wrist-worn runtime a Personal Tape snaps into — the wiki's
+term, and the game's device. Paul wears one, and it is the only piece of the
+fiction the code models as a package of its own, because it is the only one that
+holds state: two slots, a phosphor text strip, and a tape with something to say.
+
+```go
+armilla.Slot2()                      armilla.SetSlot2(item)
+armilla.SetPending(item)             armilla.TakePending()
+armilla.SetStrip("SLOT2: READING")   armilla.StripIfEmpty("SRP: 1 tape")
+armilla.Offer(line)                  armilla.Waiting()   armilla.TakeOffer()
+```
+
+Slot 2 and the strip are `State` vars — `inc.VarSlot2` and `inc.VarArmillaStrip`,
+both spelled `armilla.…`, so the save file says the same word the package does.
+The other two are the things the engine has no notion of: the cassette on its way
+into the slot, and the tape waiting to speak. Only `armilla.Reset()` clears them,
+and `New` calls it straight after `world.Attach`.
+
+`armilla` builds on `world` — slot 2 and the strip go through `world.Game()`, and
+`TakeOffer` hands its line to `world.Do` — and it knows nothing of `tape`: which
+dialogue a cassette plays is `tape.Dialogue`, asked by the HUD, not by the
+device. It is `inc/system/` because nobody authors a file into it, diegetic
+object or not.
 
 This is what lets an entity file be a literal: the tape-insert script closes
 over the `world` package, not over a parameter it would have had to be handed.
@@ -386,7 +414,8 @@ Exported names are the authoring vocabulary — what a content file spells out:
 `boot.New` and `boot.Opts`, the constants in `inc/constants.go`, each package's
 `<Category>Manager` and entity type, the colour tokens, the tape lookups
 (`tape.Is`, `tape.Of`, `tape.IsItem`, `tape.Dialogue`), the world (`world.Do`,
-`world.Slot2`, …) and the action constructors (`world.Paused`, `world.SetMode`,
+`world.Game`, …), the Armilla (`armilla.Slot2`, `armilla.SetStrip`, …) and the
+action constructors (`world.Paused`, `world.SetMode`,
 `world.UseTheme`, `world.TapeOffer`, `world.Fn`). A tape's line is `inkwell.Say`
 like anyone else's — the tape voice is on the character, not on a second
 spelling of Say.
@@ -406,9 +435,9 @@ display: `ScreenW`, `ScreenH`.
 The layering is the import graph, so the compiler keeps it:
 
 ```
-inc ← theme ← world ← tape ← widget ← boot ← main
- ↑      ↑        ↑                      ↑
-util    └── content ───────────────────-┘
+inc ← theme ← world ← armilla ← tape ← widget ← boot ← main
+ ↑      ↑        ↑                              ↑
+util    └── content ───────────────────────────-┘
 ```
 
 `inc` imports nothing and everything imports it, and `util` sits beside it on
@@ -418,10 +447,10 @@ pointing back is now an import cycle, not a review comment. The one edge worth
 knowing is `widget → tape`: the tape slots ask which cassette a tape is in, so
 the tape concept sits below the HUD rather than beside it.
 
-`theme`, `world` and `widget` are `inc/system/`, and so is `boot` — not because
-it sits low, it sits at the very top, but because nobody authors anything in it.
-The other seven, `tape` among them, are `inc/content/`, which makes `widget →
-tape` the one edge that leaves `system` for `content`.
+`theme`, `world`, `armilla` and `widget` are `inc/system/`, and so is `boot` —
+not because it sits low, it sits at the very top, but because nobody authors
+anything in it. The other seven, `tape` among them, are `inc/content/`, which
+makes `widget → tape` the one edge that leaves `system` for `content`.
 
 ## Adding a scene
 

@@ -2,8 +2,6 @@ package scene
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
-
-	"realworld/inc/system/world"
 )
 
 type Scene = inkwell.Scene
@@ -27,12 +25,4 @@ var Floor = []inkwell.Polygon{
 			Y: 258,
 		},
 	),
-}
-
-func setVarIfEmpty(name string, v any) inkwell.Action {
-	return world.Fn(func(ctx *inkwell.Ctx) {
-		if ctx.Game.State.Var(name) == nil {
-			ctx.Game.State.SetVar(name, v)
-		}
-	})
 }

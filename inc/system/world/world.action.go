@@ -37,23 +37,6 @@ func SetMode(m Mode) inkwell.Action {
 	return Fn(func(*inkwell.Ctx) { setMode(m) })
 }
 
-func TapeOffer(line inkwell.Action) inkwell.Action {
-	return Fn(func(*inkwell.Ctx) {
-		tapeLine = line
-		tapeWaiting = true
-	})
-}
-
-func TakeTapeOffer() {
-	if !tapeWaiting {
-		return
-	}
-	tapeWaiting = false
-	line := tapeLine
-	tapeLine = nil
-	Do(line)
-}
-
 func Paused(inner inkwell.Action) inkwell.Action {
 	return &pausedAction{
 		inner: inner,

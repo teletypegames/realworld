@@ -207,7 +207,8 @@ inc/util/                              RGB and RGBA over image/color; imports no
 
 inc/system/boot/                       New(Opts): the hand-off to the engine
 inc/system/widget/                     HUD layout, visibility conditions, 14 widgets
-inc/system/world/                      the run state and the custom actions
+inc/system/world/                      the engine binding, the mode, the note
+inc/system/armilla/                    Paul's Armilla: two slots, the strip, the offer
 inc/system/theme/                      the Theme alias, realworld-93, nokia-punk
 
 inc/content/scene/  …/background/       one file per location, twice
@@ -239,9 +240,9 @@ The layering is no longer a rule kept by hand — it is the import graph, and th
 compiler rejects the arrow that points the wrong way:
 
 ```
-inc ← theme ← world ← tape ← widget ← boot ← main
-        ↑        ↑                      ↑
-        └── content ───────────────────-┘
+inc ← theme ← world ← armilla ← tape ← widget ← boot ← main
+        ↑        ↑                              ↑
+        └── content ───────────────────────────-┘
 ```
 
 Adding a scene means adding `inc/content/scene/scene.<name>.go` and
@@ -332,13 +333,24 @@ written back before the hand-off is the derived half of the map:
 `scene.FillSelectorPins` reads the exit graph backwards and `Set`s the selector.
 
 There is one world, and now the package *is* the singleton: `world.Do(…)`,
-`world.Slot2()`, `world.SetPending(…)`. Nothing takes a world parameter and no
-widget holds a back-reference, which is what lets a script file be a literal —
-the tape-insert script closes over the `world` package rather than over a
-parameter someone would have had to thread to it. What little it still keeps is
-in package-level variables that only `world.Attach` may reset; the mode and the
-top bar's note are not among them, because those are `State` vars the engine
-itself can see.
+`world.Game()`, `world.Fn(…)`. Nothing takes a world parameter and no widget
+holds a back-reference, which is what lets a script file be a literal — the
+tape-insert script closes over the package rather than over a parameter someone
+would have had to thread to it. `world` itself is down to the binding: the
+engine pointer, the mode and the top bar's note, the last two being `State` vars
+the engine can see for itself.
+
+The device came out of it. **Armilla** is the wiki's word for the wrist-worn
+runtime a Personal Tape snaps into, and Paul's is the one piece of the fiction
+with enough state to earn a package: `armilla.Slot2()`, `armilla.SetPending(…)`,
+`armilla.SetStrip(…)`, `armilla.Offer(…)`. Two of those are `State` vars that
+were already spelled `armilla.slot2` and `armilla.strip` in the save file, and
+the strip in particular had been written by whoever happened to be nearby — a
+raw `SetVar` in the tape-insert script, a `setVarIfEmpty` helper in `scene`, a
+read in the top bar. Now the device owns it, and the helper is gone. What
+`armilla` does not know is `tape`: which dialogue a cassette plays is
+`tape.Dialogue`, asked by the HUD, because that is a fact about the cassette and
+not about the thing it is plugged into.
 
 **On the word "scene".** The wiki, the concept-art deck and the beat tables all
 count *screens*, and this code used to as well: it carried its own `Screen`

@@ -11,6 +11,7 @@ import (
 	"realworld/inc/content/scene"
 	"realworld/inc/content/script"
 	_ "realworld/inc/content/tape"
+	"realworld/inc/system/armilla"
 	"realworld/inc/system/theme"
 	"realworld/inc/system/widget"
 	"realworld/inc/system/world"
@@ -65,6 +66,7 @@ func New(o Opts) *inkwell.Game {
 	theme.ThemeManager.Each(g.ThemeManager.Register)
 
 	world.Attach(g)
+	armilla.Reset()
 	g.UseTheme(inc.RealWorld)
 
 	g.StartAt(start)

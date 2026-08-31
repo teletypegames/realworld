@@ -4,6 +4,7 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/system/armilla"
 )
 
 func init() {
@@ -33,7 +34,7 @@ func init() {
 				},
 			},
 		},
-		OnEnter:  setVarIfEmpty(inc.VarArmillaStrip, "SRP: 1 tape"),
+		OnEnter:  armilla.StripIfEmpty("SRP: 1 tape"),
 		Hotspots: []inkwell.Hotspot{hidingPlace(), backDoor(), bin(), fireEscape()},
 	})
 }
