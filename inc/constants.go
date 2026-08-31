@@ -35,6 +35,7 @@ const (
 	FlagHasTape   = "has_mystery_tape"
 	FlagTapeSpoke = "tape_spoke"
 	FlagClubEntry = "club_entry"
+	FlagDebug     = "debug"
 
 	VarSlot2        = "armilla.slot2"
 	VarArmillaStrip = "armilla.strip"

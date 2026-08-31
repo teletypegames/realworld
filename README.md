@@ -28,6 +28,7 @@ go run . -lang hu          # the same game in Hungarian
 go run . -finale           # the finale — try the Nokia-punk theme switch
 go run . -scene selector   # the location selector: the map the city hangs off
 go run . -scene hospital   # any scene in the deck, e.g. to look at the art
+go run . -debug            # with the debug menu on d — see The debug menu below
 ```
 
 Scene names are the constants in `names.manager.go` (`selector`, `paul_shop`,
@@ -49,6 +50,7 @@ go mod edit -dropreplace git.teletypegames.org/engines/inkwell
 
 ```bash
 make build                    # native binary into bin/
+make debug                    # the same, with the debug menu switched on
 make wasm                     # dist/game.wasm + wasm_exec.js
 make export VERSION=0.1       # zipped HTML/WASM bundle
 make binaries VERSION=0.1     # win-x86, win-x64, linux-x64 zips
@@ -63,16 +65,44 @@ Release metadata lives in `metadata.json`.
 |---|---|
 | left click | run the selected verb |
 | right click | verb coin (Look / Use / Talk / Take) |
-| `←` `→` | previous / next scene, in file order, wrapping |
 | `F1` | toggle hotspot outlines |
+| `d` | the debug menu, in a debug run or build — see below |
 | `SPACE` | during a cutscene: let the tape speak, if it offered |
 
-The scenes are connected to each other (see **The map** below); the arrow keys
-are a reviewing tool on top of that, walking every scene in turn. The walk is
-inert during a cutscene, a menu, or a stopped world, so it can never cut
-across an authored beat.
-
 Screenshots: `EBITEN_SCREENSHOT_KEY=q go run .`, then press `q` in the window.
+
+## The debug menu
+
+A window down the right half of the screen, opened and closed with `d`: the
+scene deck, the item catalogue, and everything clickable in the scene the
+player is standing in. It is the engine's `Menu` widget with the engine's
+`DebugMenuRoot` handed to it, registered in `widget.debug_menu.go` like any
+other widget — the menu system is generic, and the debug menu is one use of it.
+
+It is off unless the build or the run switches it on:
+
+```bash
+go run . -debug     # this run
+make debug          # a binary with it on from the start (-tags debug)
+```
+
+Both do the same one thing: set `inc.FlagDebug`, which is what the widget's
+`whenDebug` reads. A release build with no flag never ticks the widget, so `d`
+does nothing at all.
+
+```
+DEBUG
+├── Scenes         every scene in the deck — Enter teleports
+├── Items          give / take away / select, and the use-with pairs
+├── Action points  the current scene's hotspots and exit strips, verb by verb
+└── Exits          where each one leads, and the flag that unlocks it
+```
+
+Arrows walk the rows, Enter opens one, Backspace goes back a level and closes
+at the root, Escape closes; the mouse does the same, and the title bar carries
+a back arrow and a close box. The game keeps running underneath — clicks
+outside the window still reach it — and the menu stays live during a cutscene,
+which is what makes it closable once one starts.
 
 ## Layout
 
@@ -157,7 +187,7 @@ Two things do **not** get translated, and both are load-bearing:
 
 - **Names.** `inc.SceneAlley`, `inc.FlagHasTape`, `inc.NotePaused` are
   identifiers the engine and the conditions compare against. `inc.NotePaused`
-  is the one that looks like prose — it is a `State` var `whenUnpaused` reads,
+  is the one that looks like prose — it is a `State` var a `Condition` reads,
   so the value stays `"paused"` in every language and `TopBar.Notes` in
   `widget.top_bar.go` maps it to what the top bar shows.
 - **Sentence frames built around another string.** `inkwell.Format` resolves
@@ -310,8 +340,9 @@ A tape's line is `inkwell.Say` like anybody else's; the engine sends it to the
 log instead of a speech bubble because the character says so.
 
 So adding an entity is adding a file, and there is no second list to keep in
-step. The price is that registration order is file-name order: the arrow keys
-walk the scenes alphabetically rather than in the concept-art deck's order.
+step. The price is that registration order is file-name order: the debug
+menu lists the scenes alphabetically rather than in the concept-art deck's
+order.
 That was a deliberate trade — the deck order was a list that had to be kept in
 step with the files by hand, and the deck is a thing to look at, not a thing to
 play through.
@@ -415,7 +446,8 @@ field in a literal:
 | a `titleBar` widget that pushed the scene title into the top bar | `TopBar` already discovers the title; `NoteVar` adds the "— paused" |
 | a `UseWithGuard` widget stealing clicks to answer unauthored use-with pairs | `Game.UseWithFail`, beside `ExitLook` and `ExitTake` |
 | a `windowSizer` widget resizing the window on its first tick | `Game.WindowScale` |
-| a `sceneNav` widget walking the scene catalogue | `inkwell.SceneNav`, a built-in dev widget |
+| a `sceneNav` widget walking the scene catalogue with the arrow keys | `inkwell.Menu` + `inkwell.DebugMenuRoot`: a menu system, and a debug menu that lists the deck rather than stepping through it |
+| nothing yet — but a menu could not have taken the arrow keys without `SceneNav` taking them too, and could not have stayed open across a cutscene | `Input.KeyPressed` / `ClaimKey`, the consume-on-use protocol extended to the keyboard, and `Awake`, the widget that ticks while a script holds the frame |
 | `sceneDefaults` rewriting every scene with Paul and a floor | `Game.Player` and `Game.Walkboxes` |
 | nothing yet — but a second language would have meant a parallel catalogue keyed by id | `inkwell.Text`: every displayed field carries its own languages, in place |
 | nothing yet — the debug font's atlas stops at U+00FF, so `ő` and `ű` drew as blanks (and so did the em dashes already in these scene titles) | inkwell bakes its own atlas through Latin Extended-A |

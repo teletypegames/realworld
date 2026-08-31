@@ -35,5 +35,5 @@ const (
 var (
 	whenPlaying  = inkwell.VarEq(inc.VarMode, string(world.ModePlay))
 	whenCutscene = inkwell.VarEq(inc.VarMode, string(world.ModeCutscene))
-	whenUnpaused = inkwell.And(whenPlaying, inkwell.Not(inkwell.VarEq(inc.VarNote, inc.NotePaused)))
+	whenDebug    = inkwell.Flag(inc.FlagDebug)
 )

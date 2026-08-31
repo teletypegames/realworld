@@ -114,8 +114,9 @@ already fallen off, and now two directories have.
   type, its `Manager`, and whatever else the category shares.
 - Every other file in a package holds exactly one entity: one scene, one
   background, one item. The file registers it itself, in an `init()`.
-- Two files have no category. `inc/constants.go` is the vocabulary every
-  package imports, and `inc/system/boot/boot.go` builds the game.
+- Two things have no category. `inc/constants.go` is the vocabulary every
+  package imports, and `inc/system/boot/` builds the game — `boot.go`, plus the
+  two one-line files a `-tags debug` build picks between.
 - `inc/util` is in neither group, beside `inc/constants.go` rather than under
   one of them, for the same reason: it is a helper over the standard library
   with no game in it, so it imports nothing of ours and anything may import it.
@@ -128,6 +129,8 @@ inc/constants.go                         entity names and world-state keys
 inc/util/util.color.go                   RGB and RGBA, hex to color.Color
 
 inc/system/boot/boot.go                  New(Options) builds the game
+inc/system/boot/boot.debug.go            debugBuild = true, behind -tags debug
+inc/system/boot/boot.release.go          debugBuild = false, without it
 inc/system/widget/widget.manager.go      the Widget alias, HUD layout, the conditions
 inc/system/widget/widget.*.go            one widget per file, registering itself
 inc/system/world/world.manager.go        the engine binding, the mode, the note
@@ -279,8 +282,8 @@ The rule stops at the package's own API. `world.Do`, `armilla.Slot2`,
 already the namespace and the receiver would be an empty word.
 
 `init()` order is file-name order, so **registration order is alphabetical**.
-Nothing may depend on it — including the order the arrow keys walk the scenes,
-which is simply the order the files sit in.
+Nothing may depend on it — including the order the debug menu lists the scenes
+in, which is simply the order the files sit in.
 
 An `init()` only runs if something imports the package. `inc/system/boot` names
 eight of the nine for their manager, which is import enough; `tape` is the one
@@ -329,8 +332,8 @@ WidgetManager.Register(&inkwell.StatusLine{
 })
 ```
 
-`whenPlaying`, `whenCutscene` and `whenUnpaused` are in `widget.manager.go`, and
-they read `inc.VarMode` and `inc.VarNote` out of the engine's own `State`. A widget of
+`whenPlaying`, `whenCutscene` and `whenDebug` are in `widget.manager.go`, and
+they read `inc.VarMode` and `inc.FlagDebug` out of the engine's own `State`. A widget of
 ours says the same thing with a method — `VisibleWhen() inkwell.Condition` —
 because it has no literal to put a field in. A widget that is switched off
 neither ticks nor draws nor blocks a click, so nothing else has to ask.
@@ -484,7 +487,7 @@ spelling of Say.
 
 Everything else stays unexported, and now the compiler holds the line: the HUD
 widgets (`tapeSlots`, `letterbox`, `hudFrame`, …), the conditions
-(`whenPlaying`, `whenCutscene`, `whenUnpaused`), the runners, `setMode`,
+(`whenPlaying`, `whenCutscene`, `whenDebug`), the runners, `setMode`,
 `setNote`, `setVarIfEmpty`.
 
 The word is **scene**, the engine's own. The wiki and the concept-art deck count
@@ -558,11 +561,19 @@ and edits there follow its style, not this one's.
 
 ```
 make build     native binary into bin/
+make debug     native binary with the debug menu on, -tags debug
 make wasm      js/wasm build into dist/
 make watch     rebuild on change
 go run . -scene <name>     start on a given scene
 go run . -finale           start with the finale
+go run . -debug            with the debug menu on d
 ```
+
+The debug menu is the engine's `Menu` widget with `inkwell.DebugMenuRoot`
+handed to it, registered in `widget.debug_menu.go`. Either `-debug` or a
+`-tags debug` build sets `inc.FlagDebug`, which is what its `whenDebug`
+condition reads; without the flag the widget never ticks. `README.md` has the
+rest, under **The debug menu**.
 
 Art is embedded into the binary (`//go:embed assets` in `main.go`), because
 js/wasm has no OS filesystem and `make binaries` ships the executable alone.

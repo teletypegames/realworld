@@ -24,6 +24,12 @@ build:
 	@mkdir -p $(BIN_DIR)
 	go build -o $(OUTPUT_BIN) .
 
+# Same binary with the debug menu switched on from the start — no -debug flag
+# needed. See README, "The debug menu".
+debug:
+	@mkdir -p $(BIN_DIR)
+	go build -tags debug -o $(OUTPUT_BIN) .
+
 # Headless: composes the game, validates every cross-manager name reference
 # and checks the HUD layout. No window opens.
 test:
@@ -88,4 +94,4 @@ watch:
 clean:
 	rm -rf $(BIN_DIR) $(DIST_DIR)
 
-.PHONY: all build test wasm export watch clean binaries binary-win-x86 binary-win-x64 binary-linux-x64 binary-build
+.PHONY: all build debug test wasm export watch clean binaries binary-win-x86 binary-win-x64 binary-linux-x64 binary-build

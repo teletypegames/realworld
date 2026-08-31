@@ -21,6 +21,7 @@ func main() {
 	flag.BoolVar(&options.Finale, "finale", false,
 		"start with the finale, to try the Nokia-punk theme switch")
 	flag.StringVar(&options.Lang, "lang", "en", "language the game speaks (en, hu)")
+	flag.BoolVar(&options.Debug, "debug", false, "open the debug menu with d (a debug build has it anyway)")
 	flag.Parse()
 
 	if err := inkwell.Run(boot.New(options)); err != nil {

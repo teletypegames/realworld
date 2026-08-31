@@ -21,6 +21,7 @@ type Options struct {
 	Scene  string
 	Finale bool
 	Lang   string
+	Debug  bool
 }
 
 var exitLook = inkwell.Text{
@@ -68,6 +69,9 @@ func New(options Options) *inkwell.Game {
 	world.Attach(game)
 	armilla.Reset()
 	game.UseTheme(inc.RealWorld)
+	if options.Debug || debugBuild {
+		game.State.SetFlag(inc.FlagDebug)
+	}
 
 	game.StartAt(start)
 	game.OnStart(inc.ScriptOpening)
