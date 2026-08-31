@@ -9,7 +9,7 @@ import (
 
 type Widget = inkwell.Widget
 
-var Manager = inkwell.NewManager[Widget]()
+var WidgetManager = inkwell.NewManager[Widget]()
 
 const (
 	ScreenW = 640

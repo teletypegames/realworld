@@ -8,7 +8,7 @@ import (
 
 type Scene = inkwell.Scene
 
-var Manager = inkwell.NewManager[Scene]()
+var SceneManager = inkwell.NewManager[Scene]()
 
 var Floor = []inkwell.Polygon{
 	inkwell.Poly(

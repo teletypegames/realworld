@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Background{
+	BackgroundManager.Register(Background{
 		Name: inc.BgBVKBranch,
 		Path: "assets/bg/bvk_branch.png",
 		Kind: inkwell.AssetImage,

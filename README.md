@@ -250,14 +250,16 @@ Every category owns a manager, and they are all the engine's own
 in registration order and addressed by name. There is no second registry type
 here: the entity types are aliases of engine structs, so they already satisfy
 `inkwell.Named` and need no help reading their own name. Each one lives in its
-own package's manager file, next to the alias it holds, and it needs no prefix
-because the package already is one:
+own package's manager file, next to the alias it holds, and it is the one
+identifier that keeps its category in its own name — a manager is read where the
+package qualifier has already fallen off, on a `*Game` field or inside its own
+entity files, and a bare `Manager` says nothing about what is in it:
 
 ```go
 // inc/content/character/character.manager.go
 type Character = inkwell.Character
 
-var Manager = inkwell.NewManager[Character]()
+var CharacterManager = inkwell.NewManager[Character]()
 ```
 
 An entity file is a literal that hands itself over in an `init()`:
@@ -266,7 +268,7 @@ An entity file is a literal that hands itself over in an `init()`:
 package background
 
 func init() {
-	Manager.Register(Background{
+	BackgroundManager.Register(Background{
 		Name: inc.BgServerFarm,
 		Path: "assets/bg/server_farm.png",
 		Kind: inkwell.AssetImage,
@@ -276,7 +278,7 @@ func init() {
 
 The `init()` only runs if something imports the package, so a package whose
 entities nobody names by symbol needs a blank import in `inc/system/boot`.
-Exactly one does — `tape`, everything else is imported for its `Manager` — and
+Exactly one does — `tape`, everything else is imported for its manager — and
 the list is per package, not per entity, so adding a file is still adding a
 file.
 
@@ -312,7 +314,7 @@ step with the files by hand, and the deck is a thing to look at, not a thing to
 play through.
 
 The game's own catalogue is readable without going through the engine:
-`scene.Manager.Get("alley")` answers long before there is a `*Game` to ask. And
+`scene.SceneManager.Get("alley")` answers long before there is a `*Game` to ask. And
 when the game is built, nothing is copied into it — `New` assigns our managers
 onto the `*Game` in place of the empty ones `NewGame` made, so engine and game
 share one registry per category instead of keeping two of them in step. Themes

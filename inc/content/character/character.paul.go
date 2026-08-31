@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Character{
+	CharacterManager.Register(Character{
 		Name:  inc.Paul,
 		Speed: 96,
 		W:     28,

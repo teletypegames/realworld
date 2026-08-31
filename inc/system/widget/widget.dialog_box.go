@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.DialogBox{
+	WidgetManager.Register(&inkwell.DialogBox{
 		Name:       "dialog",
 		Bounds:     inkwell.Rect(0, ScreenH-LineH*9, DividerX, LineH*9),
 		LineHeight: LineH,

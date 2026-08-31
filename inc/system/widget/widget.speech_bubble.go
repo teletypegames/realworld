@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.SpeechBubble{
+	WidgetManager.Register(&inkwell.SpeechBubble{
 		Name:      "speech",
 		MaxWidth:  360,
 		Padding:   Pad,

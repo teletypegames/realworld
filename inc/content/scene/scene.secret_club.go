@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Scene{
+	SceneManager.Register(Scene{
 		Name: inc.SceneSecretClub,
 		Title: inkwell.Text{
 			{Lang: "en", Text: "SECRET CLUB — THE UNDERWATER SUN"},

@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&tapeChannel{
+	WidgetManager.Register(&tapeChannel{
 		Name:   "channel",
 		Bounds: inkwell.Rect(DividerX+2, HUDTop+2, ScreenW-DividerX-4, ScreenH-HUDTop-4),
 	})

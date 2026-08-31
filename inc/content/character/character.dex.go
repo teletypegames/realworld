@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Character{
+	CharacterManager.Register(Character{
 		Name: inc.Dex,
 		Label: inkwell.Text{
 			{Lang: "en", Text: "DEX"},

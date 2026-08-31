@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&letterbox{
+	WidgetManager.Register(&letterbox{
 		Name: "letterbox",
 		Bar:  36,
 	})

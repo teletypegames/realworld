@@ -149,7 +149,9 @@ all the engine's own `inkwell.Manager[T]` — the same registry type the `*Game`
 hangs its content off. The game defines no registry of its own.
 
 Each one is declared in its own package's manager file, beside the alias it
-holds, and it needs no prefix because the package already is one:
+holds, and it carries its category in its own name — the one identifier that
+keeps the prefix, because a manager is read far from its package and a bare
+`Manager` says nothing about what is in it:
 
 ```go
 // inc/content/character/character.manager.go
@@ -157,14 +159,15 @@ package character
 
 type Character = inkwell.Character
 
-var Manager = inkwell.NewManager[Character]()
+var CharacterManager = inkwell.NewManager[Character]()
 ```
 
 Read from `inc/system/boot` the nine of them still line up as a list —
-`background.Manager`, `character.Manager`, `dialog.Manager`, `item.Manager`,
-`scene.Manager`, `script.Manager`, `tape.Manager`, `theme.Manager`,
-`widget.Manager` — only now the list is a consequence of the imports rather
-than a block someone has to keep in step.
+`background.BackgroundManager`, `character.CharacterManager`,
+`dialog.DialogManager`, `item.ItemManager`, `scene.SceneManager`,
+`script.ScriptManager`, `tape.TapeManager`, `theme.ThemeManager`,
+`widget.WidgetManager` — only now the list is a consequence of the imports
+rather than a block someone has to keep in step.
 
 Aliases of engine structs already carry `GetName()` and satisfy
 `inkwell.Named`, which is the whole of what a manager asks of them.
@@ -197,7 +200,7 @@ somewhere else to keep in step — the file hands itself to its manager in an
 package background
 
 func init() {
-	Manager.Register(Background{
+	BackgroundManager.Register(Background{
 		Name: inc.BgServerFarm,
 		Path: "assets/bg/server_farm.png",
 		Kind: inkwell.AssetImage,
@@ -207,7 +210,7 @@ func init() {
 
 Adding an entity is adding a file. Deleting one is deleting a file. Package-level
 variables are initialised before any `init()` runs, whatever file each sits in,
-so a package's `Manager` exists by the time its first entity file registers into
+so a package's manager exists by the time its first entity file registers into
 one.
 
 `init()` order is file-name order, so **registration order is alphabetical**.
@@ -215,7 +218,7 @@ Nothing may depend on it — including the order the arrow keys walk the scenes,
 which is simply the order the files sit in.
 
 An `init()` only runs if something imports the package. `inc/system/boot` names
-eight of the nine for their `Manager`, which is import enough; `tape` is the one
+eight of the nine for their manager, which is import enough; `tape` is the one
 nobody names, so it is there as a blank import. That list is **per package, not
 per entity** — a new scene file still touches nothing but itself.
 
@@ -227,7 +230,7 @@ which the game registers as literals the same way it registers a background:
 
 ```go
 func init() {
-	Manager.Register(&inkwell.Cursor{
+	WidgetManager.Register(&inkwell.Cursor{
 		Name: "cursor",
 	})
 }
@@ -254,7 +257,7 @@ hidden for a cutscene, and that is a condition over game state, not a wrapper
 and not an `if` at the top of every `Draw`:
 
 ```go
-Manager.Register(&inkwell.StatusLine{
+WidgetManager.Register(&inkwell.StatusLine{
 	Name: "status",
 	When: whenPlaying,
 	Y:    statusY,
@@ -274,14 +277,14 @@ hands ours over in their place — the types are identical, so the engine and th
 game end up sharing one registry per category rather than two in step:
 
 ```go
-g.AssetManager = background.Manager
-g.CharacterManager = character.Manager
-g.DialogueManager = dialog.Manager
-g.ItemManager = item.Manager
-g.SceneManager = scene.Manager
-g.ScriptManager = script.Manager
-g.WidgetManager = widget.Manager
-theme.Manager.Each(g.ThemeManager.Register)
+g.AssetManager = background.BackgroundManager
+g.CharacterManager = character.CharacterManager
+g.DialogueManager = dialog.DialogManager
+g.ItemManager = item.ItemManager
+g.SceneManager = scene.SceneManager
+g.ScriptManager = script.ScriptManager
+g.WidgetManager = widget.WidgetManager
+theme.ThemeManager.Each(g.ThemeManager.Register)
 ```
 
 Themes are the odd one out and stay a copy: `NewGame` puts four preset themes
@@ -354,23 +357,29 @@ over the `world` package, not over a parameter it would have had to be handed.
 
 ## Naming
 
-The package is the namespace now, so an identifier never repeats what the
-package already says. It is `scene.Floor`, not `scene.SceneFloor`;
-`tape.Dialogue`, not `tape.TapeDialogue`; `widget.Manager`, not
-`widget.WidgetManager`; `world.Do`, not `world.WorldDo`. Read the call site, not
+The package is the namespace, so an identifier never repeats what the package
+already says. It is `scene.Floor`, not `scene.SceneFloor`; `tape.Dialogue`, not
+`tape.TapeDialogue`; `world.Do`, not `world.WorldDo`. Read the call site, not
 the declaration, when choosing a name:
 
 ```go
 scene.FillSelectorPins()   tape.Is(speaker)   world.Do(a)   widget.ScreenW
 ```
 
+The manager is the one exception, and it keeps its prefix on purpose:
+`widget.WidgetManager`, `scene.SceneManager`, `theme.ThemeManager`. A manager is
+the one name that is read where the package qualifier has already fallen off —
+assigned onto a `*Game` field beside the engine's own `CharacterManager`, or
+called from inside its own package's entity files, where `Manager.Register`
+would not say what is being registered.
+
 Entities themselves need no name at all — they are anonymous literals inside
 their file's `init()`, and the file name says which one it is.
 
 Exported names are the authoring vocabulary — what a content file spells out:
 `boot.New` and `boot.Opts`, the constants in `inc/constants.go`, each package's
-`Manager` and entity type, the colour tokens, the tape lookups (`tape.Is`,
-`tape.Of`, `tape.IsItem`, `tape.Dialogue`), the world (`world.Do`,
+`<Category>Manager` and entity type, the colour tokens, the tape lookups
+(`tape.Is`, `tape.Of`, `tape.IsItem`, `tape.Dialogue`), the world (`world.Do`,
 `world.Slot2`, …) and the action constructors (`world.Paused`, `world.SetMode`,
 `world.UseTheme`, `world.TapeOffer`, `world.Fn`). A tape's line is `inkwell.Say`
 like anyone else's — the tape voice is on the character, not on a second

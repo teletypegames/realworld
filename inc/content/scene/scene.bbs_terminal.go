@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Scene{
+	SceneManager.Register(Scene{
 		Name: inc.SceneBBSTerminal,
 		Title: inkwell.Text{
 			{Lang: "en", Text: "TERMINAL — BBS ACCESS POINT"},

@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Character{
+	CharacterManager.Register(Character{
 		Name: inc.TapeMystery,
 		Label: inkwell.Text{
 			{Lang: "en", Text: "UNKNOWN TAPE"},

@@ -8,7 +8,7 @@ import (
 
 type Theme = inkwell.Theme
 
-var Manager = inkwell.NewManager[Theme]()
+var ThemeManager = inkwell.NewManager[Theme]()
 
 func RGB(hex uint32) color.Color {
 	return color.RGBA{

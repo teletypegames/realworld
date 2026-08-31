@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.SceneNav{
+	WidgetManager.Register(&inkwell.SceneNav{
 		Name: "scene_nav",
 		When: whenUnpaused,
 	})

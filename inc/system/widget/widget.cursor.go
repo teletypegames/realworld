@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.Cursor{
+	WidgetManager.Register(&inkwell.Cursor{
 		Name: "cursor",
 	})
 }

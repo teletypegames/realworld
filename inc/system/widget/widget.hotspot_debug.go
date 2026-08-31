@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.HotspotDebug{
+	WidgetManager.Register(&inkwell.HotspotDebug{
 		Name: "hotspot_debug",
 	})
 }

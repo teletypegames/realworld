@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Script{
+	ScriptManager.Register(Script{
 		Name: inc.ScriptFinale,
 		Actions: inkwell.Seq(
 			world.SetMode(world.ModeCutscene),

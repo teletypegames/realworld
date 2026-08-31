@@ -6,4 +6,4 @@ import (
 
 type Item = inkwell.Item
 
-var Manager = inkwell.NewManager[Item]()
+var ItemManager = inkwell.NewManager[Item]()

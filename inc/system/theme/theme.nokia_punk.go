@@ -11,7 +11,7 @@ var (
 )
 
 func init() {
-	Manager.Register(Theme{
+	ThemeManager.Register(Theme{
 		Name:                    inc.NokiaPunk,
 		PanelBG:                 npBlack,
 		StatusText:              Green,

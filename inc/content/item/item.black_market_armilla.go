@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Item{
+	ItemManager.Register(Item{
 		Name: inc.ItemBlackArmilla,
 		Description: inkwell.Text{
 			{Lang: "en", Text: "black-market Armilla"},

@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Background{
+	BackgroundManager.Register(Background{
 		Name: inc.BgRooftopHideout,
 		Path: "assets/bg/rooftop_hideout.png",
 		Kind: inkwell.AssetImage,

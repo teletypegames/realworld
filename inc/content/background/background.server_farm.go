@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Background{
+	BackgroundManager.Register(Background{
 		Name: inc.BgServerFarm,
 		Path: "assets/bg/server_farm.png",
 		Kind: inkwell.AssetImage,

@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.InventoryBar{
+	WidgetManager.Register(&inkwell.InventoryBar{
 		Name: "inventory",
 		When: whenPlaying,
 		Origin: inkwell.Point{

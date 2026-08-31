@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Script{
+	ScriptManager.Register(Script{
 		Name: inc.ScriptTapeInsert,
 		Actions: inkwell.Seq(
 			world.Fn(func(ctx *inkwell.Ctx) {

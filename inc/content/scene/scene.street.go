@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Scene{
+	SceneManager.Register(Scene{
 		Name: inc.SceneStreet,
 		Title: inkwell.Text{
 			{Lang: "en", Text: "STREET"},

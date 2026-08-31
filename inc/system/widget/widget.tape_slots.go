@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&tapeSlots{
+	WidgetManager.Register(&tapeSlots{
 		Name:   "tapes",
 		Bounds: inkwell.Rect(192, slotsY, 194, slotsH),
 	})

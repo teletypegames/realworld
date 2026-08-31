@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	Manager.Register(Theme{
+	ThemeManager.Register(Theme{
 		Name:                    inc.RealWorld,
 		PanelBG:                 black,
 		StatusText:              Ink,

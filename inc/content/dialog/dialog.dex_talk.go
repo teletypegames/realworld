@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Dialog{
+	DialogManager.Register(Dialog{
 		Name:  inc.DlgDex,
 		Start: "root",
 		Nodes: []inkwell.DialogueNode{{

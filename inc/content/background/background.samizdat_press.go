@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Background{
+	BackgroundManager.Register(Background{
 		Name: inc.BgSamizdatPress,
 		Path: "assets/bg/samizdat_press.png",
 		Kind: inkwell.AssetImage,

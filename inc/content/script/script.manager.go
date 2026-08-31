@@ -6,4 +6,4 @@ import (
 
 type Script = inkwell.Script
 
-var Manager = inkwell.NewManager[Script]()
+var ScriptManager = inkwell.NewManager[Script]()

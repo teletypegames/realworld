@@ -18,7 +18,7 @@ var exitToSelector = inkwell.Exit{
 }
 
 func init() {
-	Manager.Register(Scene{
+	SceneManager.Register(Scene{
 		Name: inc.SceneSelector,
 		Title: inkwell.Text{
 			{Lang: "en", Text: "SAN FRANCISCO"},
@@ -31,12 +31,12 @@ func init() {
 }
 
 func FillSelectorPins() {
-	selector, ok := Manager.Get(inc.SceneSelector)
+	selector, ok := SceneManager.Get(inc.SceneSelector)
 	if !ok {
 		return
 	}
 	var exits []inkwell.Exit
-	for _, entity := range Manager.All() {
+	for _, entity := range SceneManager.All() {
 		if !leadsToSelector(entity) {
 			continue
 		}
@@ -47,7 +47,7 @@ func FillSelectorPins() {
 		})
 	}
 	selector.Exits = exits
-	Manager.Set(selector)
+	SceneManager.Set(selector)
 }
 
 func leadsToSelector(s Scene) bool {

@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.RadialVerbs{
+	WidgetManager.Register(&inkwell.RadialVerbs{
 		Name:    "verbs",
 		Trigger: inkwell.MouseButtonRight,
 		Radius:  58,

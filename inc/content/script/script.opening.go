@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Script{
+	ScriptManager.Register(Script{
 		Name: inc.ScriptOpening,
 		Actions: inkwell.Seq(
 			inkwell.SetFlag(inc.FlagPoliceTip),

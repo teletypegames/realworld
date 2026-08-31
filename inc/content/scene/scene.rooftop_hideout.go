@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Scene{
+	SceneManager.Register(Scene{
 		Name: inc.SceneRooftopHideout,
 		Title: inkwell.Text{
 			{Lang: "en", Text: "NORMAN'S ROOFTOP HIDEOUT"},

@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.TopBar{
+	WidgetManager.Register(&inkwell.TopBar{
 		Name:    "topbar",
 		When:    whenPlaying,
 		Height:  TopBarH,

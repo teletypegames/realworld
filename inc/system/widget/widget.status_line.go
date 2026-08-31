@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.StatusLine{
+	WidgetManager.Register(&inkwell.StatusLine{
 		Name:        "status",
 		When:        whenPlaying,
 		Y:           statusY,

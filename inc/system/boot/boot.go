@@ -55,14 +55,14 @@ func New(o Opts) *inkwell.Game {
 	}
 	g.UseWithFail = script.UseWithFail
 
-	g.AssetManager = background.Manager
-	g.CharacterManager = character.Manager
-	g.DialogueManager = dialog.Manager
-	g.ItemManager = item.Manager
-	g.SceneManager = scene.Manager
-	g.ScriptManager = script.Manager
-	g.WidgetManager = widget.Manager
-	theme.Manager.Each(g.ThemeManager.Register)
+	g.AssetManager = background.BackgroundManager
+	g.CharacterManager = character.CharacterManager
+	g.DialogueManager = dialog.DialogManager
+	g.ItemManager = item.ItemManager
+	g.SceneManager = scene.SceneManager
+	g.ScriptManager = script.ScriptManager
+	g.WidgetManager = widget.WidgetManager
+	theme.ThemeManager.Each(g.ThemeManager.Register)
 
 	world.Attach(g)
 	g.UseTheme(inc.RealWorld)

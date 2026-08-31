@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Dialog{
+	DialogManager.Register(Dialog{
 		Name:  inc.DlgMysteryTape,
 		Start: "root",
 		Nodes: []inkwell.DialogueNode{{

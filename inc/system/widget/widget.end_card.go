@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&inkwell.EndCard{
+	WidgetManager.Register(&inkwell.EndCard{
 		Name: "endcard",
 	})
 }

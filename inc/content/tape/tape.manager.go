@@ -12,14 +12,14 @@ type Tape struct {
 	Dialogue string
 }
 
-var Manager = inkwell.NewManager[Tape]()
+var TapeManager = inkwell.NewManager[Tape]()
 
 func (t Tape) GetName() string { return t.Name }
 
-func Is(name string) bool { return Manager.Has(name) }
+func Is(name string) bool { return TapeManager.Has(name) }
 
 func Of(item string) (Tape, bool) {
-	for _, t := range Manager.All() {
+	for _, t := range TapeManager.All() {
 		if t.Item != "" && t.Item == item {
 			return t, true
 		}

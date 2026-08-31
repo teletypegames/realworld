@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(Item{
+	ItemManager.Register(Item{
 		Name: inc.ItemMysteryTape,
 		Description: inkwell.Text{
 			{Lang: "en", Text: "unmarked Personal Tape"},

@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	Manager.Register(&hudFrame{
+	WidgetManager.Register(&hudFrame{
 		Name: "hudframe",
 	})
 }
