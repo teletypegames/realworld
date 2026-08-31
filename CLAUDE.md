@@ -221,6 +221,39 @@ variables are initialised before any `init()` runs, whatever file each sits in,
 so a package's manager exists by the time its first entity file registers into
 one.
 
+### A file's helpers hang off the file's own type
+
+An entity file that is too long to read as one literal breaks pieces out —
+`scene.alley.go` builds its four hotspots that way. Those helpers are **not**
+package functions. Twenty-four scene files share one `scene` namespace, so a
+package-level `bin()` is the *package's* bin, and the next scene that wants one
+cannot have it. The file declares an empty type instead, named after itself, and
+hangs its helpers off that:
+
+```go
+type alley struct{}
+
+func init() {
+	a := alley{}
+	SceneManager.Register(Scene{
+		…
+		Hotspots: []inkwell.Hotspot{a.hidingPlace(), a.backDoor(), a.bin(), a.fireEscape()},
+	})
+}
+
+func (alley) bin() inkwell.Hotspot { … }
+```
+
+The receiver is the namespace, so the method name drops what the type already
+says — `selector.leadsTo`, not `leadsToSelector`. Where the helpers read from
+data rather than build it, the type is not empty and the data are its fields:
+`script.usewith_fail.go` carries the four line-sets as fields of `useWithFail`
+and answers with `fail.paul(n)` and `fail.dex(n)`.
+
+The rule stops at the package's own API. `world.Do`, `armilla.Slot2`,
+`tape.Dialogue` and `boot.New` stay functions, because there the package is
+already the namespace and the receiver would be an empty word.
+
 `init()` order is file-name order, so **registration order is alphabetical**.
 Nothing may depend on it — including the order the arrow keys walk the scenes,
 which is simply the order the files sit in.
@@ -345,7 +378,12 @@ live with the rest of the writing, in `script/script.usewith_fail.go`.
 ## The world
 
 There is exactly one game, so there is exactly one world — and since there is
-exactly one, the **package is the singleton**. There is no `World` value to pass
+exactly one, the **package is the singleton**. What the singleton holds is a
+`state` struct with one unexported instance, so the mutable fields sit together
+and `Attach` resets them in a single assignment rather than one line per field —
+a fifth field cannot be forgotten. `armilla` does the same. Only the state is a
+struct: the exported names stay package functions, because a `*World` threaded
+to every widget and script is the thing this design removed. There is no `World` value to pass
 around and no back-reference for a widget to hold: `world.Do(…)`,
 `world.Game()`, `world.Fn(…)` are reachable from anywhere that imports `world`.
 `New` calls `world.Attach(g)`, which binds the engine and resets the run state,

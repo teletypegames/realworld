@@ -7,7 +7,10 @@ import (
 	"realworld/inc/system/armilla"
 )
 
+type alley struct{}
+
 func init() {
+	a := alley{}
 	SceneManager.Register(Scene{
 		Name: inc.SceneAlley,
 		Title: inkwell.Text{
@@ -35,11 +38,11 @@ func init() {
 			},
 		},
 		OnEnter:  armilla.StripIfEmpty("SRP: 1 tape"),
-		Hotspots: []inkwell.Hotspot{hidingPlace(), backDoor(), bin(), fireEscape()},
+		Hotspots: []inkwell.Hotspot{a.hidingPlace(), a.backDoor(), a.bin(), a.fireEscape()},
 	})
 }
 
-func hidingPlace() inkwell.Hotspot {
+func (alley) hidingPlace() inkwell.Hotspot {
 	return inkwell.Hotspot{
 		Name: "hiding_place",
 		Label: inkwell.Text{
@@ -92,7 +95,7 @@ func hidingPlace() inkwell.Hotspot {
 	}
 }
 
-func backDoor() inkwell.Hotspot {
+func (alley) backDoor() inkwell.Hotspot {
 	return inkwell.Hotspot{
 		Name: "back_door",
 		Label: inkwell.Text{
@@ -133,7 +136,7 @@ func backDoor() inkwell.Hotspot {
 	}
 }
 
-func bin() inkwell.Hotspot {
+func (alley) bin() inkwell.Hotspot {
 	return inkwell.Hotspot{
 		Name: "bin",
 		Label: inkwell.Text{
@@ -158,7 +161,7 @@ func bin() inkwell.Hotspot {
 	}
 }
 
-func fireEscape() inkwell.Hotspot {
+func (alley) fireEscape() inkwell.Hotspot {
 	return inkwell.Hotspot{
 		Name: "fire_escape",
 		Label: inkwell.Text{

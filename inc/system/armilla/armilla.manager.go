@@ -7,18 +7,15 @@ import (
 	"realworld/inc/system/world"
 )
 
-var (
+type state struct {
 	pending string
-
 	waiting bool
 	line    inkwell.Action
-)
-
-func Reset() {
-	pending = ""
-	waiting = false
-	line = nil
 }
+
+var st state
+
+func Reset() { st = state{} }
 
 func Slot2() string {
 	if v, ok := world.Game().State.Var(inc.VarSlot2).(string); ok {
@@ -29,11 +26,11 @@ func Slot2() string {
 
 func SetSlot2(item string) { world.Game().State.SetVar(inc.VarSlot2, item) }
 
-func SetPending(item string) { pending = item }
+func SetPending(item string) { st.pending = item }
 
 func TakePending() string {
-	item := pending
-	pending = ""
+	item := st.pending
+	st.pending = ""
 	return item
 }
 
@@ -47,21 +44,21 @@ func StripIfEmpty(text string) inkwell.Action {
 	})
 }
 
-func Waiting() bool { return waiting }
+func Waiting() bool { return st.waiting }
 
 func Offer(a inkwell.Action) inkwell.Action {
 	return world.Fn(func(*inkwell.Ctx) {
-		line = a
-		waiting = true
+		st.line = a
+		st.waiting = true
 	})
 }
 
 func TakeOffer() {
-	if !waiting {
+	if !st.waiting {
 		return
 	}
-	waiting = false
-	a := line
-	line = nil
+	st.waiting = false
+	a := st.line
+	st.line = nil
 	world.Do(a)
 }

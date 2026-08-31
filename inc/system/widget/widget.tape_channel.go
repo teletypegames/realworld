@@ -65,7 +65,7 @@ func (t *tapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
 			if !tape.Is(m.Speaker) {
 				continue
 			}
-			col, txt = speechColor(g, m.Speaker, th.ChatLogResponse), m.Text
+			col, txt = t.speechColor(g, m.Speaker, th.ChatLogResponse), m.Text
 		default:
 			col, txt = th.ChatLogSystem, m.Text
 		}
@@ -95,13 +95,13 @@ func (t *tapeChannel) lastSpeaker(g *inkwell.Game, th inkwell.Theme) (string, co
 	for i := len(msgs) - 1; i >= 0; i-- {
 		m := msgs[i]
 		if m.Kind == inkwell.LogResponse && tape.Is(m.Speaker) {
-			return g.CharacterLabel(m.Speaker).String(), speechColor(g, m.Speaker, th.ChatLogResponse)
+			return g.CharacterLabel(m.Speaker).String(), t.speechColor(g, m.Speaker, th.ChatLogResponse)
 		}
 	}
-	return g.CharacterLabel(inc.Dex).String(), speechColor(g, inc.Dex, th.ChatLogResponse)
+	return g.CharacterLabel(inc.Dex).String(), t.speechColor(g, inc.Dex, th.ChatLogResponse)
 }
 
-func speechColor(g *inkwell.Game, name string, fallback color.Color) color.Color {
+func (t *tapeChannel) speechColor(g *inkwell.Game, name string, fallback color.Color) color.Color {
 	if c, ok := g.CharacterManager.Get(name); ok && c.SpeechColor != nil {
 		return c.SpeechColor
 	}

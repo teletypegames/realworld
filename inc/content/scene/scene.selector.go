@@ -30,27 +30,30 @@ func init() {
 	})
 }
 
+type selector struct{}
+
 func FillSelectorPins() {
-	selector, ok := SceneManager.Get(inc.SceneSelector)
+	s, ok := SceneManager.Get(inc.SceneSelector)
 	if !ok {
 		return
 	}
+	sel := selector{}
 	var exits []inkwell.Exit
 	for _, entity := range SceneManager.All() {
-		if !leadsToSelector(entity) {
+		if !sel.leadsTo(entity) {
 			continue
 		}
 		exits = append(exits, inkwell.Exit{
 			To:    entity.Name,
-			Label: pinLabel(entity.Title),
-			Area:  pin(len(exits)),
+			Label: sel.pinLabel(entity.Title),
+			Area:  sel.pin(len(exits)),
 		})
 	}
-	selector.Exits = exits
-	SceneManager.Set(selector)
+	s.Exits = exits
+	SceneManager.Set(s)
 }
 
-func leadsToSelector(s Scene) bool {
+func (selector) leadsTo(s Scene) bool {
 	for _, e := range s.Exits {
 		if e.To == inc.SceneSelector {
 			return true
@@ -69,12 +72,12 @@ const (
 	pinGapY = 38.0
 )
 
-func pin(i int) inkwell.Shape {
+func (selector) pin(i int) inkwell.Shape {
 	col, row := i%pinCols, i/pinCols
 	return inkwell.Rect(pinX+float64(col)*pinGapX, pinY+float64(row)*pinGapY, pinW, pinH)
 }
 
-func pinLabel(title inkwell.Text) inkwell.Text {
+func (selector) pinLabel(title inkwell.Text) inkwell.Text {
 	return title.Map(func(s string) string {
 		name, _, _ := strings.Cut(s, " — ")
 		return name

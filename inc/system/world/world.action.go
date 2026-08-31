@@ -6,7 +6,7 @@ import (
 	"realworld/inc"
 )
 
-func Do(a inkwell.Action) { game.Do(a) }
+func Do(a inkwell.Action) { st.game.Do(a) }
 
 type fnAction struct{ fn func(*inkwell.Ctx) }
 
@@ -34,7 +34,7 @@ func UseTheme(name string) inkwell.Action {
 }
 
 func SetMode(m Mode) inkwell.Action {
-	return Fn(func(*inkwell.Ctx) { setMode(m) })
+	return Fn(func(*inkwell.Ctx) { st.setMode(m) })
 }
 
 func Paused(inner inkwell.Action) inkwell.Action {
@@ -63,11 +63,11 @@ type pausedRunner struct {
 func (r *pausedRunner) Tick(ctx *inkwell.Ctx) inkwell.Status {
 	if !r.started {
 		r.started = true
-		setNote(inc.NotePaused)
+		st.setNote(inc.NotePaused)
 	}
 	s := r.inner.Tick(ctx)
 	if s != inkwell.StatusRunning {
-		setNote("")
+		st.setNote("")
 	}
 	return s
 }
