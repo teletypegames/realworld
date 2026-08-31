@@ -13,7 +13,7 @@ func init() {
 			{Lang: "en", Text: "NEUMATRONIC SHOWROOM"},
 			{Lang: "hu", Text: "NEUMATRONIC BEMUTATÓTEREM"},
 		},
-		Background: inc.BgShowroom,
+		Background: inc.BackgroundShowroom,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

@@ -16,18 +16,18 @@ type hudFrame struct {
 	Name string
 }
 
-func (h *hudFrame) GetName() string                { return h.Name }
-func (h *hudFrame) VisibleWhen() inkwell.Condition { return whenPlaying }
-func (h *hudFrame) Layer() inkwell.Layer           { return inkwell.LayerPanel }
-func (h *hudFrame) Tick(ctx *inkwell.UICtx)        {}
+func (frame *hudFrame) GetName() string                { return frame.Name }
+func (frame *hudFrame) VisibleWhen() inkwell.Condition { return whenPlaying }
+func (frame *hudFrame) Layer() inkwell.Layer           { return inkwell.LayerPanel }
+func (frame *hudFrame) Tick(context *inkwell.UICtx)    {}
 
-func (h *hudFrame) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
-	th := ctx.Game.Theme()
-	vector.DrawFilledRect(dst, 0, HUDTop+1, ScreenW, ScreenH-HUDTop-1, th.PanelBG, false)
+func (frame *hudFrame) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
+	theme := context.Game.Theme()
+	vector.DrawFilledRect(destination, 0, HUDTop+1, ScreenWidth, ScreenHeight-HUDTop-1, theme.PanelBG, false)
 
-	vector.StrokeLine(dst, 0, HUDTop, ScreenW, HUDTop, 1, th.CharacterPanelBorder, false)
+	vector.StrokeLine(destination, 0, HUDTop, ScreenWidth, HUDTop, 1, theme.CharacterPanelBorder, false)
 
-	vector.StrokeLine(dst, DividerX, HUDTop+1, DividerX, ScreenH, 1, th.CharacterPanelBorder, false)
+	vector.StrokeLine(destination, DividerX, HUDTop+1, DividerX, ScreenHeight, 1, theme.CharacterPanelBorder, false)
 }
 
-func (h *hudFrame) BlocksClickAt(p inkwell.Point) bool { return p.Y >= HUDTop }
+func (frame *hudFrame) BlocksClickAt(point inkwell.Point) bool { return point.Y >= HUDTop }

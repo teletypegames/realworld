@@ -12,24 +12,24 @@ type Widget = inkwell.Widget
 var WidgetManager = inkwell.NewManager[Widget]()
 
 const (
-	ScreenW = 640
-	ScreenH = 380
+	ScreenWidth  = 640
+	ScreenHeight = 380
 
-	LineH = inkwell.GlyphH + 2
-	Pad   = 6
+	LineHeight = inkwell.GlyphH + 2
+	Padding    = 6
 
-	TopBarH  = LineH + 2
-	DividerX = 394
+	TopBarHeight = LineHeight + 2
+	DividerX     = 394
 
-	HUDH   = Pad + LineH + 4 + invSlot*2 + invGap + Pad
-	HUDTop = ScreenH - HUDH
+	HUDHeight = Padding + LineHeight + 4 + inventorySlotSize*2 + inventoryGap + Padding
+	HUDTop    = ScreenHeight - HUDHeight
 
-	statusY = HUDTop + Pad
-	slotsY  = HUDTop + Pad + LineH
-	slotsH  = LineH*2 + Pad*2
-	invY    = slotsY + 4
-	invSlot = 40
-	invGap  = 4
+	statusY           = HUDTop + Padding
+	slotsY            = HUDTop + Padding + LineHeight
+	slotsHeight       = LineHeight*2 + Padding*2
+	inventoryY        = slotsY + 4
+	inventorySlotSize = 40
+	inventoryGap      = 4
 )
 
 var (

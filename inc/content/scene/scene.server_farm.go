@@ -13,7 +13,7 @@ func init() {
 			{Lang: "en", Text: "SERVER FARM"},
 			{Lang: "hu", Text: "SZERVERFARM"},
 		},
-		Background: inc.BgServerFarm,
+		Background: inc.BackgroundServerFarm,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

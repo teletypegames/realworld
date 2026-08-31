@@ -16,14 +16,14 @@ var assets embed.FS
 func init() { inkwell.AssetFS = assets }
 
 func main() {
-	var o boot.Opts
-	flag.StringVar(&o.Scene, "scene", "", "starting scene (empty: the alley)")
-	flag.BoolVar(&o.Finale, "finale", false,
+	var options boot.Options
+	flag.StringVar(&options.Scene, "scene", "", "starting scene (empty: the alley)")
+	flag.BoolVar(&options.Finale, "finale", false,
 		"start with the finale, to try the Nokia-punk theme switch")
-	flag.StringVar(&o.Lang, "lang", "en", "language the game speaks (en, hu)")
+	flag.StringVar(&options.Lang, "lang", "en", "language the game speaks (en, hu)")
 	flag.Parse()
 
-	if err := inkwell.Run(boot.New(o)); err != nil {
+	if err := inkwell.Run(boot.New(options)); err != nil {
 		log.Fatal(err)
 	}
 }

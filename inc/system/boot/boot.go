@@ -17,7 +17,7 @@ import (
 	"realworld/inc/system/world"
 )
 
-type Opts struct {
+type Options struct {
 	Scene  string
 	Finale bool
 	Lang   string
@@ -28,51 +28,51 @@ var exitLook = inkwell.Text{
 	{Lang: "hu", Text: "Arra van: %s."},
 }
 
-func New(o Opts) *inkwell.Game {
-	start := o.Scene
+func New(options Options) *inkwell.Game {
+	start := options.Scene
 	if start == "" {
 		start = inc.SceneAlley
 	}
 
 	inkwell.Fallback = "en"
-	inkwell.Lang = o.Lang
+	inkwell.Lang = options.Lang
 
 	scene.FillSelectorPins()
 
-	g := inkwell.NewGame("Real World", widget.ScreenW, widget.ScreenH)
-	g.MaxLogLines = 64
-	g.WindowScale = 2
-	g.SceneRect = inkwell.Rect(0, widget.TopBarH, widget.ScreenW, widget.HUDTop-widget.TopBarH)
-	g.Player = inc.Paul
-	g.Walkboxes = scene.Floor
-	g.ExitLook = func(e inkwell.Exit) inkwell.Action {
-		return inkwell.Say(inc.Paul, inkwell.Format(exitLook, e.Label))
+	game := inkwell.NewGame("Real World", widget.ScreenWidth, widget.ScreenHeight)
+	game.MaxLogLines = 64
+	game.WindowScale = 2
+	game.SceneRect = inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.HUDTop-widget.TopBarHeight)
+	game.Player = inc.Paul
+	game.Walkboxes = scene.Floor
+	game.ExitLook = func(exit inkwell.Exit) inkwell.Action {
+		return inkwell.Say(inc.Paul, inkwell.Format(exitLook, exit.Label))
 	}
-	g.ExitTake = func(inkwell.Exit) inkwell.Action {
+	game.ExitTake = func(inkwell.Exit) inkwell.Action {
 		return inkwell.Say(inc.Paul, inkwell.Text{
 			{Lang: "en", Text: "It's a way out, not a thing."},
 			{Lang: "hu", Text: "Az egy kijárat, nem egy tárgy."},
 		})
 	}
-	g.UseWithFail = script.UseWithFail
+	game.UseWithFail = script.UseWithFail
 
-	g.AssetManager = background.BackgroundManager
-	g.CharacterManager = character.CharacterManager
-	g.DialogueManager = dialog.DialogManager
-	g.ItemManager = item.ItemManager
-	g.SceneManager = scene.SceneManager
-	g.ScriptManager = script.ScriptManager
-	g.WidgetManager = widget.WidgetManager
-	theme.ThemeManager.Each(g.ThemeManager.Register)
+	game.AssetManager = background.BackgroundManager
+	game.CharacterManager = character.CharacterManager
+	game.DialogueManager = dialog.DialogManager
+	game.ItemManager = item.ItemManager
+	game.SceneManager = scene.SceneManager
+	game.ScriptManager = script.ScriptManager
+	game.WidgetManager = widget.WidgetManager
+	theme.ThemeManager.Each(game.ThemeManager.Register)
 
-	world.Attach(g)
+	world.Attach(game)
 	armilla.Reset()
-	g.UseTheme(inc.RealWorld)
+	game.UseTheme(inc.RealWorld)
 
-	g.StartAt(start)
-	g.OnStart(inc.ScriptOpening)
-	if o.Finale {
-		g.OnFinale(inc.ScriptFinale)
+	game.StartAt(start)
+	game.OnStart(inc.ScriptOpening)
+	if options.Finale {
+		game.OnFinale(inc.ScriptFinale)
 	}
-	return g
+	return game
 }

@@ -10,7 +10,7 @@ func init() {
 	WidgetManager.Register(&inkwell.TopBar{
 		Name:    "topbar",
 		When:    whenPlaying,
-		Height:  TopBarH,
+		Height:  TopBarHeight,
 		TimeVar: inc.VarArmillaStrip,
 		NoteVar: inc.VarNote,
 		Notes: map[string]inkwell.Text{

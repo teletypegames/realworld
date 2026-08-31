@@ -24,7 +24,7 @@ func init() {
 			{Lang: "en", Text: "SAN FRANCISCO"},
 			{Lang: "hu", Text: "SAN FRANCISCO"},
 		},
-		Background: inc.BgSelector,
+		Background: inc.BackgroundSelector,
 		Actors:     []inkwell.SceneActor{},
 		Walkboxes:  []inkwell.Polygon{},
 	})
@@ -33,29 +33,29 @@ func init() {
 type selector struct{}
 
 func FillSelectorPins() {
-	s, ok := SceneManager.Get(inc.SceneSelector)
-	if !ok {
+	selectorScene, found := SceneManager.Get(inc.SceneSelector)
+	if !found {
 		return
 	}
-	sel := selector{}
+	pins := selector{}
 	var exits []inkwell.Exit
 	for _, entity := range SceneManager.All() {
-		if !sel.leadsTo(entity) {
+		if !pins.leadsTo(entity) {
 			continue
 		}
 		exits = append(exits, inkwell.Exit{
 			To:    entity.Name,
-			Label: sel.pinLabel(entity.Title),
-			Area:  sel.pin(len(exits)),
+			Label: pins.label(entity.Title),
+			Area:  pins.area(len(exits)),
 		})
 	}
-	s.Exits = exits
-	SceneManager.Set(s)
+	selectorScene.Exits = exits
+	SceneManager.Set(selectorScene)
 }
 
-func (selector) leadsTo(s Scene) bool {
-	for _, e := range s.Exits {
-		if e.To == inc.SceneSelector {
+func (selector) leadsTo(scene Scene) bool {
+	for _, exit := range scene.Exits {
+		if exit.To == inc.SceneSelector {
 			return true
 		}
 	}
@@ -63,23 +63,23 @@ func (selector) leadsTo(s Scene) bool {
 }
 
 const (
-	pinCols = 3
-	pinW    = 192.0
-	pinH    = 32.0
-	pinX    = 16.0
-	pinY    = 28.0
-	pinGapX = 204.0
-	pinGapY = 38.0
+	pinColumns = 3
+	pinWidth   = 192.0
+	pinHeight  = 32.0
+	pinX       = 16.0
+	pinY       = 28.0
+	pinGapX    = 204.0
+	pinGapY    = 38.0
 )
 
-func (selector) pin(i int) inkwell.Shape {
-	col, row := i%pinCols, i/pinCols
-	return inkwell.Rect(pinX+float64(col)*pinGapX, pinY+float64(row)*pinGapY, pinW, pinH)
+func (selector) area(index int) inkwell.Shape {
+	column, row := index%pinColumns, index/pinColumns
+	return inkwell.Rect(pinX+float64(column)*pinGapX, pinY+float64(row)*pinGapY, pinWidth, pinHeight)
 }
 
-func (selector) pinLabel(title inkwell.Text) inkwell.Text {
-	return title.Map(func(s string) string {
-		name, _, _ := strings.Cut(s, " — ")
+func (selector) label(title inkwell.Text) inkwell.Text {
+	return title.Map(func(title string) string {
+		name, _, _ := strings.Cut(title, " — ")
 		return name
 	})
 }

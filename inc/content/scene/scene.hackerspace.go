@@ -13,7 +13,7 @@ func init() {
 			{Lang: "en", Text: "HACKERSPACE"},
 			{Lang: "hu", Text: "HACKERSPACE"},
 		},
-		Background: inc.BgHackerspace,
+		Background: inc.BackgroundHackerspace,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

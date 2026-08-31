@@ -14,7 +14,7 @@ import (
 func init() {
 	WidgetManager.Register(&tapeChannel{
 		Name:   "channel",
-		Bounds: inkwell.Rect(DividerX+2, HUDTop+2, ScreenW-DividerX-4, ScreenH-HUDTop-4),
+		Bounds: inkwell.Rect(DividerX+2, HUDTop+2, ScreenWidth-DividerX-4, ScreenHeight-HUDTop-4),
 	})
 }
 
@@ -23,87 +23,89 @@ type tapeChannel struct {
 	Bounds inkwell.Rectangle
 }
 
-func (t *tapeChannel) GetName() string                { return t.Name }
-func (t *tapeChannel) VisibleWhen() inkwell.Condition { return whenPlaying }
-func (t *tapeChannel) Layer() inkwell.Layer           { return inkwell.LayerHUD }
+func (channel *tapeChannel) GetName() string                { return channel.Name }
+func (channel *tapeChannel) VisibleWhen() inkwell.Condition { return whenPlaying }
+func (channel *tapeChannel) Layer() inkwell.Layer           { return inkwell.LayerHUD }
 
-func (t *tapeChannel) Tick(ctx *inkwell.UICtx) {}
+func (channel *tapeChannel) Tick(context *inkwell.UICtx) {}
 
-func (t *tapeChannel) BlocksClickAt(p inkwell.Point) bool { return t.Bounds.Contains(p) }
+func (channel *tapeChannel) BlocksClickAt(point inkwell.Point) bool {
+	return channel.Bounds.Contains(point)
+}
 
-func (t *tapeChannel) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
-	g := ctx.Game
-	th := g.Theme()
-	b := t.Bounds
-	if b.W <= 0 || b.H <= 0 {
+func (channel *tapeChannel) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
+	game := context.Game
+	theme := game.Theme()
+	bounds := channel.Bounds
+	if bounds.W <= 0 || bounds.H <= 0 {
 		return
 	}
-	const lh, pad = LineH, Pad
 
-	vector.DrawFilledRect(dst, float32(b.X), float32(b.Y), float32(b.W), float32(b.H), th.ChatLogBG, false)
+	vector.DrawFilledRect(destination, float32(bounds.X), float32(bounds.Y),
+		float32(bounds.W), float32(bounds.H), theme.ChatLogBG, false)
 
-	speaker, speakerCol := t.lastSpeaker(g, th)
-	g.DrawText(dst, speaker, int(b.X)+pad, int(b.Y)+pad, speakerCol)
-	hy := float32(b.Y+pad+lh) + 2
-	vector.StrokeLine(dst, float32(b.X)+pad, hy,
-		float32(b.X+b.W)-pad, hy, 1, th.CharacterPanelBorder, false)
+	speaker, speakerColor := channel.lastSpeaker(game, theme)
+	game.DrawText(destination, speaker, int(bounds.X)+Padding, int(bounds.Y)+Padding, speakerColor)
+	ruleY := float32(bounds.Y+Padding+LineHeight) + 2
+	vector.StrokeLine(destination, float32(bounds.X)+Padding, ruleY,
+		float32(bounds.X+bounds.W)-Padding, ruleY, 1, theme.CharacterPanelBorder, false)
 
 	type line struct {
-		text string
-		col  color.Color
+		text  string
+		color color.Color
 	}
-	wrapW := int(b.W) - pad*2
+	wrapWidth := int(bounds.W) - Padding*2
 	var rendered []line
-	for _, m := range g.Messages() {
-		var col color.Color
-		var txt string
-		switch m.Kind {
+	for _, message := range game.Messages() {
+		var lineColor color.Color
+		var text string
+		switch message.Kind {
 		case inkwell.LogAction:
-
-			col, txt = th.ChatLogPrompt, m.Text
+			lineColor, text = theme.ChatLogPrompt, message.Text
 		case inkwell.LogResponse:
-			if !tape.Is(m.Speaker) {
+			if !tape.Is(message.Speaker) {
 				continue
 			}
-			col, txt = t.speechColor(g, m.Speaker, th.ChatLogResponse), m.Text
+			lineColor, text = channel.speechColor(game, message.Speaker, theme.ChatLogResponse), message.Text
 		default:
-			col, txt = th.ChatLogSystem, m.Text
+			lineColor, text = theme.ChatLogSystem, message.Text
 		}
-		for _, wl := range inkwell.WrapText(txt, wrapW) {
+		for _, wrapped := range inkwell.WrapText(text, wrapWidth) {
 			rendered = append(rendered, line{
-				text: wl,
-				col:  col,
+				text:  wrapped,
+				color: lineColor,
 			})
 		}
 	}
 
-	top := int(b.Y) + pad + lh + 6
-	maxLines := (int(b.Y+b.H) - pad - top) / lh
+	top := int(bounds.Y) + Padding + LineHeight + 6
+	maxLines := (int(bounds.Y+bounds.H) - Padding - top) / LineHeight
 	if maxLines <= 0 {
 		return
 	}
 	if start := len(rendered) - maxLines; start > 0 {
 		rendered = rendered[start:]
 	}
-	for i, ln := range rendered {
-		g.DrawText(dst, ln.text, int(b.X)+pad, top+i*lh, ln.col)
+	for index, rendering := range rendered {
+		game.DrawText(destination, rendering.text, int(bounds.X)+Padding, top+index*LineHeight, rendering.color)
 	}
 }
 
-func (t *tapeChannel) lastSpeaker(g *inkwell.Game, th inkwell.Theme) (string, color.Color) {
-	msgs := g.Messages()
-	for i := len(msgs) - 1; i >= 0; i-- {
-		m := msgs[i]
-		if m.Kind == inkwell.LogResponse && tape.Is(m.Speaker) {
-			return g.CharacterLabel(m.Speaker).String(), t.speechColor(g, m.Speaker, th.ChatLogResponse)
+func (channel *tapeChannel) lastSpeaker(game *inkwell.Game, theme inkwell.Theme) (string, color.Color) {
+	messages := game.Messages()
+	for index := len(messages) - 1; index >= 0; index-- {
+		message := messages[index]
+		if message.Kind == inkwell.LogResponse && tape.Is(message.Speaker) {
+			return game.CharacterLabel(message.Speaker).String(),
+				channel.speechColor(game, message.Speaker, theme.ChatLogResponse)
 		}
 	}
-	return g.CharacterLabel(inc.Dex).String(), t.speechColor(g, inc.Dex, th.ChatLogResponse)
+	return game.CharacterLabel(inc.Dex).String(), channel.speechColor(game, inc.Dex, theme.ChatLogResponse)
 }
 
-func (t *tapeChannel) speechColor(g *inkwell.Game, name string, fallback color.Color) color.Color {
-	if c, ok := g.CharacterManager.Get(name); ok && c.SpeechColor != nil {
-		return c.SpeechColor
+func (channel *tapeChannel) speechColor(game *inkwell.Game, name string, fallback color.Color) color.Color {
+	if character, found := game.CharacterManager.Get(name); found && character.SpeechColor != nil {
+		return character.SpeechColor
 	}
 	return fallback
 }

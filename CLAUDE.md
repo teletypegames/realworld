@@ -13,6 +13,30 @@ it until it does not, and put the reasoning in `README.md` instead.
 The single exception is compiler directives (`//go:embed`, `//go:build`), which
 are instructions to the toolchain rather than prose.
 
+### Every name is spelled out
+
+No abbreviations, anywhere an identifier is ours: not in a local, not in a
+parameter, not in a receiver, not in a constant, not in a field. It is `game`,
+not `g`; `theme`, not `th`; `destination`, not `dst`; `context`, not `ctx`;
+`mousePoint`, not `mp`; `ScreenWidth`, not `ScreenW`; `BackgroundAlley`, not
+`BgAlley`. A one-letter name is a comment the compiler cannot check, and this
+file already forbids the checkable kind.
+
+Receivers are spelled out too, which means Go's one-letter receiver convention
+does not apply here: `func (frame *hudFrame)`, `func (channel *tapeChannel)`,
+`func (slots *tapeSlots)`. The receiver takes the noun the type is *an instance
+of*, so it never has to repeat the type name and never shadows it.
+
+Three things keep their short form, and all three for the same reason — they are
+somebody else's word, not ours:
+
+- **Acronyms that are the domain's own**: `HUD`, `BBS`, `BVK`, `SRP`, `RGB`. An
+  acronym is the full name of the thing; `RGB` is what `image/color` calls it.
+- **The engine's vocabulary**: `inc.VarMode` and `inc.VarNote` stay `Var`,
+  because the engine's own API is `State.Var` and `State.SetVar`, and half a
+  translation is worse than none.
+- **`err`**, which is the language's own spelling in every Go program.
+
 ### English first, then every other language beside it
 
 Identifiers, commit messages, `README.md` and this file are English and only
@@ -103,7 +127,7 @@ main.go                                  flags + inkwell.Run
 inc/constants.go                         entity names and world-state keys
 inc/util/util.color.go                   RGB and RGBA, hex to color.Color
 
-inc/system/boot/boot.go                  New(Opts) builds the game
+inc/system/boot/boot.go                  New(Options) builds the game
 inc/system/widget/widget.manager.go      the Widget alias, HUD layout, the conditions
 inc/system/widget/widget.*.go            one widget per file, registering itself
 inc/system/world/world.manager.go        the engine binding, the mode, the note
@@ -209,7 +233,7 @@ package background
 
 func init() {
 	BackgroundManager.Register(Background{
-		Name: inc.BgServerFarm,
+		Name: inc.BackgroundServerFarm,
 		Path: "assets/bg/server_farm.png",
 		Kind: inkwell.AssetImage,
 	})
@@ -359,7 +383,7 @@ if o.Finale {
 
 `OnFinale` is the engine's hook for a closing script, queued straight after the
 opening. Here it is what `-finale` uses to drop into the ending, which is why it
-is set from `Opts` rather than always.
+is set from `Options` rather than always.
 
 The rest of `New` is fields on the `*Game`, and every one of them replaces
 something this package used to carry itself:
@@ -385,7 +409,7 @@ a fifth field cannot be forgotten. `armilla` does the same. Only the state is a
 struct: the exported names stay package functions, because a `*World` threaded
 to every widget and script is the thing this design removed. There is no `World` value to pass
 around and no back-reference for a widget to hold: `world.Do(…)`,
-`world.Game()`, `world.Fn(…)` are reachable from anywhere that imports `world`.
+`world.Game()`, `world.Func(…)` are reachable from anywhere that imports `world`.
 `New` calls `world.Attach(g)`, which binds the engine and resets the run state,
 so building the game twice is clean.
 
@@ -435,7 +459,7 @@ already says. It is `scene.Floor`, not `scene.SceneFloor`; `tape.Dialogue`, not
 the declaration, when choosing a name:
 
 ```go
-scene.FillSelectorPins()   tape.Is(speaker)   world.Do(a)   widget.ScreenW
+scene.FillSelectorPins()   tape.Is(speaker)   world.Do(action)   widget.ScreenWidth
 ```
 
 The manager is the one exception, and it keeps its prefix on purpose:
@@ -449,12 +473,12 @@ Entities themselves need no name at all — they are anonymous literals inside
 their file's `init()`, and the file name says which one it is.
 
 Exported names are the authoring vocabulary — what a content file spells out:
-`boot.New` and `boot.Opts`, the constants in `inc/constants.go`, each package's
+`boot.New` and `boot.Options`, the constants in `inc/constants.go`, each package's
 `<Category>Manager` and entity type, the colour tokens, the tape lookups
 (`tape.Is`, `tape.Of`, `tape.IsItem`, `tape.Dialogue`), the world (`world.Do`,
 `world.Game`, …), the Armilla (`armilla.Slot2`, `armilla.SetStrip`, …) and the
 action constructors (`world.Paused`, `world.SetMode`,
-`world.UseTheme`, `world.TapeOffer`, `world.Fn`). A tape's line is `inkwell.Say`
+`world.UseTheme`, `armilla.Offer`, `world.Func`). A tape's line is `inkwell.Say`
 like anyone else's — the tape voice is on the character, not on a second
 spelling of Say.
 
@@ -466,7 +490,7 @@ widgets (`tapeSlots`, `letterbox`, `hudFrame`, …), the conditions
 The word is **scene**, the engine's own. The wiki and the concept-art deck count
 *screens*, and this code used to as well, but everything a screen had that a
 scene did not now lives in inkwell. "Screen" survives only where it means the
-display: `ScreenW`, `ScreenH`.
+display: `ScreenWidth`, `ScreenHeight`.
 
 ## Layering
 
@@ -492,7 +516,7 @@ makes `widget → tape` the one edge that leaves `system` for `content`.
 
 ## Adding a scene
 
-1. Constants in `inc/constants.go`: `Scene<Name>`, `Bg<Name>`
+1. Constants in `inc/constants.go`: `Scene<Name>`, `Background<Name>`
 2. `inc/content/scene/scene.<name>.go` — an `init()` registering a `Scene`, its
    `Title` and every `Label` written in both languages
 3. `inc/content/background/background.<name>.go` — an `init()` registering a

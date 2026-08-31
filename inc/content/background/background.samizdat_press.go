@@ -8,7 +8,7 @@ import (
 
 func init() {
 	BackgroundManager.Register(Background{
-		Name: inc.BgSamizdatPress,
+		Name: inc.BackgroundSamizdatPress,
 		Path: "assets/bg/samizdat_press.png",
 		Kind: inkwell.AssetImage,
 	})

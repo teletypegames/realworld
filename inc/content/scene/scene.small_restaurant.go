@@ -13,7 +13,7 @@ func init() {
 			{Lang: "en", Text: "SMALL RESTAURANT — NEXT DOOR"},
 			{Lang: "hu", Text: "KIS ÉTTEREM — A SZOMSZÉDBAN"},
 		},
-		Background: inc.BgSmallRestaurant,
+		Background: inc.BackgroundSmallRestaurant,
 		Exits: []inkwell.Exit{
 			{
 				To: inc.SceneTrinketShop,

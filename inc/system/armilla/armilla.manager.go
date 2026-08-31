@@ -7,58 +7,58 @@ import (
 	"realworld/inc/system/world"
 )
 
-type state struct {
+type armillaState struct {
 	pending string
 	waiting bool
 	line    inkwell.Action
 }
 
-var st state
+var state armillaState
 
-func Reset() { st = state{} }
+func Reset() { state = armillaState{} }
 
 func Slot2() string {
-	if v, ok := world.Game().State.Var(inc.VarSlot2).(string); ok {
-		return v
+	if value, isText := world.Game().State.Var(inc.VarSlot2).(string); isText {
+		return value
 	}
 	return ""
 }
 
 func SetSlot2(item string) { world.Game().State.SetVar(inc.VarSlot2, item) }
 
-func SetPending(item string) { st.pending = item }
+func SetPending(item string) { state.pending = item }
 
 func TakePending() string {
-	item := st.pending
-	st.pending = ""
+	item := state.pending
+	state.pending = ""
 	return item
 }
 
 func SetStrip(text string) { world.Game().State.SetVar(inc.VarArmillaStrip, text) }
 
 func StripIfEmpty(text string) inkwell.Action {
-	return world.Fn(func(ctx *inkwell.Ctx) {
-		if ctx.Game.State.Var(inc.VarArmillaStrip) == nil {
-			ctx.Game.State.SetVar(inc.VarArmillaStrip, text)
+	return world.Func(func(context *inkwell.Ctx) {
+		if context.Game.State.Var(inc.VarArmillaStrip) == nil {
+			context.Game.State.SetVar(inc.VarArmillaStrip, text)
 		}
 	})
 }
 
-func Waiting() bool { return st.waiting }
+func Waiting() bool { return state.waiting }
 
-func Offer(a inkwell.Action) inkwell.Action {
-	return world.Fn(func(*inkwell.Ctx) {
-		st.line = a
-		st.waiting = true
+func Offer(line inkwell.Action) inkwell.Action {
+	return world.Func(func(*inkwell.Ctx) {
+		state.line = line
+		state.waiting = true
 	})
 }
 
 func TakeOffer() {
-	if !st.waiting {
+	if !state.waiting {
 		return
 	}
-	st.waiting = false
-	a := st.line
-	st.line = nil
-	world.Do(a)
+	state.waiting = false
+	line := state.line
+	state.line = nil
+	world.Do(line)
 }

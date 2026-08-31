@@ -28,11 +28,11 @@ var tapeWaitingHint = inkwell.Text{
 	{Lang: "hu", Text: "SZÓKÖZ — %s mondani akar valamit"},
 }
 
-func (l *letterbox) GetName() string                { return l.Name }
-func (l *letterbox) VisibleWhen() inkwell.Condition { return whenCutscene }
-func (l *letterbox) Layer() inkwell.Layer           { return inkwell.LayerScene }
+func (box *letterbox) GetName() string                { return box.Name }
+func (box *letterbox) VisibleWhen() inkwell.Condition { return whenCutscene }
+func (box *letterbox) Layer() inkwell.Layer           { return inkwell.LayerScene }
 
-func (l *letterbox) Tick(ctx *inkwell.UICtx) {
+func (box *letterbox) Tick(context *inkwell.UICtx) {
 	if !armilla.Waiting() {
 		return
 	}
@@ -41,20 +41,20 @@ func (l *letterbox) Tick(ctx *inkwell.UICtx) {
 	}
 }
 
-func (l *letterbox) Draw(dst *ebiten.Image, ctx *inkwell.UICtx) {
-	g := ctx.Game
-	th := g.Theme()
-	bar := l.Bar
+func (box *letterbox) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
+	game := context.Game
+	theme := game.Theme()
+	bar := box.Bar
 	if bar <= 0 {
 		bar = 18
 	}
-	w, h := float32(g.Width), float32(g.Height)
+	width, height := float32(game.Width), float32(game.Height)
 	black := util.RGB(0x000000)
-	vector.DrawFilledRect(dst, 0, 0, w, float32(bar), black, false)
-	vector.DrawFilledRect(dst, 0, h-float32(bar), w, float32(bar), black, false)
+	vector.DrawFilledRect(destination, 0, 0, width, float32(bar), black, false)
+	vector.DrawFilledRect(destination, 0, height-float32(bar), width, float32(bar), black, false)
 
 	if armilla.Waiting() {
-		msg := inkwell.Format(tapeWaitingHint, g.CharacterLabel(inc.Dex)).String()
-		g.DrawText(dst, msg, g.Width-inkwell.TextWidth(msg)-4, g.Height-int(bar)+4, th.ChatLogResponse)
+		hint := inkwell.Format(tapeWaitingHint, game.CharacterLabel(inc.Dex)).String()
+		game.DrawText(destination, hint, game.Width-inkwell.TextWidth(hint)-4, game.Height-int(bar)+4, theme.ChatLogResponse)
 	}
 }

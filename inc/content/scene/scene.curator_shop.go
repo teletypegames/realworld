@@ -13,7 +13,7 @@ func init() {
 			{Lang: "en", Text: "CURATOR SERVICE — THE MASTER'S WORKSHOP"},
 			{Lang: "hu", Text: "KURÁTORSZOLGÁLAT — A MESTER MŰHELYE"},
 		},
-		Background: inc.BgCuratorShop,
+		Background: inc.BackgroundCuratorShop,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

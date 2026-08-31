@@ -61,39 +61,39 @@ var fail = useWithFail{
 	},
 }
 
-func UseWithFail(item string, h *inkwell.Hotspot) inkwell.Action {
-	key := "fail." + item + "." + h.Name
+func UseWithFail(item string, hotspot *inkwell.Hotspot) inkwell.Action {
+	key := "fail." + item + "." + hotspot.Name
 	world.Game().State.NoteTalked(key)
-	n := world.Game().State.Talked(key)
+	count := world.Game().State.Talked(key)
 
 	return inkwell.Seq(
-		inkwell.Say(inc.Paul, fail.paul(n)),
-		inkwell.Say(inc.Dex, fail.dex(n)),
+		inkwell.Say(inc.Paul, fail.paul(count)),
+		inkwell.Say(inc.Dex, fail.dex(count)),
 	)
 }
 
-func (f useWithFail) paul(n int) inkwell.Text { return f.pick(f.paulLines, n) }
+func (fail useWithFail) paul(count int) inkwell.Text { return fail.pick(fail.paulLines, count) }
 
-func (f useWithFail) dex(n int) inkwell.Text {
+func (fail useWithFail) dex(count int) inkwell.Text {
 	switch {
-	case n <= 1:
-		return f.pick(f.dexDry, n)
-	case n == 2:
-		return f.pick(f.dexTease, n)
+	case count <= 1:
+		return fail.pick(fail.dexDry, count)
+	case count == 2:
+		return fail.pick(fail.dexTease, count)
 	default:
-		return f.dexGiveUp
+		return fail.dexGiveUp
 	}
 }
 
-func (f useWithFail) pick(s []inkwell.Text, n int) inkwell.Text {
+func (fail useWithFail) pick(lines []inkwell.Text, count int) inkwell.Text {
 	switch {
-	case len(s) == 0:
+	case len(lines) == 0:
 		return nil
-	case n <= 0:
-		return s[0]
-	case n-1 < len(s):
-		return s[n-1]
+	case count <= 0:
+		return lines[0]
+	case count-1 < len(lines):
+		return lines[count-1]
 	default:
-		return s[rand.Intn(len(s))]
+		return lines[rand.Intn(len(lines))]
 	}
 }

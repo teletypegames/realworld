@@ -12,13 +12,13 @@ func init() {
 	ScriptManager.Register(Script{
 		Name: inc.ScriptTapeInsert,
 		Actions: inkwell.Seq(
-			world.Fn(func(ctx *inkwell.Ctx) {
+			world.Func(func(context *inkwell.Ctx) {
 				item := armilla.TakePending()
 				if item == "" {
 					return
 				}
 				armilla.SetSlot2(item)
-				ctx.Game.Inventory.Remove(item)
+				context.Game.Inventory.Remove(item)
 				armilla.SetStrip("SLOT2: READING")
 			}),
 			inkwell.Say(inc.Paul, inkwell.Text{

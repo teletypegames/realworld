@@ -6,13 +6,13 @@ import (
 )
 
 var (
-	Ink     = util.RGB(0xDCD5C4)
-	InkDim  = util.RGB(0x8A806B)
-	Amber   = util.RGB(0xE0A33E)
-	AmberLo = util.RGB(0xA8701A)
-	black   = util.RGB(0x14120E)
-	panel   = util.RGB(0x0D0B08)
-	sceneBG = util.RGB(0x241F18)
+	Ink             = util.RGB(0xDCD5C4)
+	InkDim          = util.RGB(0x8A806B)
+	Amber           = util.RGB(0xE0A33E)
+	AmberLow        = util.RGB(0xA8701A)
+	black           = util.RGB(0x14120E)
+	panel           = util.RGB(0x0D0B08)
+	sceneBackground = util.RGB(0x241F18)
 )
 
 func init() {
@@ -22,14 +22,14 @@ func init() {
 		StatusText:              Ink,
 		FlashText:               Amber,
 		VerbButtonBG:            util.RGB(0x1E1A14),
-		VerbButtonSelectedBG:    AmberLo,
+		VerbButtonSelectedBG:    AmberLow,
 		VerbButtonText:          Ink,
 		InventorySlotBG:         util.RGB(0x1E1A14),
-		InventorySlotSelectedBG: AmberLo,
+		InventorySlotSelectedBG: AmberLow,
 		SpeechBubbleBG:          util.RGBA(0x14120E, 0xDC),
 		SpeechDefaultText:       Ink,
 		DialogBG:                util.RGBA(0x0D0B08, 0xF0),
-		DialogBorder:            AmberLo,
+		DialogBorder:            AmberLow,
 		DialogChoiceBG:          util.RGB(0x1E1A14),
 		DialogChoiceHover:       Amber,
 		DialogSpeaker:           Amber,
@@ -38,7 +38,7 @@ func init() {
 		EndCardText:             Ink,
 		CursorColor:             Amber,
 		HotspotOutline:          util.RGB(0x7A6A44),
-		SceneBackdrop:           sceneBG,
+		SceneBackdrop:           sceneBackground,
 		TopBarBG:                panel,
 		TopBarText:              InkDim,
 		TopBarAccent:            Amber,
@@ -47,7 +47,7 @@ func init() {
 		ChatLogResponse:         Amber,
 		ChatLogSystem:           util.RGB(0x6B6353),
 		CharacterPanelBG:        panel,
-		CharacterPanelBorder:    AmberLo,
+		CharacterPanelBorder:    AmberLow,
 		CharacterPanelTitle:     Amber,
 	})
 }

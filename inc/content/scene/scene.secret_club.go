@@ -13,7 +13,7 @@ func init() {
 			{Lang: "en", Text: "SECRET CLUB — THE UNDERWATER SUN"},
 			{Lang: "hu", Text: "TITKOS KLUB — A VÍZ ALATTI NAP"},
 		},
-		Background: inc.BgSecretClub,
+		Background: inc.BackgroundSecretClub,
 		Exits: []inkwell.Exit{
 			{
 				To: inc.SceneBBSTerminal,

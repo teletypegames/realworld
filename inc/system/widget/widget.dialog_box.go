@@ -7,8 +7,8 @@ import (
 func init() {
 	WidgetManager.Register(&inkwell.DialogBox{
 		Name:       "dialog",
-		Bounds:     inkwell.Rect(0, ScreenH-LineH*9, DividerX, LineH*9),
-		LineHeight: LineH,
-		Padding:    Pad,
+		Bounds:     inkwell.Rect(0, ScreenHeight-LineHeight*9, DividerX, LineHeight*9),
+		LineHeight: LineHeight,
+		Padding:    Padding,
 	})
 }

@@ -13,7 +13,7 @@ func init() {
 			{Lang: "en", Text: "NORMAN'S ROOFTOP HIDEOUT"},
 			{Lang: "hu", Text: "NORMAN BÚVÓHELYE A TETŐN"},
 		},
-		Background: inc.BgRooftopHideout,
+		Background: inc.BackgroundRooftopHideout,
 		Exits: []inkwell.Exit{
 			{
 				To: inc.SceneNormanApartment,

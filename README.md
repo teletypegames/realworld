@@ -110,8 +110,8 @@ Every pixel it gives back is a pixel of art.
      InventoryBar          TapeSlots           TapeChannel
 ```
 
-Every vertical measurement derives from `LineH` (glyph cell + leading) and from
-`ScreenH`, both in `widget/widget.manager.go`, not from the wireframe deck's ratios, so
+Every vertical measurement derives from `LineHeight` (glyph cell + leading) and
+from `ScreenHeight`, both in `widget/widget.manager.go`, not from the wireframe deck's ratios, so
 the layout cannot drift out of step with the font — or with the art — again;
 `TestLayoutFitsTheFont` guards it. The tape channel comes out at 4 rows of 38
 columns, which is about one and a half of Dex's remarks on screen at once.
@@ -205,7 +205,7 @@ main.go                                flags + inkwell.Run
 inc/constants.go                       every name and state key; imports nothing
 inc/util/                              RGB and RGBA over image/color; imports nothing
 
-inc/system/boot/                       New(Opts): the hand-off to the engine
+inc/system/boot/                       New(Options): the hand-off to the engine
 inc/system/widget/                     HUD layout, visibility conditions, 14 widgets
 inc/system/world/                      the engine binding, the mode, the note
 inc/system/armilla/                    Paul's Armilla: two slots, the strip, the offer
@@ -272,7 +272,7 @@ package background
 
 func init() {
 	BackgroundManager.Register(Background{
-		Name: inc.BgServerFarm,
+		Name: inc.BackgroundServerFarm,
 		Path: "assets/bg/server_farm.png",
 		Kind: inkwell.AssetImage,
 	})
@@ -333,7 +333,7 @@ written back before the hand-off is the derived half of the map:
 `scene.FillSelectorPins` reads the exit graph backwards and `Set`s the selector.
 
 There is one world, and now the package *is* the singleton: `world.Do(…)`,
-`world.Game()`, `world.Fn(…)`. Nothing takes a world parameter and no widget
+`world.Game()`, `world.Func(…)`. Nothing takes a world parameter and no widget
 holds a back-reference, which is what lets a script file be a literal — the
 tape-insert script closes over the package rather than over a parameter someone
 would have had to thread to it. `world` itself is down to the binding: the
@@ -359,7 +359,7 @@ its exits above all. Those went into the engine instead (inkwell `Exit`,
 `Game.SceneRect`, `CurrentScene`/`PreviousScene`, `Back()`), and with the gap
 closed there was nothing left for a second type to carry. The code says scene,
 because that is what the thing is. "Screen" survives only where it means the
-display: `ScreenW`, `ScreenH`.
+display: `ScreenWidth`, `ScreenHeight`.
 
 Art lives in `assets/bg/` and is embedded into the binary (`main.go`), because
 js/wasm has no OS filesystem and `make binaries` packages the executable alone.

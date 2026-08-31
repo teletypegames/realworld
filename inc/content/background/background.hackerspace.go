@@ -8,7 +8,7 @@ import (
 
 func init() {
 	BackgroundManager.Register(Background{
-		Name: inc.BgHackerspace,
+		Name: inc.BackgroundHackerspace,
 		Path: "assets/bg/hackerspace.png",
 		Kind: inkwell.AssetImage,
 	})

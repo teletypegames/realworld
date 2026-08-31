@@ -14,22 +14,22 @@ const (
 	ModeMenu     Mode = "menu"
 )
 
-type state struct {
+type worldState struct {
 	game *inkwell.Game
 }
 
-var st state
+var state worldState
 
-func Attach(g *inkwell.Game) {
-	st = state{
-		game: g,
+func Attach(game *inkwell.Game) {
+	state = worldState{
+		game: game,
 	}
-	st.setMode(ModePlay)
-	st.setNote("")
+	state.setMode(ModePlay)
+	state.setNote("")
 }
 
-func Game() *inkwell.Game { return st.game }
+func Game() *inkwell.Game { return state.game }
 
-func (s *state) setMode(m Mode) { s.game.State.SetVar(inc.VarMode, string(m)) }
+func (state *worldState) setMode(mode Mode) { state.game.State.SetVar(inc.VarMode, string(mode)) }
 
-func (s *state) setNote(text string) { s.game.State.SetVar(inc.VarNote, text) }
+func (state *worldState) setNote(note string) { state.game.State.SetVar(inc.VarNote, note) }

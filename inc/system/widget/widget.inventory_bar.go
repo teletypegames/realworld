@@ -9,12 +9,12 @@ func init() {
 		Name: "inventory",
 		When: whenPlaying,
 		Origin: inkwell.Point{
-			X: Pad + 2,
-			Y: invY,
+			X: Padding + 2,
+			Y: inventoryY,
 		},
 		Slots:    8,
 		Cols:     4,
-		SlotSize: invSlot,
-		Gap:      invGap,
+		SlotSize: inventorySlotSize,
+		Gap:      inventoryGap,
 	})
 }

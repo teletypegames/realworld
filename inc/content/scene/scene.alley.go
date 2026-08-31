@@ -10,14 +10,14 @@ import (
 type alley struct{}
 
 func init() {
-	a := alley{}
+	hotspots := alley{}
 	SceneManager.Register(Scene{
 		Name: inc.SceneAlley,
 		Title: inkwell.Text{
 			{Lang: "en", Text: "ALLEY — BEHIND NOODLE'S HOUSE"},
 			{Lang: "hu", Text: "SIKÁTOR — NOODLE HÁZA MÖGÖTT"},
 		},
-		Background: inc.BgAlley,
+		Background: inc.BackgroundAlley,
 		Exits: []inkwell.Exit{
 			{
 				To: inc.SceneNoodleHouse,
@@ -38,7 +38,7 @@ func init() {
 			},
 		},
 		OnEnter:  armilla.StripIfEmpty("SRP: 1 tape"),
-		Hotspots: []inkwell.Hotspot{a.hidingPlace(), a.backDoor(), a.bin(), a.fireEscape()},
+		Hotspots: []inkwell.Hotspot{hotspots.hidingPlace(), hotspots.backDoor(), hotspots.bin(), hotspots.fireEscape()},
 	})
 }
 

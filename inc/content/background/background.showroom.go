@@ -8,7 +8,7 @@ import (
 
 func init() {
 	BackgroundManager.Register(Background{
-		Name: inc.BgShowroom,
+		Name: inc.BackgroundShowroom,
 		Path: "assets/bg/showroom.png",
 		Kind: inkwell.AssetImage,
 	})

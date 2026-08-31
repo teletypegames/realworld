@@ -8,8 +8,8 @@ func init() {
 	WidgetManager.Register(&inkwell.SpeechBubble{
 		Name:      "speech",
 		MaxWidth:  360,
-		Padding:   Pad,
+		Padding:   Padding,
 		OffsetY:   8,
-		FallbackY: TopBarH + Pad,
+		FallbackY: TopBarHeight + Padding,
 	})
 }

@@ -8,7 +8,7 @@ import (
 
 func init() {
 	BackgroundManager.Register(Background{
-		Name: inc.BgScrapMarket,
+		Name: inc.BackgroundScrapMarket,
 		Path: "assets/bg/scrap_market.png",
 		Kind: inkwell.AssetImage,
 	})

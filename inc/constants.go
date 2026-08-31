@@ -20,8 +20,8 @@ const (
 )
 
 const (
-	DlgDex         = "dex_talk"
-	DlgMysteryTape = "mystery_tape_silent"
+	DialogDex         = "dex_talk"
+	DialogMysteryTape = "mystery_tape_silent"
 )
 
 const (
@@ -73,28 +73,28 @@ const (
 )
 
 const (
-	BgSelector        = "bg_selector"
-	BgPaulShop        = "bg_paul_shop"
-	BgNoodleHouse     = "bg_noodle_house"
-	BgNormanApartment = "bg_norman_apartment"
-	BgPoliceStation   = "bg_police_station"
-	BgAlley           = "bg_alley"
-	BgHackerspace     = "bg_hackerspace"
-	BgIceCreamShop    = "bg_ice_cream_shop"
-	BgTrinketShop     = "bg_trinket_shop"
-	BgSmallRestaurant = "bg_small_restaurant"
-	BgSecretClub      = "bg_secret_club"
-	BgBBSTerminal     = "bg_bbs_terminal"
-	BgStreet          = "bg_street"
-	BgHospital        = "bg_hospital"
-	BgServerFarm      = "bg_server_farm"
-	BgSecretLab       = "bg_secret_lab"
-	BgRooftopHideout  = "bg_rooftop_hideout"
-	BgPublicBBS       = "bg_public_bbs"
-	BgBVKBranch       = "bg_bvk_branch"
-	BgCuratorShop     = "bg_curator_shop"
-	BgScrapMarket     = "bg_scrap_market"
-	BgSamizdatPress   = "bg_samizdat_press"
-	BgShowroom        = "bg_showroom"
-	BgColumbarium     = "bg_columbarium"
+	BackgroundSelector        = "bg_selector"
+	BackgroundPaulShop        = "bg_paul_shop"
+	BackgroundNoodleHouse     = "bg_noodle_house"
+	BackgroundNormanApartment = "bg_norman_apartment"
+	BackgroundPoliceStation   = "bg_police_station"
+	BackgroundAlley           = "bg_alley"
+	BackgroundHackerspace     = "bg_hackerspace"
+	BackgroundIceCreamShop    = "bg_ice_cream_shop"
+	BackgroundTrinketShop     = "bg_trinket_shop"
+	BackgroundSmallRestaurant = "bg_small_restaurant"
+	BackgroundSecretClub      = "bg_secret_club"
+	BackgroundBBSTerminal     = "bg_bbs_terminal"
+	BackgroundStreet          = "bg_street"
+	BackgroundHospital        = "bg_hospital"
+	BackgroundServerFarm      = "bg_server_farm"
+	BackgroundSecretLab       = "bg_secret_lab"
+	BackgroundRooftopHideout  = "bg_rooftop_hideout"
+	BackgroundPublicBBS       = "bg_public_bbs"
+	BackgroundBVKBranch       = "bg_bvk_branch"
+	BackgroundCuratorShop     = "bg_curator_shop"
+	BackgroundScrapMarket     = "bg_scrap_market"
+	BackgroundSamizdatPress   = "bg_samizdat_press"
+	BackgroundShowroom        = "bg_showroom"
+	BackgroundColumbarium     = "bg_columbarium"
 )

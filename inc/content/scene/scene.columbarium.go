@@ -13,7 +13,7 @@ func init() {
 			{Lang: "en", Text: "COLUMBARIUM — DEX'S MEMORIAL"},
 			{Lang: "hu", Text: "KOLUMBÁRIUM — DEX EMLÉKHELYE"},
 		},
-		Background: inc.BgColumbarium,
+		Background: inc.BackgroundColumbarium,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

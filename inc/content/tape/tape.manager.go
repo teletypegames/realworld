@@ -14,27 +14,27 @@ type Tape struct {
 
 var TapeManager = inkwell.NewManager[Tape]()
 
-func (t Tape) GetName() string { return t.Name }
+func (tape Tape) GetName() string { return tape.Name }
 
 func Is(name string) bool { return TapeManager.Has(name) }
 
 func Of(item string) (Tape, bool) {
-	for _, t := range TapeManager.All() {
-		if t.Item != "" && t.Item == item {
-			return t, true
+	for _, candidate := range TapeManager.All() {
+		if candidate.Item != "" && candidate.Item == item {
+			return candidate, true
 		}
 	}
 	return Tape{}, false
 }
 
 func IsItem(item string) bool {
-	_, ok := Of(item)
-	return ok
+	_, found := Of(item)
+	return found
 }
 
 func Dialogue(item string) string {
-	if t, ok := Of(item); ok && t.Dialogue != "" {
-		return t.Dialogue
+	if loaded, found := Of(item); found && loaded.Dialogue != "" {
+		return loaded.Dialogue
 	}
-	return inc.DlgDex
+	return inc.DialogDex
 }

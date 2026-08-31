@@ -6,35 +6,35 @@ import (
 	"realworld/inc"
 )
 
-func Do(a inkwell.Action) { st.game.Do(a) }
+func Do(action inkwell.Action) { state.game.Do(action) }
 
-type fnAction struct{ fn func(*inkwell.Ctx) }
+type funcAction struct{ body func(*inkwell.Ctx) }
 
-func (a *fnAction) Start() inkwell.Runner {
-	return &fnRunner{
-		spec: a,
+func (action *funcAction) Start() inkwell.Runner {
+	return &funcRunner{
+		action: action,
 	}
 }
 
-type fnRunner struct{ spec *fnAction }
+type funcRunner struct{ action *funcAction }
 
-func (r *fnRunner) Tick(ctx *inkwell.Ctx) inkwell.Status {
-	r.spec.fn(ctx)
+func (runner *funcRunner) Tick(context *inkwell.Ctx) inkwell.Status {
+	runner.action.body(context)
 	return inkwell.StatusDone
 }
 
-func Fn(f func(*inkwell.Ctx)) inkwell.Action {
-	return &fnAction{
-		fn: f,
+func Func(body func(*inkwell.Ctx)) inkwell.Action {
+	return &funcAction{
+		body: body,
 	}
 }
 
 func UseTheme(name string) inkwell.Action {
-	return Fn(func(ctx *inkwell.Ctx) { ctx.Game.UseTheme(name) })
+	return Func(func(context *inkwell.Ctx) { context.Game.UseTheme(name) })
 }
 
-func SetMode(m Mode) inkwell.Action {
-	return Fn(func(*inkwell.Ctx) { st.setMode(m) })
+func SetMode(mode Mode) inkwell.Action {
+	return Func(func(*inkwell.Ctx) { state.setMode(mode) })
 }
 
 func Paused(inner inkwell.Action) inkwell.Action {
@@ -47,27 +47,27 @@ type pausedAction struct {
 	inner inkwell.Action
 }
 
-func (a *pausedAction) Start() inkwell.Runner {
+func (action *pausedAction) Start() inkwell.Runner {
 	return &pausedRunner{
-		spec:  a,
-		inner: a.inner.Start(),
+		action: action,
+		inner:  action.inner.Start(),
 	}
 }
 
 type pausedRunner struct {
-	spec    *pausedAction
+	action  *pausedAction
 	inner   inkwell.Runner
 	started bool
 }
 
-func (r *pausedRunner) Tick(ctx *inkwell.Ctx) inkwell.Status {
-	if !r.started {
-		r.started = true
-		st.setNote(inc.NotePaused)
+func (runner *pausedRunner) Tick(context *inkwell.Ctx) inkwell.Status {
+	if !runner.started {
+		runner.started = true
+		state.setNote(inc.NotePaused)
 	}
-	s := r.inner.Tick(ctx)
-	if s != inkwell.StatusRunning {
-		st.setNote("")
+	status := runner.inner.Tick(context)
+	if status != inkwell.StatusRunning {
+		state.setNote("")
 	}
-	return s
+	return status
 }
