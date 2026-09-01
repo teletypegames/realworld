@@ -19,19 +19,16 @@ var exitToSelector = inkwell.Exit{
 
 type selector struct{}
 
-func init() {
-	pins := selector{}
-	SceneManager.Register(Scene{
-		Name: inc.SceneSelector,
-		Title: inkwell.Text{
-			{Lang: "en", Text: "SAN FRANCISCO"},
-			{Lang: "hu", Text: "SAN FRANCISCO"},
-		},
-		Actors:    []inkwell.SceneActor{},
-		Walkboxes: []inkwell.Polygon{},
-		Derived:   pins.fromGraph,
-	})
-}
+var _ = SceneManager.Register(Scene{
+	Name: inc.SceneSelector,
+	Title: inkwell.Text{
+		{Lang: "en", Text: "SAN FRANCISCO"},
+		{Lang: "hu", Text: "SAN FRANCISCO"},
+	},
+	Actors:    []inkwell.SceneActor{},
+	Walkboxes: []inkwell.Polygon{},
+	Derived:   selector{}.fromGraph,
+})
 
 func (selector) fromGraph(game *inkwell.Game) []inkwell.Exit {
 	pins := selector{}

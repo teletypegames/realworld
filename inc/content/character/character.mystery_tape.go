@@ -7,14 +7,12 @@ import (
 	"realworld/inc/system/theme"
 )
 
-func init() {
-	CharacterManager.Register(Character{
-		Name: inc.TapeMystery,
-		Label: inkwell.Text{
-			{Lang: "en", Text: "UNKNOWN TAPE"},
-			{Lang: "hu", Text: "ISMERETLEN KAZETTA"},
-		},
-		Voice:       inkwell.VoiceLog,
-		SpeechColor: theme.Bone,
-	})
-}
+var _ = CharacterManager.Register(Character{
+	Name: inc.TapeMystery,
+	Label: inkwell.Text{
+		{Lang: "en", Text: "UNKNOWN TAPE"},
+		{Lang: "hu", Text: "ISMERETLEN KAZETTA"},
+	},
+	Voice:       inkwell.VoiceLog,
+	SpeechColor: theme.Bone,
+})

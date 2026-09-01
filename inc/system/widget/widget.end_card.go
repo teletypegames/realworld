@@ -4,8 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-func init() {
-	WidgetManager.Register(&inkwell.EndCard{
-		Name: "endcard",
-	})
-}
+var _ = WidgetManager.Register(&inkwell.EndCard{
+	Name: "endcard",
+})

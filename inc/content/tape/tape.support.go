@@ -4,8 +4,6 @@ import (
 	"realworld/inc"
 )
 
-func init() {
-	TapeManager.Register(Tape{
-		Name: inc.TapeSupport,
-	})
-}
+var _ = TapeManager.Register(Tape{
+	Name: inc.TapeSupport,
+})

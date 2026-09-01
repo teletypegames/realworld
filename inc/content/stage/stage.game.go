@@ -8,21 +8,19 @@ import (
 	"realworld/inc/system/widget"
 )
 
-func init() {
-	StageManager.Register(Stage{
-		Name:  inc.StageGame,
-		World: true,
-		Title: inkwell.Text{
-			{Lang: "en", Text: "REAL WORLD"},
-			{Lang: "hu", Text: "REAL WORLD"},
-		},
-	})
+var _ = StageManager.Register(Stage{
+	Name:  inc.StageGame,
+	World: true,
+	Title: inkwell.Text{
+		{Lang: "en", Text: "REAL WORLD"},
+		{Lang: "hu", Text: "REAL WORLD"},
+	},
+})
 
-	widget.WidgetManager.Register(&inkwell.KeyBinding{
-		Name:         "pause",
-		When:         inkwell.OnStage(inc.StageGame),
-		Key:          ebiten.KeyEscape,
-		Do:           inkwell.GoToStage(inc.StageMainMenu),
-		DuringScript: true,
-	})
-}
+var _ = widget.WidgetManager.Register(&inkwell.KeyBinding{
+	Name:         "pause",
+	When:         inkwell.OnStage(inc.StageGame),
+	Key:          ebiten.KeyEscape,
+	Do:           inkwell.GoToStage(inc.StageMainMenu),
+	DuringScript: true,
+})

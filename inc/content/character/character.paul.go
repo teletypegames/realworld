@@ -7,16 +7,14 @@ import (
 	"realworld/inc/system/theme"
 )
 
-func init() {
-	CharacterManager.Register(Character{
-		Name:  inc.Paul,
-		Speed: 96,
-		W:     28,
-		H:     68,
-		Start: inkwell.Point{
-			X: 320,
-			Y: 232,
-		},
-		SpeechColor: theme.Ink,
-	})
-}
+var _ = CharacterManager.Register(Character{
+	Name:  inc.Paul,
+	Speed: 96,
+	W:     28,
+	H:     68,
+	Start: inkwell.Point{
+		X: 320,
+		Y: 232,
+	},
+	SpeechColor: theme.Ink,
+})

@@ -181,8 +181,8 @@ go run . -lang hu
 `main` sets `inkwell.Lang` from the flag and `inkwell.Fallback` to `"en"`,
 so a language a line has not been translated into yet still reaches the player
 in English rather than vanishing. Resolution happens at the moment of display,
-never at construction, so the `init()` that registers an entity does not care
-when the language was set.
+never at construction, so the declaration that registers an entity does not
+care when the language was set.
 
 Two things do **not** get translated, and both are load-bearing:
 
@@ -313,21 +313,29 @@ type Character = inkwell.Character
 var CharacterManager = inkwell.NewManager[Character]()
 ```
 
-An entity file is a literal that hands itself over in an `init()`:
+An entity file is a literal that hands itself over, and it is a declaration
+rather than a procedure:
 
 ```go
 package tape
 
-func init() {
-	TapeManager.Register(Tape{
-		Name:   inc.TapeMystery,
-		Item:   inc.ItemMysteryTape,
-		Dialog: inc.DialogMysteryTape,
-	})
-}
+var _ = TapeManager.Register(Tape{
+	Name:   inc.TapeMystery,
+	Item:   inc.ItemMysteryTape,
+	Dialog: inc.DialogMysteryTape,
+})
 ```
 
-The `init()` only runs if something imports the package, so a package whose
+`Register` returns what it registered, which is what makes that possible — a
+statement can only stand in a function body, an expression can stand in a
+variable initialiser. It buys more than two lines and an indent level: a
+package-level variable is initialised in dependency order, so the manager is
+built before any file that writes into it, whichever the compiler reads first.
+Two files keep an `init()` and earn it — `background.manager.go` loops over
+the scene deck, and `tape.slots.go` builds a value that has to be wired to
+itself, neither of which is an expression.
+
+A package initialises only if something imports it, so a package whose
 entities nobody names by symbol needs a blank import in `main.go`.
 Exactly one does — `tape`, everything else is imported for its manager — and
 the list is per package, not per entity, so adding a file is still adding a
@@ -359,7 +367,7 @@ trigger and offers no click to a hotspot, which is what lets the main menu be
 the first thing a player sees without the alley running behind it.
 
 Each stage file is a whole screen: the `Stage` literal and the widget that
-draws it, in one `init()` — a `Sticky` `inkwell.Menu` for the four menu
+draws it, in one file — a `Sticky` `inkwell.Menu` for the four menu
 screens, an `inkwell.TextCard` for the credits. Sticky because a menu with
 nothing behind it must not be closable. The HUD needed one line to follow all
 of this: `WhenPlaying` is `And(OnStage(inc.StageGame), Not(inCutscene))`, and

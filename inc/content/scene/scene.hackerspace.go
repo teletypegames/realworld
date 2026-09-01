@@ -6,15 +6,13 @@ import (
 	"realworld/inc"
 )
 
-func init() {
-	SceneManager.Register(Scene{
-		Name: inc.SceneHackerspace,
-		Title: inkwell.Text{
-			{Lang: "en", Text: "HACKERSPACE"},
-			{Lang: "hu", Text: "HACKERSPACE"},
-		},
-		Exits: []inkwell.Exit{
-			exitToSelector,
-		},
-	})
-}
+var _ = SceneManager.Register(Scene{
+	Name: inc.SceneHackerspace,
+	Title: inkwell.Text{
+		{Lang: "en", Text: "HACKERSPACE"},
+		{Lang: "hu", Text: "HACKERSPACE"},
+	},
+	Exits: []inkwell.Exit{
+		exitToSelector,
+	},
+})

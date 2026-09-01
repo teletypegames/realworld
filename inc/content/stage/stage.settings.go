@@ -9,31 +9,29 @@ import (
 
 type settingsScreen struct{}
 
-func init() {
-	settings := settingsScreen{}
-	StageManager.Register(Stage{
-		Name: inc.StageSettings,
-		Title: inkwell.Text{
+var _ = StageManager.Register(Stage{
+	Name: inc.StageSettings,
+	Title: inkwell.Text{
+		{Lang: "en", Text: "SETTINGS"},
+		{Lang: "hu", Text: "BEÁLLÍTÁSOK"},
+	},
+})
+
+var _ = widget.WidgetManager.Register(&inkwell.Menu{
+	Name:   "settings_menu",
+	When:   inkwell.OnStage(inc.StageSettings),
+	Sticky: true,
+	Bounds: window(320, 140),
+	Root: inkwell.MenuItem{
+		Label: inkwell.Text{
 			{Lang: "en", Text: "SETTINGS"},
 			{Lang: "hu", Text: "BEÁLLÍTÁSOK"},
 		},
-	})
+		Expand: settingsScreen{}.rows,
+	},
+})
 
-	widget.WidgetManager.Register(&inkwell.Menu{
-		Name:   "settings_menu",
-		When:   inkwell.OnStage(inc.StageSettings),
-		Sticky: true,
-		Bounds: window(320, 140),
-		Root: inkwell.MenuItem{
-			Label: inkwell.Text{
-				{Lang: "en", Text: "SETTINGS"},
-				{Lang: "hu", Text: "BEÁLLÍTÁSOK"},
-			},
-			Expand: settings.rows,
-		},
-	})
-	widget.WidgetManager.Register(escapeToMenu("settings_escape", inc.StageSettings))
-}
+var _ = widget.WidgetManager.Register(escapeToMenu("settings_escape", inc.StageSettings))
 
 func (settings settingsScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 	return []inkwell.MenuItem{

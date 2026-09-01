@@ -6,15 +6,13 @@ import (
 	"realworld/inc"
 )
 
-func init() {
-	SceneManager.Register(Scene{
-		Name: inc.SceneServerFarm,
-		Title: inkwell.Text{
-			{Lang: "en", Text: "SERVER FARM"},
-			{Lang: "hu", Text: "SZERVERFARM"},
-		},
-		Exits: []inkwell.Exit{
-			exitToSelector,
-		},
-	})
-}
+var _ = SceneManager.Register(Scene{
+	Name: inc.SceneServerFarm,
+	Title: inkwell.Text{
+		{Lang: "en", Text: "SERVER FARM"},
+		{Lang: "hu", Text: "SZERVERFARM"},
+	},
+	Exits: []inkwell.Exit{
+		exitToSelector,
+	},
+})

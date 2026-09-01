@@ -4,9 +4,7 @@ import (
 	"realworld/inc"
 )
 
-func init() {
-	TapeManager.Register(Tape{
-		Name:   inc.Dex,
-		Dialog: inc.DialogDex,
-	})
-}
+var _ = TapeManager.Register(Tape{
+	Name:   inc.Dex,
+	Dialog: inc.DialogDex,
+})

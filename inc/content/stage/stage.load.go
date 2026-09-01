@@ -9,31 +9,29 @@ import (
 
 type loadScreen struct{}
 
-func init() {
-	slots := loadScreen{}
-	StageManager.Register(Stage{
-		Name: inc.StageLoad,
-		Title: inkwell.Text{
+var _ = StageManager.Register(Stage{
+	Name: inc.StageLoad,
+	Title: inkwell.Text{
+		{Lang: "en", Text: "LOAD"},
+		{Lang: "hu", Text: "BETÖLTÉS"},
+	},
+})
+
+var _ = widget.WidgetManager.Register(&inkwell.Menu{
+	Name:   "load_menu",
+	When:   inkwell.OnStage(inc.StageLoad),
+	Sticky: true,
+	Bounds: window(360, 180),
+	Root: inkwell.MenuItem{
+		Label: inkwell.Text{
 			{Lang: "en", Text: "LOAD"},
 			{Lang: "hu", Text: "BETÖLTÉS"},
 		},
-	})
+		Expand: loadScreen{}.rows,
+	},
+})
 
-	widget.WidgetManager.Register(&inkwell.Menu{
-		Name:   "load_menu",
-		When:   inkwell.OnStage(inc.StageLoad),
-		Sticky: true,
-		Bounds: window(360, 180),
-		Root: inkwell.MenuItem{
-			Label: inkwell.Text{
-				{Lang: "en", Text: "LOAD"},
-				{Lang: "hu", Text: "BETÖLTÉS"},
-			},
-			Expand: slots.rows,
-		},
-	})
-	widget.WidgetManager.Register(escapeToMenu("load_escape", inc.StageLoad))
-}
+var _ = widget.WidgetManager.Register(escapeToMenu("load_escape", inc.StageLoad))
 
 func (loadScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 	var rows []inkwell.MenuItem

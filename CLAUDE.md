@@ -117,7 +117,7 @@ already fallen off, and now two directories have.
 - `[category].manager.go` is the file that ties a package together — its entity
   type, its `Manager`, and whatever else the category shares.
 - Every other file in a package holds exactly one entity: one scene, one
-  background, one item. The file registers it itself, in an `init()`.
+  item, one screen. The file registers it itself, as a declaration.
 - Two things have no category. `inc/constants.go` is the vocabulary every
   package imports, and `main.go` builds the game — flags, one `inkwell.Game`
   literal, and
@@ -246,20 +246,38 @@ facts about a speaker, not about a cassette.
 ### Entities register themselves
 
 An entity file is a literal and nothing else. No constructor function, no list
-somewhere else to keep in step — the file hands itself to its manager in an
-`init()`:
+somewhere else to keep in step, and no procedure either — the file *is* the
+declaration that hands itself to its manager:
 
 ```go
 package tape
 
-func init() {
-	TapeManager.Register(Tape{
-		Name:   inc.TapeMystery,
-		Item:   inc.ItemMysteryTape,
-		Dialog: inc.DialogMysteryTape,
-	})
-}
+var _ = TapeManager.Register(Tape{
+	Name:   inc.TapeMystery,
+	Item:   inc.ItemMysteryTape,
+	Dialog: inc.DialogMysteryTape,
+})
 ```
+
+`Register` returns what it registered, which is the whole of what makes this
+possible: a statement can only stand in a function body, an expression can
+stand in a variable initialiser. The result goes to `_` because an entity
+needs no name — the file name says which one it is.
+
+This is not only two lines and an indent level shorter than an `init()`. A
+package-level variable is initialised in **dependency order**, so the manager
+is built before any file that writes into it, whichever one the compiler reads
+first — with `init()` that rested on the separate rule that every package
+variable is ready before any `init()` runs. The registration order is
+unchanged: still the order the files are presented in, which is alphabetical,
+and still nothing may depend on it.
+
+Two files keep an `init()`, and both earn it. `background.manager.go` loops
+over the scene deck, and a loop is not an expression. `tape.slots.go` builds a
+value that has to be wired to itself — `panel.Hotspots = panel.hotspots` —
+which a composite literal cannot do. Where a file is assembly before it is an
+entity, `init()` is the honest word for it; contorting those two into
+declarations would cost more than it saves.
 
 Backgrounds are the one category with no per-entity file, and it is not an
 exception to the rule so much as the rule reaching its limit: every one of the
@@ -282,10 +300,7 @@ That is what makes `background → scene` the right direction: the asset is
 *derived from* the deck, so the deriving package imports the source. Adding a
 scene is now a PNG whose name matches.
 
-Adding an entity is adding a file. Deleting one is deleting a file. Package-level
-variables are initialised before any `init()` runs, whatever file each sits in,
-so a package's manager exists by the time its first entity file registers into
-one.
+Adding an entity is adding a file. Deleting one is deleting a file.
 
 ### A file's helpers hang off the file's own type
 
@@ -299,16 +314,23 @@ hangs its helpers off that:
 ```go
 type alley struct{}
 
-func init() {
-	a := alley{}
-	SceneManager.Register(Scene{
-		…
-		Hotspots: []inkwell.Hotspot{a.hidingPlace(), a.backDoor(), a.bin(), a.fireEscape()},
-	})
+var _ = SceneManager.Register(Scene{
+	…
+	Hotspots: alley{}.hotspots(),
+})
+
+func (place alley) hotspots() []inkwell.Hotspot {
+	return []inkwell.Hotspot{place.hidingPlace(), place.backDoor(), place.bin(), place.fireEscape()}
 }
 
 func (alley) bin() inkwell.Hotspot { … }
 ```
+
+`alley{}` in the literal rather than a local is the same rule read from the
+other end: the type is the namespace, so naming an instance of it adds a word
+that says nothing. Where the helpers are used more than once, a method that
+gathers them — `alley{}.hotspots()` — keeps the receiver out of the literal
+entirely.
 
 The receiver is the namespace, so the method name drops what the type already
 says — `selector.leadsTo`, not `leadsToSelector`. Where the helpers read from
@@ -321,27 +343,25 @@ The rule stops where the package is already the namespace: `armilla.Slot2`,
 would be an empty word. `system` is the other way round — the receiver is
 the whole point, so everything it offers is a method on `System`.
 
-`init()` order is file-name order, so **registration order is alphabetical**.
-Nothing may depend on it — including the order the debug menu lists the scenes
-in, which is simply the order the files sit in.
+Initialisation order is file-name order, so **registration order is
+alphabetical**. Nothing may depend on it — including the order the debug menu
+lists the scenes in, which is simply the order the files sit in.
 
-An `init()` only runs if something imports the package. `main.go` names eight of
-the nine for their manager, which is import enough; `tape` is the one nobody
-names, so it is there as a blank import. That list is **per package, not
-per entity** — a new scene file still touches nothing but itself.
+A package initialises only if something imports it. `main.go` names most of
+them for their manager, which is import enough; `tape` is the one nobody names,
+so it is there as a blank import. That list is **per package, not per entity** —
+a new scene file still touches nothing but itself.
 
 ### Widgets name their layer instead of their order
 
 A widget is a file like any other entity — `widget.<name>.go`, one widget,
-registering itself in an `init()` — and that includes the engine's own widgets,
+registering itself — and that includes the engine's own widgets,
 which the game registers as literals the same way it registers a background:
 
 ```go
-func init() {
-	WidgetManager.Register(&inkwell.Cursor{
-		Name: "cursor",
-	})
-}
+var _ = WidgetManager.Register(&inkwell.Cursor{
+	Name: "cursor",
+})
 ```
 
 What a widget cannot take from alphabetical registration is its place in the
@@ -365,7 +385,7 @@ hidden for a cutscene, and that is a condition over game state, not a wrapper
 and not an `if` at the top of every `Draw`:
 
 ```go
-WidgetManager.Register(&inkwell.StatusLine{
+var _ = WidgetManager.Register(&inkwell.StatusLine{
 	Name: "status",
 	When: WhenPlaying,
 	Y:    statusY,
@@ -494,7 +514,7 @@ alley running behind it — before stages, the only way to hold the world still
 was a script that never finished, which is the trick `ShowEnd` still plays.
 
 A stage file is a screen, both halves of it: the `Stage` literal and the
-widget that draws it, in one `init()`. `stage.main_menu.go` registers a
+widget that draws it, in one file. `stage.main_menu.go` registers a
 `Stage` and the `inkwell.Menu` that is that stage — `Sticky`, because a menu
 with nothing behind it must not be closable — and `stage.credits.go`
 registers a `Stage` and an `inkwell.TextCard`. That is the same shape
@@ -621,7 +641,7 @@ called from inside its own package's entity files, where `Manager.Register`
 would not say what is being registered.
 
 Entities themselves need no name at all — they are anonymous literals inside
-their file's `init()`, and the file name says which one it is.
+their file, handed straight to a manager, and the file name says which one it is.
 
 Exported names are the authoring vocabulary — what a content file spells out:
 the constants in `inc/constants.go`, each package's
@@ -673,8 +693,8 @@ are `inc/content/`, and no arrow leaves `system` for `content` any more.
 ## Adding a scene
 
 1. One constant in `inc/constants.go`: `Scene<Name>`
-2. `inc/content/scene/scene.<name>.go` — an `init()` registering a `Scene`, its
-   `Title` and every `Label` written in both languages
+2. `inc/content/scene/scene.<name>.go` — a `var _ = SceneManager.Register(Scene{…})`
+   with its `Title` and every `Label` written in both languages
 3. A 640×380 PNG at `assets/bg/<name>.png`
 
 Nothing else moves. There is no list to update, and nothing names the picture:

@@ -6,11 +6,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-func init() {
-	WidgetManager.Register(&hudFrame{
-		Name: "hudframe",
-	})
-}
+var _ = WidgetManager.Register(&hudFrame{
+	Name: "hudframe",
+})
 
 type hudFrame struct {
 	Name string

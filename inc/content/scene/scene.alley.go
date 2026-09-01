@@ -9,39 +9,45 @@ import (
 
 type alley struct{}
 
-func init() {
-	hotspots := alley{}
-	SceneManager.Register(Scene{
-		Name: inc.SceneAlley,
-		Title: inkwell.Text{
-			{Lang: "en", Text: "ALLEY — BEHIND NOODLE'S HOUSE"},
-			{Lang: "hu", Text: "SIKÁTOR — NOODLE HÁZA MÖGÖTT"},
+var _ = SceneManager.Register(Scene{
+	Name: inc.SceneAlley,
+	Title: inkwell.Text{
+		{Lang: "en", Text: "ALLEY — BEHIND NOODLE'S HOUSE"},
+		{Lang: "hu", Text: "SIKÁTOR — NOODLE HÁZA MÖGÖTT"},
+	},
+	Exits: []inkwell.Exit{
+		{
+			To: inc.SceneNoodleHouse,
+			Label: inkwell.Text{
+				{Lang: "en", Text: "back out to the street"},
+				{Lang: "hu", Text: "vissza az utcára"},
+			},
+			Side: inkwell.ExitLeft,
 		},
-		Exits: []inkwell.Exit{
-			{
-				To: inc.SceneNoodleHouse,
-				Label: inkwell.Text{
-					{Lang: "en", Text: "back out to the street"},
-					{Lang: "hu", Text: "vissza az utcára"},
-				},
-				Side: inkwell.ExitLeft,
+	},
+	Actors: []inkwell.SceneActor{
+		{
+			CharacterName: inc.Paul,
+			At: inkwell.Point{
+				X: 120,
+				Y: 232,
 			},
 		},
-		Actors: []inkwell.SceneActor{
-			{
-				CharacterName: inc.Paul,
-				At: inkwell.Point{
-					X: 120,
-					Y: 232,
-				},
-			},
-		},
-		OnEnter: armilla.StripIfEmpty(inkwell.Text{
-			{Lang: "en", Text: "SRP: 1 tape"},
-			{Lang: "hu", Text: "SRP: 1 kazetta"},
-		}),
-		Hotspots: []inkwell.Hotspot{hotspots.hidingPlace(), hotspots.backDoor(), hotspots.bin(), hotspots.fireEscape()},
-	})
+	},
+	OnEnter: armilla.StripIfEmpty(inkwell.Text{
+		{Lang: "en", Text: "SRP: 1 tape"},
+		{Lang: "hu", Text: "SRP: 1 kazetta"},
+	}),
+	Hotspots: alley{}.hotspots(),
+})
+
+func (place alley) hotspots() []inkwell.Hotspot {
+	return []inkwell.Hotspot{
+		place.hidingPlace(),
+		place.backDoor(),
+		place.bin(),
+		place.fireEscape(),
+	}
 }
 
 func (alley) hidingPlace() inkwell.Hotspot {

@@ -7,14 +7,12 @@ import (
 	"realworld/inc/system/theme"
 )
 
-func init() {
-	CharacterManager.Register(Character{
-		Name: inc.Dex,
-		Label: inkwell.Text{
-			{Lang: "en", Text: "DEX"},
-			{Lang: "hu", Text: "DEX"},
-		},
-		Voice:       inkwell.VoiceLog,
-		SpeechColor: theme.Amber,
-	})
-}
+var _ = CharacterManager.Register(Character{
+	Name: inc.Dex,
+	Label: inkwell.Text{
+		{Lang: "en", Text: "DEX"},
+		{Lang: "hu", Text: "DEX"},
+	},
+	Voice:       inkwell.VoiceLog,
+	SpeechColor: theme.Amber,
+})

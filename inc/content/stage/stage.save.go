@@ -9,31 +9,29 @@ import (
 
 type saveScreen struct{}
 
-func init() {
-	slots := saveScreen{}
-	StageManager.Register(Stage{
-		Name: inc.StageSave,
-		Title: inkwell.Text{
+var _ = StageManager.Register(Stage{
+	Name: inc.StageSave,
+	Title: inkwell.Text{
+		{Lang: "en", Text: "SAVE"},
+		{Lang: "hu", Text: "MENTÉS"},
+	},
+})
+
+var _ = widget.WidgetManager.Register(&inkwell.Menu{
+	Name:   "save_menu",
+	When:   inkwell.OnStage(inc.StageSave),
+	Sticky: true,
+	Bounds: window(360, 180),
+	Root: inkwell.MenuItem{
+		Label: inkwell.Text{
 			{Lang: "en", Text: "SAVE"},
 			{Lang: "hu", Text: "MENTÉS"},
 		},
-	})
+		Expand: saveScreen{}.rows,
+	},
+})
 
-	widget.WidgetManager.Register(&inkwell.Menu{
-		Name:   "save_menu",
-		When:   inkwell.OnStage(inc.StageSave),
-		Sticky: true,
-		Bounds: window(360, 180),
-		Root: inkwell.MenuItem{
-			Label: inkwell.Text{
-				{Lang: "en", Text: "SAVE"},
-				{Lang: "hu", Text: "MENTÉS"},
-			},
-			Expand: slots.rows,
-		},
-	})
-	widget.WidgetManager.Register(escapeToMenu("save_escape", inc.StageSave))
-}
+var _ = widget.WidgetManager.Register(escapeToMenu("save_escape", inc.StageSave))
 
 func (saveScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 	var rows []inkwell.MenuItem
