@@ -463,11 +463,18 @@ construction.
 the game for, and all three are `script` functions — a line the player reads
 belongs with the rest of the writing, not in the wiring.
 
-What is left outside the literal is exactly what cannot be in it: the two
-`inkwell` package variables (`Lang`, `Fallback`), the two locals the flags
-compute, `system.System.Attach(game)`, which needs the pointer the literal is
-about to become, and `inkwell.Run(game)`. Nine lines around a literal — `main`
-used to be twelve assignments and four method calls.
+The command line is a type rather than four loose pointers: `options` carries
+what the flags chose, and the two answers the literal needs that a flag does not
+give directly are methods on it — `chosen.finaleScript()`, which is `""` for an
+ordinary run, and `chosen.flags()`, which is where `-debug` and `debugBuild`
+meet. `chosen.game()` holds the literal. That is the same rule the entity files
+follow: a file's helpers hang off the file's own type, so `main` grows methods
+rather than package functions with names nobody else can use.
+
+What is left in `main` is exactly what cannot be in the literal: the two
+`inkwell` package variables (`Lang`, `Fallback`), `system.System.Attach(game)`,
+which needs the pointer the literal is about to become, and `inkwell.Run(game)`.
+Six lines — `main` used to be twelve assignments and four method calls.
 
 ## The system
 

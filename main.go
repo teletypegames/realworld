@@ -26,26 +26,57 @@ var assets embed.FS
 func init() { inkwell.AssetFS = assets }
 
 func main() {
-	start := flag.String("scene", inc.SceneAlley, "starting scene")
+	chosen := parseOptions()
+
+	inkwell.Fallback = "en"
+	inkwell.Lang = chosen.language
+
+	game := chosen.game()
+	system.System.Attach(game)
+
+	if err := inkwell.Run(game); err != nil {
+		log.Fatal(err)
+	}
+}
+
+type options struct {
+	startScene string
+	finale     bool
+	language   string
+	debug      bool
+}
+
+func parseOptions() options {
+	startScene := flag.String("scene", inc.SceneAlley, "starting scene")
 	finale := flag.Bool("finale", false, "start with the finale, to try the Nokia-punk theme switch")
-	lang := flag.String("lang", "en", "language the game speaks (en, hu)")
+	language := flag.String("lang", "en", "language the game speaks (en, hu)")
 	debug := flag.Bool("debug", false, "open the debug menu with d (a debug build has it anyway)")
 	flag.Parse()
 
-	inkwell.Fallback = "en"
-	inkwell.Lang = *lang
-
-	var finaleScript string
-	if *finale {
-		finaleScript = inc.ScriptFinale
+	return options{
+		startScene: *startScene,
+		finale:     *finale,
+		language:   *language,
+		debug:      *debug,
 	}
+}
 
-	var flags []string
-	if *debug || debugBuild {
-		flags = []string{inc.FlagDebug}
+func (chosen options) finaleScript() string {
+	if !chosen.finale {
+		return ""
 	}
+	return inc.ScriptFinale
+}
 
-	game := inkwell.New(inkwell.Game{
+func (chosen options) flags() []string {
+	if !chosen.debug && !debugBuild {
+		return nil
+	}
+	return []string{inc.FlagDebug}
+}
+
+func (chosen options) game() *inkwell.Game {
+	return inkwell.New(inkwell.Game{
 		Title:       "Real World",
 		Width:       widget.ScreenWidth,
 		Height:      widget.ScreenHeight,
@@ -53,11 +84,11 @@ func main() {
 		MaxLogLines: 64,
 		SceneRect:   inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.HUDTop-widget.TopBarHeight),
 
-		StartScene:   *start,
+		StartScene:   chosen.startScene,
 		StartScript:  inc.ScriptOpening,
-		FinaleScript: finaleScript,
+		FinaleScript: chosen.finaleScript(),
 		StartTheme:   inc.RealWorld,
-		Flags:        flags,
+		Flags:        chosen.flags(),
 
 		Player:      inc.Paul,
 		Walkboxes:   scene.Floor,
@@ -74,10 +105,4 @@ func main() {
 		ThemeManager:     theme.ThemeManager,
 		WidgetManager:    widget.WidgetManager,
 	})
-
-	system.System.Attach(game)
-
-	if err := inkwell.Run(game); err != nil {
-		log.Fatal(err)
-	}
 }
