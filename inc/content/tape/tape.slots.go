@@ -54,7 +54,7 @@ func (slotPanel) dex(game *inkwell.Game, area inkwell.Rectangle) inkwell.Hotspot
 		OnLook: remark,
 		OnUse:  remark,
 		OnTake: remark,
-		OnTalk: system.System.Paused(inkwell.RunDialog(inc.Dex)),
+		OnTalk: system.System.Paused(inkwell.RunDialog(inc.DialogDex)),
 		OnUseWithAny: inkwell.Say(inc.Dex, inkwell.Text{
 			{Lang: "en", Text: "The first slot is mine. I'm not moving."},
 			{Lang: "hu", Text: "Az első foglalat az enyém. Nem megyek sehová."},

@@ -156,11 +156,11 @@ inc/content/scene/scene.*.go             one file per scene
 inc/content/background/background.manager.go  one asset per registered scene
 inc/content/character/character.*.go     the cast: people who stand in a scene
 inc/content/item/item.*.go               inventory
-inc/content/dialog/dialog.manager.go     the Dialog alias and its Manager
+inc/content/dialog/dialog.*.go           dialog trees
 inc/content/script/script.*.go           named action sequences
 inc/content/tape/tape.manager.go         the Tape entity, the Speakers derived from it
 inc/content/tape/tape.slots.go           the two Armilla slots, as hotspots
-inc/content/tape/tape.*.go               one card per file: label, colour, conversation
+inc/content/tape/tape.*.go               one card per file: label, colour, the dialog it plays
 ```
 
 `inc` is constants and nothing else, so every package can import it and it can
@@ -238,23 +238,26 @@ the engine, so there is nothing left for a second type to hold.
 `Tape` is the exception, and it is a real one: a tape is a card you push into
 a device, and it talks back like a chatbot — a thing inkwell has no notion of.
 It is **not a character**: nobody on a cassette stands in a scene, walks, or
-has a sprite. A tape file holds everything about the card in one literal — its
-`Label`, its `Color`, the `Item` that carries it and its `Dialog`, the whole
-conversation inline rather than a name pointing at a file in `dialog/`.
+has a sprite. A tape file is the card in one literal — its `Label`, its
+`Color`, the `Item` that carries it and the name of the `Dialog` it plays. The
+dialog itself is a file in `dialog/` like every other tree, because a
+conversation is written and read on its own, and the card only has to say
+which one is its.
 
-`tape.manager.go` derives the rest. Every tape is an `inkwell.Speaker` with
+`tape.manager.go` derives the voice. Every tape is an `inkwell.Speaker` with
 `VoiceLog`, registered into `tape.Speakers`, which is what `main.go` hands the
-engine as its `SpeakerManager`; and a tape that talks has its `Dialog`
-registered under the tape's own name, so the dialog of a cassette *is* the
-cassette. Dex is one of these cards — the one in slot one — which is why
-`character/` holds Paul alone. The two lookups left are `tape.Of`, the tape an
-item is, and `tape.Dialog`, the dialog to run for a loaded item, which is the
-tape's name or Dex's when the card has nothing to say.
+engine as its `SpeakerManager`. Dex is one of these cards — the one in slot
+one — which is why `character/` holds Paul alone. The two lookups are
+`tape.Of`, the tape an item is, and `tape.Dialog`, the dialog to run for a
+loaded item, which is the card's own or Dex's when the card names none.
 
-A card's answers need not be written in advance: `inkwell.Reply(speaker,
-func(*inkwell.State) inkwell.Text)` is `Say` with the line decided when it is
-spoken, so a tape can answer from what the player has done without a dialog
-node per case.
+What a dialog answers with, and when, is the engine's. A choice that is only
+offered under a condition says so in `Show`, and the condition is written as a
+literal, `inkwell.Given`, with every requirement a field: `Flag`, `NotFlag`,
+`Item`, `NotItem`, `Var` with `Is`. An answer that branches is an `inkwell.If`
+over the same `Given`; an answer that has to be computed is
+`inkwell.Reply(speaker, func(*inkwell.State) inkwell.Text)`, `Say` with the
+line decided when it is spoken.
 
 ### Entities register themselves
 
@@ -290,7 +293,7 @@ and still nothing may depend on it.
 
 Three files keep an `init()`, and all three earn it. `background.manager.go`
 loops over the scene deck, and `tape.manager.go` loops over the cards to
-derive a speaker and a dialog from each; a loop is not an expression. `tape.slots.go` builds a
+derive a speaker from each; a loop is not an expression. `tape.slots.go` builds a
 value that has to be wired to itself — `panel.Hotspots = panel.hotspots` —
 which a composite literal cannot do. Where a file is assembly before it is an
 entity, `init()` is the honest word for it; contorting those two into
@@ -704,10 +707,8 @@ thing to what it is made of or derived from. `tape → widget`: the tape slots
 are a cassette thing that registers a widget, so the cassette sits above the
 HUD rather than below it — this is the arrow that used to run the other way.
 `stage → widget`: a screen registers the menu or card that draws it, for the
-same reason. `background → scene`: an asset is derived from the deck, so the
-deriving package imports the source. And `tape → dialog` is the same arrow
-again: a card's conversation is registered into the dialog manager by the
-package that derives it.
+same reason. And `background → scene`: an asset is derived from the deck, so
+the deriving package imports the source.
 
 `main` is at the very top, and it is the only place that names every package at
 once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other six

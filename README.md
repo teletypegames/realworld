@@ -331,14 +331,18 @@ var _ = TapeManager.Register(Tape{
 
 A tape is a card, not a character. It is pushed into a device and talks back
 like a chatbot, so nothing about it stands in a scene, and the file is the
-whole card: its label, its colour, the item it travels in, and its
-conversation inline as an `inkwell.Dialog`. `tape.manager.go` derives an
-`inkwell.Speaker` from each one — `VoiceLog`, so the line lands in the channel
-and never in a bubble — into `tape.Speakers`, which `main.go` hands the engine
-as its `SpeakerManager`, and registers the conversation under the tape's own
-name. Dex is such a card, so `character/` holds Paul alone. An answer that
-depends on what the player has done is `inkwell.Reply(speaker, func(*State)
-Text)`: `Say` with the line decided when it is spoken.
+card: its label, its colour, the item it travels in, and the name of the
+dialog it plays, which is a file in `dialog/` like every other tree.
+`tape.manager.go` derives an `inkwell.Speaker` from each one — `VoiceLog`, so
+the line lands in the channel and never in a bubble — into `tape.Speakers`,
+which `main.go` hands the engine as its `SpeakerManager`. Dex is such a card,
+so `character/` holds Paul alone.
+
+A choice a card only offers under a condition says so in `Show`, and the
+condition is a literal: `inkwell.Given{Item: …, NotFlag: …}`, every set field
+a requirement. An answer that branches is an `inkwell.If` over the same
+`Given`; one that depends on more than a branch is `inkwell.Reply(speaker,
+func(*State) Text)`, `Say` with the line decided when it is spoken.
 
 `Register` returns what it registered, which is what makes that possible — a
 statement can only stand in a function body, an expression can stand in a
