@@ -49,12 +49,12 @@ func (slotPanel) dex(game *inkwell.Game, area inkwell.Rectangle) inkwell.Hotspot
 	})
 	return inkwell.Hotspot{
 		Name:   "slot1",
-		Label:  game.CharacterLabel(inc.Dex),
+		Label:  game.SpeakerLabel(inc.Dex),
 		Area:   area,
 		OnLook: remark,
 		OnUse:  remark,
 		OnTake: remark,
-		OnTalk: system.System.Paused(inkwell.RunDialog(inc.DialogDex)),
+		OnTalk: system.System.Paused(inkwell.RunDialog(inc.Dex)),
 		OnUseWithAny: inkwell.Say(inc.Dex, inkwell.Text{
 			{Lang: "en", Text: "The first slot is mine. I'm not moving."},
 			{Lang: "hu", Text: "Az első foglalat az enyém. Nem megyek sehová."},
@@ -121,7 +121,7 @@ func (slotPanel) insertions() map[string]inkwell.Action {
 func (slots *slotPanel) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
 	game := context.Game
 	first, second := slots.areas()
-	slots.paint(destination, game, first, slot1Label, game.CharacterLabel(inc.Dex), true)
+	slots.paint(destination, game, first, slot1Label, game.SpeakerLabel(inc.Dex), true)
 	if loaded := armilla.Slot2(); loaded != "" {
 		slots.paint(destination, game, second, slot2Label, game.ItemLabel(loaded), true)
 		return

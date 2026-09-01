@@ -154,13 +154,13 @@ inc/content/scene/scene.manager.go       the Scene alias, its Manager, the floor
 inc/content/scene/scene.selector.go      the map screen: pins derived from the graph
 inc/content/scene/scene.*.go             one file per scene
 inc/content/background/background.manager.go  one asset per registered scene
-inc/content/character/character.*.go     the cast, tapes included
+inc/content/character/character.*.go     the cast: people who stand in a scene
 inc/content/item/item.*.go               inventory
-inc/content/dialog/dialog.*.go           dialog trees
+inc/content/dialog/dialog.manager.go     the Dialog alias and its Manager
 inc/content/script/script.*.go           named action sequences
-inc/content/tape/tape.manager.go         the Tape entity and the lookups over it
+inc/content/tape/tape.manager.go         the Tape entity, the Speakers derived from it
 inc/content/tape/tape.slots.go           the two Armilla slots, as hotspots
-inc/content/tape/tape.*.go               one tape per file
+inc/content/tape/tape.*.go               one card per file: label, colour, conversation
 ```
 
 `inc` is constants and nothing else, so every package can import it and it can
@@ -177,8 +177,8 @@ knows the caller back.
 
 `widget → tape` used to be the exception, and it was defended here: the tape
 slots asked which cassette a tape was in. It is gone, and both halves of it are
-worth knowing why. The tape channel no longer asks `tape.Is` — it asks the
-engine which **voice** a speaker has, and a tape is a `VoiceLog` character, so
+worth knowing why. The tape channel does not ask `tape` anything — it asks the
+engine which **voice** a speaker has, and a tape is a `VoiceLog` speaker, so
 the filter is `Voices: []inkwell.Voice{inkwell.VoiceLog}` and the HUD learns
 nothing about cassettes. The tape slots moved the other way: they are a
 *cassette* thing, so `tape.slots.go` is a content file that registers a widget,
@@ -235,13 +235,26 @@ Nearly every entity type is an alias, `Scene` included. It was once a struct of
 our own, because inkwell's `Scene` could not carry exits; that gap was closed in
 the engine, so there is nothing left for a second type to hold.
 
-`Tape` is the exception, and it is a real one: a tape is a cassette that speaks,
-a thing inkwell has no notion of. It names the character whose voice it is, the
-item that carries it and the dialog it plays, and `tape.manager.go` holds the
-four lookups over the registry — `tape.Is`, `tape.Of`, `tape.IsItem`,
-`tape.Dialog`. What a tape *sounds* like is not in it: the display name and the
-log-only voice are `Character.Label` and `Character.Voice`, because those are
-facts about a speaker, not about a cassette.
+`Tape` is the exception, and it is a real one: a tape is a card you push into
+a device, and it talks back like a chatbot — a thing inkwell has no notion of.
+It is **not a character**: nobody on a cassette stands in a scene, walks, or
+has a sprite. A tape file holds everything about the card in one literal — its
+`Label`, its `Color`, the `Item` that carries it and its `Dialog`, the whole
+conversation inline rather than a name pointing at a file in `dialog/`.
+
+`tape.manager.go` derives the rest. Every tape is an `inkwell.Speaker` with
+`VoiceLog`, registered into `tape.Speakers`, which is what `main.go` hands the
+engine as its `SpeakerManager`; and a tape that talks has its `Dialog`
+registered under the tape's own name, so the dialog of a cassette *is* the
+cassette. Dex is one of these cards — the one in slot one — which is why
+`character/` holds Paul alone. The two lookups left are `tape.Of`, the tape an
+item is, and `tape.Dialog`, the dialog to run for a loaded item, which is the
+tape's name or Dex's when the card has nothing to say.
+
+A card's answers need not be written in advance: `inkwell.Reply(speaker,
+func(*inkwell.State) inkwell.Text)` is `Say` with the line decided when it is
+spoken, so a tape can answer from what the player has done without a dialog
+node per case.
 
 ### Entities register themselves
 
@@ -253,9 +266,12 @@ declaration that hands itself to its manager:
 package tape
 
 var _ = TapeManager.Register(Tape{
-	Name:   inc.TapeMystery,
-	Item:   inc.ItemMysteryTape,
-	Dialog: inc.DialogMysteryTape,
+	Name: inc.TapeSupport,
+	Label: inkwell.Text{
+		{Lang: "en", Text: "TECH SUPPORT"},
+		{Lang: "hu", Text: "ÜGYFÉLSZOLGÁLAT"},
+	},
+	Color: theme.AmberPale,
 })
 ```
 
@@ -272,8 +288,9 @@ variable is ready before any `init()` runs. The registration order is
 unchanged: still the order the files are presented in, which is alphabetical,
 and still nothing may depend on it.
 
-Two files keep an `init()`, and both earn it. `background.manager.go` loops
-over the scene deck, and a loop is not an expression. `tape.slots.go` builds a
+Three files keep an `init()`, and all three earn it. `background.manager.go`
+loops over the scene deck, and `tape.manager.go` loops over the cards to
+derive a speaker and a dialog from each; a loop is not an expression. `tape.slots.go` builds a
 value that has to be wired to itself — `panel.Hotspots = panel.hotspots` —
 which a composite literal cannot do. Where a file is assembly before it is an
 entity, `init()` is the honest word for it; contorting those two into
@@ -347,10 +364,10 @@ Initialisation order is file-name order, so **registration order is
 alphabetical**. Nothing may depend on it — including the order the debug menu
 lists the scenes in, which is simply the order the files sit in.
 
-A package initialises only if something imports it. `main.go` names most of
-them for their manager, which is import enough; `tape` is the one nobody names,
-so it is there as a blank import. That list is **per package, not per entity** —
-a new scene file still touches nothing but itself.
+A package initialises only if something imports it. `main.go` names every one
+of them for a manager, which is import enough — `tape` for `tape.Speakers`.
+That list is **per package, not per entity** — a new scene file still touches
+nothing but itself.
 
 ### Widgets name their layer instead of their order
 
@@ -417,14 +434,17 @@ game := inkwell.New(inkwell.Game{
 	ItemManager:      item.ItemManager,
 	SceneManager:     scene.SceneManager,
 	ScriptManager:    script.ScriptManager,
+	SpeakerManager:   tape.Speakers,
 	ThemeManager:     theme.ThemeManager,
 	WidgetManager:    widget.WidgetManager,
 })
 ```
 
 `New` fills in an empty manager for every category a caller leaves out, so the
-eight above are the eight we own and the ninth, `VerbManager`, is the engine's
-four SCUMM verbs untouched.
+nine above are the nine we own and the tenth, `VerbManager`, is the engine's
+four SCUMM verbs untouched. `SpeakerManager` is the one that is not a package's
+own registry but derived from one: the cards in `tape`, each a voice with no
+body.
 
 Themes used to be the odd one out — `NewGame` seeded its `ThemeManager` with
 four presets, so handing ours over would have thrown them away, and the game
@@ -466,6 +486,7 @@ game := inkwell.New(inkwell.Game{
 	Flags:        flags,
 
 	Player:      inc.Paul,
+	WalkOnClick: true,
 	Walkboxes:   scene.Floor,
 	ExitLook:    script.ExitLook,
 	ExitTake:    script.ExitTake,
@@ -630,7 +651,7 @@ already says. It is `scene.Floor`, not `scene.SceneFloor`; `tape.Dialog`, not
 the declaration, when choosing a name:
 
 ```go
-scene.Floor   tape.Is(speaker)   system.System.Do(action)   widget.ScreenWidth
+scene.Floor   tape.Of(item)   system.System.Do(action)   widget.ScreenWidth
 ```
 
 The manager is the one exception, and it keeps its prefix on purpose:
@@ -646,13 +667,13 @@ their file, handed straight to a manager, and the file name says which one it is
 Exported names are the authoring vocabulary — what a content file spells out:
 the constants in `inc/constants.go`, each package's
 `<Category>Manager` and entity type, the colour tokens, the tape lookups
-(`tape.Is`, `tape.Of`, `tape.IsItem`, `tape.Dialog`), the system
+(`tape.Of`, `tape.Dialog`) and `tape.Speakers`, the system
 (`system.System` and its methods `Do`, `Game`, `Attach`, …), the Armilla
 (`armilla.Slot2`, `armilla.Insert`, `armilla.StripIfEmpty`), the action
 constructors (`System.Paused`, `System.SetMode`) and the one HUD condition a
 content file has to name, `widget.WhenPlaying`. A tape's line is `inkwell.Say`
-like anyone else's — the tape voice is on the character, not on a second
-spelling of Say.
+like anyone else's — the tape voice is on the `Speaker` the manager derives,
+not on a second spelling of Say.
 
 Everything else stays unexported, and now the compiler holds the line: the HUD
 widgets (`hudFrame`, `slots`, …), the conditions `whenCutscene` and `whenDebug`,
@@ -683,8 +704,10 @@ thing to what it is made of or derived from. `tape → widget`: the tape slots
 are a cassette thing that registers a widget, so the cassette sits above the
 HUD rather than below it — this is the arrow that used to run the other way.
 `stage → widget`: a screen registers the menu or card that draws it, for the
-same reason. And `background → scene`: an asset is derived from the deck, so
-the deriving package imports the source.
+same reason. `background → scene`: an asset is derived from the deck, so the
+deriving package imports the source. And `tape → dialog` is the same arrow
+again: a card's conversation is registered into the dialog manager by the
+package that derives it.
 
 `main` is at the very top, and it is the only place that names every package at
 once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other six

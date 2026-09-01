@@ -20,11 +20,6 @@ const (
 )
 
 const (
-	DialogDex         = "dex_talk"
-	DialogMysteryTape = "mystery_tape_silent"
-)
-
-const (
 	ScriptOpening    = "opening"
 	ScriptTapeInsert = "tape_insert"
 	ScriptFinale     = "awakening_finale"

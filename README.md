@@ -263,9 +263,9 @@ cassette names the `widget` manager it registers into, and none of them is
 known back.
 
 `widget → tape` used to be the exception, because the tape slots asked which
-cassette a tape was in. Both halves of it went. The tape channel no longer asks
-`tape.Is` — it asks the engine which **voice** a speaker has, and a tape is a
-`VoiceLog` character, so the filter is one field
+cassette a tape was in. Both halves of it went. The tape channel does not ask
+`tape` anything — it asks the engine which **voice** a speaker has, and a tape
+is a `VoiceLog` speaker, so the filter is one field
 (`Voices: []inkwell.Voice{inkwell.VoiceLog}`) and the HUD learns nothing about
 cassettes. The tape slots went the other way: a slot you push a cassette into
 is a cassette thing, so `tape/tape.slots.go` is a content file that registers a
@@ -320,11 +320,25 @@ rather than a procedure:
 package tape
 
 var _ = TapeManager.Register(Tape{
-	Name:   inc.TapeMystery,
-	Item:   inc.ItemMysteryTape,
-	Dialog: inc.DialogMysteryTape,
+	Name: inc.TapeSupport,
+	Label: inkwell.Text{
+		{Lang: "en", Text: "TECH SUPPORT"},
+		{Lang: "hu", Text: "ÜGYFÉLSZOLGÁLAT"},
+	},
+	Color: theme.AmberPale,
 })
 ```
+
+A tape is a card, not a character. It is pushed into a device and talks back
+like a chatbot, so nothing about it stands in a scene, and the file is the
+whole card: its label, its colour, the item it travels in, and its
+conversation inline as an `inkwell.Dialog`. `tape.manager.go` derives an
+`inkwell.Speaker` from each one — `VoiceLog`, so the line lands in the channel
+and never in a bubble — into `tape.Speakers`, which `main.go` hands the engine
+as its `SpeakerManager`, and registers the conversation under the tape's own
+name. Dex is such a card, so `character/` holds Paul alone. An answer that
+depends on what the player has done is `inkwell.Reply(speaker, func(*State)
+Text)`: `Say` with the line decided when it is spoken.
 
 `Register` returns what it registered, which is what makes that possible — a
 statement can only stand in a function body, an expression can stand in a
@@ -404,7 +418,9 @@ The defaults a scene may leave out are not written into it at all any more:
 `g.Player` names the character a scene with no actors of its own receives, at
 his `Start`, and `g.Walkboxes` is the floor a scene without one walks on. Both
 are fields on the `*Game`, so a scene file that says nothing about either means
-"the usual", and the selector opts out by declaring both empty. What is still
+"the usual", and the selector opts out by declaring both empty. `WalkOnClick`
+sits beside them: a left click on empty floor walks Paul there through the
+walkboxes, and the engine leaves it off unless the literal says so. What is still
 derived half of the map is no longer written back from the wiring at all: the
 selector declares `Derived: pins.fromGraph`, and inkwell asks every scene for
 its derived exits once, before validation. The map screen is a literal like
@@ -511,8 +527,10 @@ field in a literal:
 |---|---|
 | a scratch-image text blitter, because `drawText` dropped the colour | `Game.DrawText` renders in colour; `inkwell.TextWidth`, `WrapText`, `ClipText`, `GlyphW/H` are the library's |
 | a pump widget driving its own `Runner`, because `queueAction` was unexported | `g.Do(action)` — one queue, in order, engine-side |
-| `TapeSay`, a second spelling of `Say` that skipped the speech bubble | `Character.Voice` — `VoiceLog` sends a character's lines to the log |
-| a `Tapes` map of display names | `Character.Label` |
+| `TapeSay`, a second spelling of `Say` that skipped the speech bubble | `Speaker.Voice` — `VoiceLog` sends a speaker's lines to the log |
+| a `Tapes` map of display names | `Speaker.Label` |
+| a `Character` per cassette, so that it could speak | `inkwell.Speaker` and `Game.SpeakerManager`: a voice with no body |
+| a dialog node per game state a cassette answers from | `inkwell.Reply(speaker, func(*State) Text)`: the line decided when spoken |
 | a `gate` wrapper and `if !World.HUDVisible()` at the top of every `Draw` | `Widget.When`, an `inkwell.Condition` the engine evaluates |
 | a `titleBar` widget that pushed the scene title into the top bar | `TopBar` already discovers the title; `NoteVar` adds the "— paused" |
 | a `UseWithGuard` widget stealing clicks to answer unauthored use-with pairs | `Game.UseWithFail`, beside `ExitLook` and `ExitTake` |

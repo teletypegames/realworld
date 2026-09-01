@@ -15,7 +15,7 @@ import (
 	"realworld/inc/content/scene"
 	"realworld/inc/content/script"
 	"realworld/inc/content/stage"
-	_ "realworld/inc/content/tape"
+	"realworld/inc/content/tape"
 	"realworld/inc/system"
 	"realworld/inc/system/theme"
 	"realworld/inc/system/widget"
@@ -110,6 +110,7 @@ func (chosen options) game() *inkwell.Game {
 		Flags:        chosen.flags(),
 
 		Player:      inc.Paul,
+		WalkOnClick: true,
 		Walkboxes:   scene.Floor,
 		ExitLook:    script.ExitLook,
 		ExitTake:    script.ExitTake,
@@ -121,6 +122,7 @@ func (chosen options) game() *inkwell.Game {
 		ItemManager:      item.ItemManager,
 		SceneManager:     scene.SceneManager,
 		ScriptManager:    script.ScriptManager,
+		SpeakerManager:   tape.Speakers,
 		StageManager:     stage.StageManager,
 		ThemeManager:     theme.ThemeManager,
 		WidgetManager:    widget.WidgetManager,
