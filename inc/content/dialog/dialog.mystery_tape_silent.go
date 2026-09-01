@@ -10,16 +10,16 @@ func init() {
 	DialogManager.Register(Dialog{
 		Name:  inc.DialogMysteryTape,
 		Start: "root",
-		Nodes: []inkwell.DialogueNode{{
+		Nodes: []inkwell.DialogNode{{
 			Name: "root",
-			Lines: []inkwell.DialogueLine{{
+			Lines: []inkwell.DialogLine{{
 				Speaker: inc.Dex,
 				Text: inkwell.Text{
 					{Lang: "en", Text: "Nothing. Warm, spinning, and silent."},
 					{Lang: "hu", Text: "Semmi. Meleg, forog, és néma."},
 				},
 			}},
-			Choices: []inkwell.DialogueChoice{
+			Choices: []inkwell.DialogChoice{
 				{
 					Text: inkwell.Text{
 						{Lang: "en", Text: "Are you sure it works?"},
@@ -38,7 +38,7 @@ func init() {
 						{Lang: "en", Text: "Fine. It'll speak when it speaks."},
 						{Lang: "hu", Text: "Jó. Majd megszólal, ha megszólal."},
 					},
-					Actions: []inkwell.Action{inkwell.EndDialogue()},
+					Actions: []inkwell.Action{inkwell.EndDialog()},
 				},
 			},
 		}},

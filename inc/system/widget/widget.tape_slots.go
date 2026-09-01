@@ -90,11 +90,11 @@ func (slots *tapeSlots) Tick(context *inkwell.UICtx) {
 	switch game.SelectedVerb() {
 	case "talk":
 		if !clickedSecond {
-			system.System.Do(system.System.Paused(inkwell.RunDialogue(inc.DialogDex)))
+			system.System.Do(system.System.Paused(inkwell.RunDialog(inc.DialogDex)))
 			return
 		}
 		if loaded := armilla.Slot2(); loaded != "" {
-			system.System.Do(system.System.Paused(inkwell.RunDialogue(tape.Dialogue(loaded))))
+			system.System.Do(system.System.Paused(inkwell.RunDialog(tape.Dialog(loaded))))
 			return
 		}
 		system.System.Do(inkwell.Say(inc.Dex, inkwell.Text{

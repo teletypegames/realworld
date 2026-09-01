@@ -66,7 +66,7 @@ func main() {
 
 	game.AssetManager = background.BackgroundManager
 	game.CharacterManager = character.CharacterManager
-	game.DialogueManager = dialog.DialogManager
+	game.DialogManager = dialog.DialogManager
 	game.ItemManager = item.ItemManager
 	game.SceneManager = scene.SceneManager
 	game.ScriptManager = script.ScriptManager

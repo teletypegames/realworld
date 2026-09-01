@@ -152,7 +152,7 @@ inc/content/scene/scene.*.go             one file per scene
 inc/content/background/background.*.go   one image asset per scene
 inc/content/character/character.*.go     the cast, tapes included
 inc/content/item/item.*.go               inventory
-inc/content/dialog/dialog.*.go           dialogue trees
+inc/content/dialog/dialog.*.go           dialog trees
 inc/content/script/script.*.go           named action sequences
 inc/content/tape/tape.manager.go         the Tape entity and the lookups over it
 inc/content/tape/tape.*.go               one tape per file
@@ -175,7 +175,7 @@ So the grouping is not the layering. The layering is the import graph and the
 compiler keeps it on its own, whichever directory a package sits in; the
 directories are there so that opening `content/` shows the game and opening
 `system/` shows the machine. A cassette is something somebody writes — a voice,
-an item, a dialogue — so `tape` is content, even though the HUD reaches across
+an item, a dialog — so `tape` is content, even though the HUD reaches across
 for it.
 
 The module is plain `realworld`, with no host in front of it, because nothing
@@ -225,9 +225,9 @@ the engine, so there is nothing left for a second type to hold.
 
 `Tape` is the exception, and it is a real one: a tape is a cassette that speaks,
 a thing inkwell has no notion of. It names the character whose voice it is, the
-item that carries it and the dialogue it plays, and `tape.manager.go` holds the
+item that carries it and the dialog it plays, and `tape.manager.go` holds the
 four lookups over the registry — `tape.Is`, `tape.Of`, `tape.IsItem`,
-`tape.Dialogue`. What a tape *sounds* like is not in it: the display name and the
+`tape.Dialog`. What a tape *sounds* like is not in it: the display name and the
 log-only voice are `Character.Label` and `Character.Voice`, because those are
 facts about a speaker, not about a cassette.
 
@@ -284,7 +284,7 @@ data rather than build it, the type is not empty and the data are its fields:
 and answers with `fail.paul(n)` and `fail.dex(n)`.
 
 The rule stops where the package is already the namespace: `armilla.Slot2`,
-`tape.Dialogue` and `scene.FillSelectorPins` stay functions, because a receiver
+`tape.Dialog` and `scene.FillSelectorPins` stay functions, because a receiver
 there would be an empty word. `system` is the other way round — the receiver is
 the whole point, so everything it offers is a method on `System`.
 
@@ -354,7 +354,7 @@ game end up sharing one registry per category rather than two in step:
 ```go
 g.AssetManager = background.BackgroundManager
 g.CharacterManager = character.CharacterManager
-g.DialogueManager = dialog.DialogManager
+g.DialogManager = dialog.DialogManager
 g.ItemManager = item.ItemManager
 g.SceneManager = scene.SceneManager
 g.ScriptManager = script.ScriptManager
@@ -469,8 +469,8 @@ and `main` calls it straight after `System.Attach`.
 
 `armilla` builds on `system` — slot 2 and the strip go through
 `system.System.Game()`, and `TakeOffer` hands its line to `system.System.Do` —
-and it knows nothing of `tape`: which dialogue a cassette plays is
-`tape.Dialogue`, asked by the HUD, not by the device. It is `inc/system/` because
+and it knows nothing of `tape`: which dialog a cassette plays is
+`tape.Dialog`, asked by the HUD, not by the device. It is `inc/system/` because
 nobody authors a file into it, diegetic object or not. Its own names stay package
 functions, because `armilla` holds no `Armilla` value the way `system` holds
 `System` — there is one wrist, and the package is it.
@@ -481,8 +481,8 @@ over `system.System`, not over a parameter it would have had to be handed.
 ## Naming
 
 The package is the namespace, so an identifier never repeats what the package
-already says. It is `scene.Floor`, not `scene.SceneFloor`; `tape.Dialogue`, not
-`tape.TapeDialogue`; `System.Do`, not `System.DoAction`. Read the call site, not
+already says. It is `scene.Floor`, not `scene.SceneFloor`; `tape.Dialog`, not
+`tape.TapeDialog`; `System.Do`, not `System.DoAction`. Read the call site, not
 the declaration, when choosing a name:
 
 ```go
@@ -502,7 +502,7 @@ their file's `init()`, and the file name says which one it is.
 Exported names are the authoring vocabulary — what a content file spells out:
 the constants in `inc/constants.go`, each package's
 `<Category>Manager` and entity type, the colour tokens, the tape lookups
-(`tape.Is`, `tape.Of`, `tape.IsItem`, `tape.Dialogue`), the system
+(`tape.Is`, `tape.Of`, `tape.IsItem`, `tape.Dialog`), the system
 (`system.System` and its methods `Do`, `Game`, `Attach`, …), the Armilla
 (`armilla.Slot2`, `armilla.SetStrip`, …) and the action constructors
 (`System.Paused`, `System.SetMode`, `System.UseTheme`, `System.Func`,

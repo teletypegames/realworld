@@ -10,16 +10,16 @@ func init() {
 	DialogManager.Register(Dialog{
 		Name:  inc.DialogDex,
 		Start: "root",
-		Nodes: []inkwell.DialogueNode{{
+		Nodes: []inkwell.DialogNode{{
 			Name: "root",
-			Lines: []inkwell.DialogueLine{{
+			Lines: []inkwell.DialogLine{{
 				Speaker: inc.Dex,
 				Text: inkwell.Text{
 					{Lang: "en", Text: "Talk."},
 					{Lang: "hu", Text: "Beszélj."},
 				},
 			}},
-			Choices: []inkwell.DialogueChoice{
+			Choices: []inkwell.DialogChoice{
 				{
 					Text: inkwell.Text{
 						{Lang: "en", Text: "What am I doing here, Dex?"},
@@ -80,7 +80,7 @@ func init() {
 						{Lang: "en", Text: "Nothing. Forget it."},
 						{Lang: "hu", Text: "Semmit. Hagyjuk."},
 					},
-					Actions: []inkwell.Action{inkwell.EndDialogue()},
+					Actions: []inkwell.Action{inkwell.EndDialog()},
 				},
 			},
 		}},

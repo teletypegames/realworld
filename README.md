@@ -150,7 +150,7 @@ The vertical divider at x=394 is the one proportion carried over from the
 wireframe deck: 61.6% world, 38.4% tape channel. The deck's *vertical*
 proportions are not carried over.
 
-The dialogue box deliberately spans only the left region, so a tape can comment
+The dialog box deliberately spans only the left region, so a tape can comment
 *alongside* a conversation.
 
 ## Languages
@@ -335,7 +335,7 @@ therefore one word per widget rather than a wrapper around each of them and an
 `if` at the top of every `Draw`.
 
 Tapes are the one entity type this game invents. `Tape` names the character
-whose voice it is, the cassette that carries it and the dialogue it plays, one
+whose voice it is, the cassette that carries it and the dialog it plays, one
 file each — what a tape *sounds* like stays on the character, as
 `Character.Label` and `Character.Voice`, because that is a fact about a speaker.
 A tape's line is `inkwell.Say` like anybody else's; the engine sends it to the
@@ -388,8 +388,8 @@ were already spelled `armilla.slot2` and `armilla.strip` in the save file, and
 the strip in particular had been written by whoever happened to be nearby — a
 raw `SetVar` in the tape-insert script, a `setVarIfEmpty` helper in `scene`, a
 read in the top bar. Now the device owns it, and the helper is gone. What
-`armilla` does not know is `tape`: which dialogue a cassette plays is
-`tape.Dialogue`, asked by the HUD, because that is a fact about the cassette and
+`armilla` does not know is `tape`: which dialog a cassette plays is
+`tape.Dialog`, asked by the HUD, because that is a fact about the cassette and
 not about the thing it is plugged into.
 
 **On the word "scene".** The wiki, the concept-art deck and the beat tables all
@@ -472,7 +472,7 @@ Also: the inkwell README gives the module path as
   picture. Either the deck gets recut so nothing that matters lives in its
   bottom third, or the HUD gets a translucent panel treatment.
 - **The scenes are empty.** 22 backgrounds are in and they are wired to each
-  other, but only the alley has hotspots, NPCs and dialogue; everywhere else
+  other, but only the alley has hotspots, NPCs and dialog; everywhere else
   there is nothing to do but leave again.
 - **The selector has no art.** The wiki's Helyszínválasztó is the centre of the
   map and the deck does not include it, so it renders as a placeholder with one
@@ -480,7 +480,7 @@ Also: the inkwell README gives the module path as
 - **Two scenes are missing from the deck.** The alley (the one authored beat)
   and deck 05, Norman's workplace — which is in the wiki's catalogue but has no
   scene file yet, so the workplace thread of the story has nowhere to happen.
-- **Spent dialogue choices are hidden, not struck through.** `DialogueChoice.Once`
+- **Spent dialog choices are hidden, not struck through.** `DialogChoice.Once`
   hides them; the deck wanted them struck through but visible, so the list
   becomes a memory of what you already tried. Needs a thin override over
   `DialogBox`.

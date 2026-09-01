@@ -6,8 +6,8 @@ import (
 
 func init() {
 	TapeManager.Register(Tape{
-		Name:     inc.TapeMystery,
-		Item:     inc.ItemMysteryTape,
-		Dialogue: inc.DialogMysteryTape,
+		Name:   inc.TapeMystery,
+		Item:   inc.ItemMysteryTape,
+		Dialog: inc.DialogMysteryTape,
 	})
 }

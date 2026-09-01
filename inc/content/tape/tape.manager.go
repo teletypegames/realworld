@@ -7,9 +7,9 @@ import (
 )
 
 type Tape struct {
-	Name     string
-	Item     string
-	Dialogue string
+	Name   string
+	Item   string
+	Dialog string
 }
 
 var TapeManager = inkwell.NewManager[Tape]()
@@ -32,9 +32,9 @@ func IsItem(item string) bool {
 	return found
 }
 
-func Dialogue(item string) string {
-	if loaded, found := Of(item); found && loaded.Dialogue != "" {
-		return loaded.Dialogue
+func Dialog(item string) string {
+	if loaded, found := Of(item); found && loaded.Dialog != "" {
+		return loaded.Dialog
 	}
 	return inc.DialogDex
 }
