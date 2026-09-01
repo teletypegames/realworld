@@ -230,7 +230,7 @@ repeated inside the directory that already carries it, because a file called
 `alley.go` tells you nothing in a list of open editor tabs.
 
 ```
-main.go                                flags, the assembly, inkwell.Run
+main.go                                flags, one Game literal, inkwell.Run
 main.debug.go  main.release.go         debugBuild, the -tags debug pair
 inc/constants.go                       every name and state key; imports nothing
 inc/util/                              RGB and RGBA over image/color; imports nothing
@@ -363,12 +363,15 @@ step with the files by hand, and the deck is a thing to look at, not a thing to
 play through.
 
 The game's own catalogue is readable without going through the engine:
-`scene.SceneManager.Get("alley")` answers long before there is a `*Game` to ask. And
-when the game is built, nothing is copied into it — `New` assigns our managers
-onto the `*Game` in place of the empty ones `NewGame` made, so engine and game
-share one registry per category instead of keeping two of them in step. Themes
-are the exception: `NewGame` seeds its theme manager with four presets, so ours
-are added to that set rather than replacing it.
+`scene.SceneManager.Get("alley")` answers long before there is a `*Game` to ask.
+And when the game is built, nothing is copied into it and nothing is assigned
+either — the eight managers are fields of the one `inkwell.Game` literal
+`main.go` hands to `inkwell.New`, so engine and game share one registry per
+category instead of keeping two of them in step. Themes used to be the
+exception, because the engine seeded its theme manager with four presets and
+handing ours over would have thrown them away; `inkwell.New` adds the presets to
+whichever manager it ends up with, so `theme.ThemeManager` goes in the literal
+like the other seven.
 
 The defaults a scene may leave out are not written into it at all any more:
 `g.Player` names the character a scene with no actors of its own receives, at

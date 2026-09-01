@@ -26,49 +26,56 @@ var assets embed.FS
 func init() { inkwell.AssetFS = assets }
 
 func main() {
-	start := flag.String("scene", "", "starting scene (empty: the alley)")
+	start := flag.String("scene", inc.SceneAlley, "starting scene")
 	finale := flag.Bool("finale", false, "start with the finale, to try the Nokia-punk theme switch")
 	lang := flag.String("lang", "en", "language the game speaks (en, hu)")
 	debug := flag.Bool("debug", false, "open the debug menu with d (a debug build has it anyway)")
 	flag.Parse()
 
-	if *start == "" {
-		*start = inc.SceneAlley
-	}
-
 	inkwell.Fallback = "en"
 	inkwell.Lang = *lang
 
-	game := inkwell.NewGame("Real World", widget.ScreenWidth, widget.ScreenHeight)
-	game.MaxLogLines = 64
-	game.WindowScale = 2
-	game.SceneRect = inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.HUDTop-widget.TopBarHeight)
-	game.Player = inc.Paul
-	game.Walkboxes = scene.Floor
-	game.ExitLook = script.ExitLook
-	game.ExitTake = script.ExitTake
-	game.UseWithFail = script.UseWithFail
+	var finaleScript string
+	if *finale {
+		finaleScript = inc.ScriptFinale
+	}
 
-	game.AssetManager = background.BackgroundManager
-	game.CharacterManager = character.CharacterManager
-	game.DialogManager = dialog.DialogManager
-	game.ItemManager = item.ItemManager
-	game.SceneManager = scene.SceneManager
-	game.ScriptManager = script.ScriptManager
-	game.WidgetManager = widget.WidgetManager
-	theme.ThemeManager.Each(game.ThemeManager.Register)
+	var flags []string
+	if *debug || debugBuild {
+		flags = []string{inc.FlagDebug}
+	}
+
+	game := inkwell.New(inkwell.Game{
+		Title:       "Real World",
+		Width:       widget.ScreenWidth,
+		Height:      widget.ScreenHeight,
+		WindowScale: 2,
+		MaxLogLines: 64,
+		SceneRect:   inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.HUDTop-widget.TopBarHeight),
+
+		StartScene:   *start,
+		StartScript:  inc.ScriptOpening,
+		FinaleScript: finaleScript,
+		StartTheme:   inc.RealWorld,
+		Flags:        flags,
+
+		Player:      inc.Paul,
+		Walkboxes:   scene.Floor,
+		ExitLook:    script.ExitLook,
+		ExitTake:    script.ExitTake,
+		UseWithFail: script.UseWithFail,
+
+		AssetManager:     background.BackgroundManager,
+		CharacterManager: character.CharacterManager,
+		DialogManager:    dialog.DialogManager,
+		ItemManager:      item.ItemManager,
+		SceneManager:     scene.SceneManager,
+		ScriptManager:    script.ScriptManager,
+		ThemeManager:     theme.ThemeManager,
+		WidgetManager:    widget.WidgetManager,
+	})
 
 	system.System.Attach(game)
-	game.UseTheme(inc.RealWorld)
-	if *debug || debugBuild {
-		game.State.SetFlag(inc.FlagDebug)
-	}
-
-	game.StartAt(*start)
-	game.OnStart(inc.ScriptOpening)
-	if *finale {
-		game.OnFinale(inc.ScriptFinale)
-	}
 
 	if err := inkwell.Run(game); err != nil {
 		log.Fatal(err)

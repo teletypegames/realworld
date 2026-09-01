@@ -119,7 +119,8 @@ already fallen off, and now two directories have.
 - Every other file in a package holds exactly one entity: one scene, one
   background, one item. The file registers it itself, in an `init()`.
 - Two things have no category. `inc/constants.go` is the vocabulary every
-  package imports, and `main.go` builds the game — flags, the assembly, and
+  package imports, and `main.go` builds the game — flags, one `inkwell.Game`
+  literal, and
   `inkwell.Run` — beside the two one-line files a `-tags debug` build picks
   between.
 - `inc/system/` is the one directory that is a group *and* a package. The group
@@ -132,7 +133,7 @@ already fallen off, and now two directories have.
   themes are written in.
 
 ```
-main.go                                  flags, the assembly, inkwell.Run
+main.go                                  flags, one Game literal, inkwell.Run
 main.debug.go                            debugBuild = true, behind -tags debug
 main.release.go                          debugBuild = false, without it
 inc/constants.go                         entity names and world-state keys
@@ -379,24 +380,35 @@ neither ticks nor draws nor blocks a click, so nothing else has to ask.
 
 ### Handing a category to the engine
 
-Nothing is copied. `inkwell.NewGame` builds its own empty managers, and `New`
-hands ours over in their place — the types are identical, so the engine and the
-game end up sharing one registry per category rather than two in step:
+Nothing is copied, and nothing is assigned either: the managers are **fields of
+the `inkwell.Game` literal** `main.go` hands to `inkwell.New`. The types are
+identical, so the engine and the game share one registry per category rather
+than keeping two in step:
 
 ```go
-g.AssetManager = background.BackgroundManager
-g.CharacterManager = character.CharacterManager
-g.DialogManager = dialog.DialogManager
-g.ItemManager = item.ItemManager
-g.SceneManager = scene.SceneManager
-g.ScriptManager = script.ScriptManager
-g.WidgetManager = widget.WidgetManager
-theme.ThemeManager.Each(g.ThemeManager.Register)
+game := inkwell.New(inkwell.Game{
+	…
+	AssetManager:     background.BackgroundManager,
+	CharacterManager: character.CharacterManager,
+	DialogManager:    dialog.DialogManager,
+	ItemManager:      item.ItemManager,
+	SceneManager:     scene.SceneManager,
+	ScriptManager:    script.ScriptManager,
+	ThemeManager:     theme.ThemeManager,
+	WidgetManager:    widget.WidgetManager,
+})
 ```
 
-Themes are the odd one out and stay a copy: `NewGame` puts four preset themes
-into its `ThemeManager`, and replacing it would throw them away. Ours are added
-to that set instead.
+`New` fills in an empty manager for every category a caller leaves out, so the
+eight above are the eight we own and the ninth, `VerbManager`, is the engine's
+four SCUMM verbs untouched.
+
+Themes used to be the odd one out — `NewGame` seeded its `ThemeManager` with
+four presets, so handing ours over would have thrown them away, and the game
+copied its two in with `Each` instead. `inkwell.New` now *adds* the presets to
+whichever `ThemeManager` it ends up with, leaving alone any name the game has
+taken, so `theme.ThemeManager` goes in the literal like the other seven and the
+copy is gone.
 
 One consequence of not copying: a manager swapped in this way must be in place
 before `inkwell.Run`, which is where the engine wires up the parts that hold a
@@ -413,35 +425,49 @@ saying "the usual", and the selector opts out by declaring both empty.
 
 ### What runs at boot
 
-`main` names two scripts and nothing else — the opening a player sees is content
-like every other script, in `script/script.opening.go`, not a slice built in the
-wiring:
+The whole assembly is **one `inkwell.Game` literal**. There is nothing to read
+in order and nothing to hold in your head: the game is what the literal says it
+is, the same way a scene is what its literal says it is.
 
 ```go
-game.StartAt(*start)
-game.OnStart(inc.ScriptOpening)
-if *finale {
-	game.OnFinale(inc.ScriptFinale)
-}
+game := inkwell.New(inkwell.Game{
+	Title:       "Real World",
+	Width:       widget.ScreenWidth,
+	Height:      widget.ScreenHeight,
+	WindowScale: 2,
+
+	StartScene:   *start,
+	StartScript:  inc.ScriptOpening,
+	FinaleScript: finaleScript,
+	StartTheme:   inc.RealWorld,
+	Flags:        flags,
+
+	Player:      inc.Paul,
+	Walkboxes:   scene.Floor,
+	ExitLook:    script.ExitLook,
+	ExitTake:    script.ExitTake,
+	UseWithFail: script.UseWithFail,
+	…
+})
 ```
 
-`OnFinale` is the engine's hook for a closing script, queued straight after the
-opening. Here it is what `-finale` uses to drop into the ending, which is why it
-is set from the flag rather than always.
+The opening a player sees is content like every other script, in
+`script/script.opening.go`, named by `StartScript` rather than built as a slice
+in the wiring. `FinaleScript` is the engine's slot for a closing script, queued
+straight after the opening; `-finale` is what fills it, which is why it is a
+local computed from the flag rather than a method called afterwards. `Flags` is
+the same shape for `-debug`: a boot flag list, not a reach into `State` after
+construction.
 
-The rest of the assembly is fields on the `*Game`, and every one of them replaces
-something the game used to carry itself:
+`ExitLook`, `ExitTake` and `UseWithFail` are the three responses the engine asks
+the game for, and all three are `script` functions — a line the player reads
+belongs with the rest of the writing, not in the wiring.
 
-```go
-game.WindowScale = 2
-game.Player = inc.Paul
-game.Walkboxes = scene.Floor
-game.UseWithFail = script.UseWithFail
-```
-
-`UseWithFail` is the response to a use-with pair nobody authored — the engine
-asks for it the same way it asks for `ExitLook` and `ExitTake`, and the lines
-live with the rest of the writing, in `script/script.usewith_fail.go`.
+What is left outside the literal is exactly what cannot be in it: the two
+`inkwell` package variables (`Lang`, `Fallback`), the two locals the flags
+compute, `system.System.Attach(game)`, which needs the pointer the literal is
+about to become, and `inkwell.Run(game)`. Nine lines around a literal — `main`
+used to be twelve assignments and four method calls.
 
 ## The system
 
