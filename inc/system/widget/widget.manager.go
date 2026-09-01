@@ -34,8 +34,12 @@ const (
 )
 
 var (
-	WhenPlaying = inkwell.VarEq(inc.VarMode, string(system.ModePlay))
+	onStage = inkwell.OnStage(inc.StageGame)
 
-	whenCutscene = inkwell.VarEq(inc.VarMode, string(system.ModeCutscene))
-	whenDebug    = inkwell.Flag(inc.FlagDebug)
+	WhenPlaying = inkwell.And(onStage, inkwell.Not(inCutscene))
+
+	whenCutscene = inkwell.And(onStage, inCutscene)
+	whenDebug    = inkwell.And(onStage, inkwell.Flag(inc.FlagDebug))
+
+	inCutscene = inkwell.VarEq(inc.VarMode, string(system.ModeCutscene))
 )

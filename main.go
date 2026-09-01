@@ -14,6 +14,7 @@ import (
 	"realworld/inc/content/item"
 	"realworld/inc/content/scene"
 	"realworld/inc/content/script"
+	"realworld/inc/content/stage"
 	_ "realworld/inc/content/tape"
 	"realworld/inc/system"
 	"realworld/inc/system/theme"
@@ -47,7 +48,7 @@ type options struct {
 }
 
 func parseOptions() options {
-	startScene := flag.String("scene", inc.SceneAlley, "starting scene")
+	startScene := flag.String("scene", "", "start straight in this scene, skipping the main menu")
 	finale := flag.Bool("finale", false, "start with the finale, to try the Nokia-punk theme switch")
 	language := flag.String("lang", "en", "language the game speaks (en, hu)")
 	debug := flag.Bool("debug", false, "open the debug menu with d (a debug build has it anyway)")
@@ -59,6 +60,23 @@ func parseOptions() options {
 		language:   *language,
 		debug:      *debug,
 	}
+}
+
+// startStage is the main menu, unless the run named a scene or asked for the
+// finale — both of those are somebody wanting to look at the game, not at its
+// front door.
+func (chosen options) startStage() string {
+	if chosen.startScene != "" || chosen.finale {
+		return inc.StageGame
+	}
+	return inc.StageMainMenu
+}
+
+func (chosen options) scene() string {
+	if chosen.startScene == "" {
+		return inc.SceneAlley
+	}
+	return chosen.startScene
 }
 
 func (chosen options) finaleScript() string {
@@ -84,7 +102,8 @@ func (chosen options) game() *inkwell.Game {
 		MaxLogLines: 64,
 		SceneRect:   inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.HUDTop-widget.TopBarHeight),
 
-		StartScene:   chosen.startScene,
+		StartStage:   chosen.startStage(),
+		StartScene:   chosen.scene(),
 		StartScript:  inc.ScriptOpening,
 		FinaleScript: chosen.finaleScript(),
 		StartTheme:   inc.RealWorld,
@@ -102,6 +121,7 @@ func (chosen options) game() *inkwell.Game {
 		ItemManager:      item.ItemManager,
 		SceneManager:     scene.SceneManager,
 		ScriptManager:    script.ScriptManager,
+		StageManager:     stage.StageManager,
 		ThemeManager:     theme.ThemeManager,
 		WidgetManager:    widget.WidgetManager,
 	})

@@ -45,6 +45,19 @@ const (
 )
 
 const (
+	StageGame     = "game"
+	StageMainMenu = "main_menu"
+	StageLoad     = "load"
+	StageSave     = "save"
+	StageSettings = "settings"
+	StageCredits  = "credits"
+)
+
+const (
+	SaveSlots = 4
+)
+
+const (
 	SceneSelector        = "selector"
 	ScenePaulShop        = "paul_shop"
 	SceneNoodleHouse     = "noodle_house"

@@ -147,6 +147,9 @@ inc/system/theme/theme.manager.go        the Theme alias and its Manager
 inc/system/theme/theme.realworld.go      realworld-93
 inc/system/theme/theme.nokia_punk.go     nokia-punk
 
+inc/content/stage/stage.manager.go       the Stage alias, its Manager, the shared rows
+inc/content/stage/stage.game.go          the world, and the key that leaves it
+inc/content/stage/stage.*.go             one screen per file: menu, load, save, …
 inc/content/scene/scene.manager.go       the Scene alias, its Manager, the floor
 inc/content/scene/scene.selector.go      the map screen: pins derived from the graph
 inc/content/scene/scene.*.go             one file per scene
@@ -476,6 +479,45 @@ What is left in `main` is exactly what cannot be in the literal: the two
 which needs the pointer the literal is about to become, and `inkwell.Run(game)`.
 Six lines — `main` used to be twelve assignments and four method calls.
 
+## Stages
+
+A **stage** is one full-screen thing the game shows, and exactly one shows at
+a time: the main menu, the load and save screens, settings, the credits — and
+the game itself, which is the point. The world is not the thing every other
+screen floats over; it is one of the screens, `inc.StageGame`, the only one
+with `World: true`.
+
+Off the world stage inkwell does not paint the scene, does not walk the
+characters, does not fire a trigger and does not offer a click to a hotspot.
+That is why the main menu can be the first thing a player sees without the
+alley running behind it — before stages, the only way to hold the world still
+was a script that never finished, which is the trick `ShowEnd` still plays.
+
+A stage file is a screen, both halves of it: the `Stage` literal and the
+widget that draws it, in one `init()`. `stage.main_menu.go` registers a
+`Stage` and the `inkwell.Menu` that is that stage — `Sticky`, because a menu
+with nothing behind it must not be closable — and `stage.credits.go`
+registers a `Stage` and an `inkwell.TextCard`. That is the same shape
+`tape.slots.go` already has: a content file registering a widget.
+
+The HUD needed one line, not fourteen. `widget.WhenPlaying` is now
+`And(OnStage(inc.StageGame), Not(inCutscene))`, so every HUD widget
+disappears off the game stage without knowing stages exist. Note which way
+round that is: **not being in a cutscene is the default**, so a fresh `State`
+after a New Game is a playing one, and nothing has to remember to set the
+mode back.
+
+`Restart`, `LoadSlot` and `GoToStage` all land at the top of the next frame,
+which is what lets a menu row say the whole of what it means at once:
+
+```go
+Do: inkwell.Seq(inkwell.Restart(), inkwell.GoToStage(inc.StageGame)),
+```
+
+`-scene` and `-finale` skip the front door: both mean somebody wants to look
+at the game, not at its main menu, so `options.startStage` answers
+`inc.StageGame` for either.
+
 ## The system
 
 There is exactly one game, so there is exactly one system — and since there is
@@ -607,8 +649,8 @@ The layering is the import graph, so the compiler keeps it:
 
 ```
 inc ← theme ← system ← armilla ← widget ← tape ← main
- ↑      ↑        ↑                          ↑
-util    └── content ──────────────────────--┘
+ ↑      ↑        ↑                  ↑      ↑
+util    └── content ────────────────┴──────┘
 ```
 
 `inc` imports nothing and everything imports it, and `util` sits beside it on
@@ -616,12 +658,13 @@ the same footing — standard library only, no game in it. `system` knows nothin
 about the HUD or the content; both build on it, never the other way round — and
 an arrow pointing back is now an import cycle, not a review comment.
 
-Two edges inside the arrow are worth knowing, and both point from a thing to
-what it is derived from. `tape → widget`: the tape slots are a cassette thing
-that registers a widget, so the cassette sits above the HUD rather than below
-it — this is the arrow that used to run the other way. And
-`background → scene`: an asset is derived from the deck, so the deriving
-package imports the source.
+Three edges inside the arrow are worth knowing, and they all point from a
+thing to what it is made of or derived from. `tape → widget`: the tape slots
+are a cassette thing that registers a widget, so the cassette sits above the
+HUD rather than below it — this is the arrow that used to run the other way.
+`stage → widget`: a screen registers the menu or card that draws it, for the
+same reason. And `background → scene`: an asset is derived from the deck, so
+the deriving package imports the source.
 
 `main` is at the very top, and it is the only place that names every package at
 once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other six

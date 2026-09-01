@@ -23,9 +23,10 @@ go run .
 ```
 
 ```bash
-go run .                   # the alley (beat 3)
+go run .                   # the main menu
 go run . -lang hu          # the same game in Hungarian
 go run . -finale           # the finale — try the Nokia-punk theme switch
+go run . -scene alley      # straight into the alley (beat 3), no main menu
 go run . -scene selector   # the location selector: the map the city hangs off
 go run . -scene hospital   # any scene in the deck, e.g. to look at the art
 go run . -debug            # with the debug menu on d — see The debug menu below
@@ -67,6 +68,7 @@ Release metadata lives in `metadata.json`.
 | right click | verb coin (Look / Use / Talk / Take) |
 | `F1` | toggle hotspot outlines |
 | `d` | the debug menu, in a debug run or build — see below |
+| `ESC` | in the game: the main menu. On a menu screen: back to the main menu |
 
 Screenshots: `EBITEN_SCREENSHOT_KEY=q go run .`, then press `q` in the window.
 
@@ -240,6 +242,7 @@ inc/system/widget/                     HUD layout, visibility conditions, 13 wid
 inc/system/armilla/                    Paul's Armilla: slot two and the strip
 inc/system/theme/                      the Theme alias, realworld-93, nokia-punk
 
+inc/content/stage/                     one file per full-screen screen
 inc/content/scene/  …/background/       one file per location, twice
 inc/content/tape/                      the Tape entity and the lookups over it
 inc/content/item/  …/character/  …/dialog/  …/script/
@@ -346,6 +349,22 @@ The second thing a widget declares is when it is on screen at all: `When` is an
 `VarMode` out of the engine's `State`. Hiding the HUD for a cutscene is
 therefore one word per widget rather than a wrapper around each of them and an
 `if` at the top of every `Draw`.
+
+**Stages.** A stage is one full-screen thing the game shows, and exactly one
+shows at a time: the main menu, load, save, settings, credits — and the game
+itself, which is the point. The world is not the thing every other screen
+floats over; it is one of them, `inc.StageGame`, the only one with
+`World: true`. Off it inkwell paints no scene, walks no character, fires no
+trigger and offers no click to a hotspot, which is what lets the main menu be
+the first thing a player sees without the alley running behind it.
+
+Each stage file is a whole screen: the `Stage` literal and the widget that
+draws it, in one `init()` — a `Sticky` `inkwell.Menu` for the four menu
+screens, an `inkwell.TextCard` for the credits. Sticky because a menu with
+nothing behind it must not be closable. The HUD needed one line to follow all
+of this: `WhenPlaying` is `And(OnStage(inc.StageGame), Not(inCutscene))`, and
+because *not being in a cutscene* is the default, a fresh `State` after a New
+Game is already a playing one.
 
 Tapes are the one entity type this game invents. `Tape` names the character
 whose voice it is, the cassette that carries it and the dialog it plays, one
