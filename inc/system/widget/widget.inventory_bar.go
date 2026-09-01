@@ -7,7 +7,7 @@ import (
 func init() {
 	WidgetManager.Register(&inkwell.InventoryBar{
 		Name: "inventory",
-		When: whenPlaying,
+		When: WhenPlaying,
 		Origin: inkwell.Point{
 			X: Padding + 2,
 			Y: inventoryY,

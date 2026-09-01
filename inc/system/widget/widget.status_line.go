@@ -7,7 +7,7 @@ import (
 func init() {
 	WidgetManager.Register(&inkwell.StatusLine{
 		Name:        "status",
-		When:        whenPlaying,
+		When:        WhenPlaying,
 		Y:           statusY,
 		Align:       inkwell.AlignLeft,
 		ScreenWidth: DividerX,

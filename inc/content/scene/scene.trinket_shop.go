@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "CHINATOWN — TRINKET SHOP"},
 			{Lang: "hu", Text: "KÍNAI NEGYED — CSECSEBECSEBOLT"},
 		},
-		Background: inc.BackgroundTrinketShop,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 			{

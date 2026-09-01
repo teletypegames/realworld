@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "NOODLE'S HOUSE — SEALED"},
 			{Lang: "hu", Text: "NOODLE HÁZA — LEPECSÉTELVE"},
 		},
-		Background: inc.BackgroundNoodleHouse,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 			{

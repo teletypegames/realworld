@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "PUBLIC BBS TERMINAL"},
 			{Lang: "hu", Text: "NYILVÁNOS BBS TERMINÁL"},
 		},
-		Background: inc.BackgroundPublicBBS,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

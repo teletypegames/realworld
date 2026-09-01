@@ -16,7 +16,6 @@ import (
 	"realworld/inc/content/script"
 	_ "realworld/inc/content/tape"
 	"realworld/inc/system"
-	"realworld/inc/system/armilla"
 	"realworld/inc/system/theme"
 	"realworld/inc/system/widget"
 )
@@ -25,11 +24,6 @@ import (
 var assets embed.FS
 
 func init() { inkwell.AssetFS = assets }
-
-var exitLook = inkwell.Text{
-	{Lang: "en", Text: "That way: %s."},
-	{Lang: "hu", Text: "Arra van: %s."},
-}
 
 func main() {
 	start := flag.String("scene", "", "starting scene (empty: the alley)")
@@ -45,23 +39,14 @@ func main() {
 	inkwell.Fallback = "en"
 	inkwell.Lang = *lang
 
-	scene.FillSelectorPins()
-
 	game := inkwell.NewGame("Real World", widget.ScreenWidth, widget.ScreenHeight)
 	game.MaxLogLines = 64
 	game.WindowScale = 2
 	game.SceneRect = inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.HUDTop-widget.TopBarHeight)
 	game.Player = inc.Paul
 	game.Walkboxes = scene.Floor
-	game.ExitLook = func(exit inkwell.Exit) inkwell.Action {
-		return inkwell.Say(inc.Paul, inkwell.Format(exitLook, exit.Label))
-	}
-	game.ExitTake = func(inkwell.Exit) inkwell.Action {
-		return inkwell.Say(inc.Paul, inkwell.Text{
-			{Lang: "en", Text: "It's a way out, not a thing."},
-			{Lang: "hu", Text: "Az egy kijárat, nem egy tárgy."},
-		})
-	}
+	game.ExitLook = script.ExitLook
+	game.ExitTake = script.ExitTake
 	game.UseWithFail = script.UseWithFail
 
 	game.AssetManager = background.BackgroundManager
@@ -74,7 +59,6 @@ func main() {
 	theme.ThemeManager.Each(game.ThemeManager.Register)
 
 	system.System.Attach(game)
-	armilla.Reset()
 	game.UseTheme(inc.RealWorld)
 	if *debug || debugBuild {
 		game.State.SetFlag(inc.FlagDebug)

@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "ICE CREAM SHOP — WHERE THE BAR WAS"},
 			{Lang: "hu", Text: "FAGYIZÓ — A RÉGI BÁR HELYÉN"},
 		},
-		Background: inc.BackgroundIceCreamShop,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

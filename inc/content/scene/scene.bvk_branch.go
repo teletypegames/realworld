@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "BVK — SAN FRANCISCO BRANCH"},
 			{Lang: "hu", Text: "BVK — SAN FRANCISCÓI FIÓK"},
 		},
-		Background: inc.BackgroundBVKBranch,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

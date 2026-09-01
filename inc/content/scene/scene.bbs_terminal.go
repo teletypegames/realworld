@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "TERMINAL — BBS ACCESS POINT"},
 			{Lang: "hu", Text: "TERMINÁL — BBS HOZZÁFÉRÉSI PONT"},
 		},
-		Background: inc.BackgroundBBSTerminal,
 		Exits: []inkwell.Exit{
 			{
 				Label: inkwell.Text{

@@ -10,6 +10,8 @@ var (
 	InkDim          = util.RGB(0x8A806B)
 	Amber           = util.RGB(0xE0A33E)
 	AmberLow        = util.RGB(0xA8701A)
+	AmberPale       = util.RGB(0xE8C86A)
+	Bone            = util.RGB(0xB9A98A)
 	black           = util.RGB(0x14120E)
 	panel           = util.RGB(0x0D0B08)
 	sceneBackground = util.RGB(0x241F18)

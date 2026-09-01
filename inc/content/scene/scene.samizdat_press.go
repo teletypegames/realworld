@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "SAMIZDAT PRINTING HOUSE"},
 			{Lang: "hu", Text: "SZAMIZDAT NYOMDA"},
 		},
-		Background: inc.BackgroundSamizdatPress,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

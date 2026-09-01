@@ -24,16 +24,18 @@ const (
 	HUDHeight = Padding + LineHeight + 4 + inventorySlotSize*2 + inventoryGap + Padding
 	HUDTop    = ScreenHeight - HUDHeight
 
+	SlotsY      = HUDTop + Padding + LineHeight
+	SlotsHeight = LineHeight*2 + Padding*2
+
 	statusY           = HUDTop + Padding
-	slotsY            = HUDTop + Padding + LineHeight
-	slotsHeight       = LineHeight*2 + Padding*2
-	inventoryY        = slotsY + 4
+	inventoryY        = SlotsY + 4
 	inventorySlotSize = 40
 	inventoryGap      = 4
 )
 
 var (
-	whenPlaying  = inkwell.VarEq(inc.VarMode, string(system.ModePlay))
+	WhenPlaying = inkwell.VarEq(inc.VarMode, string(system.ModePlay))
+
 	whenCutscene = inkwell.VarEq(inc.VarMode, string(system.ModeCutscene))
 	whenDebug    = inkwell.Flag(inc.FlagDebug)
 )

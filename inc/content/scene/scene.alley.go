@@ -17,7 +17,6 @@ func init() {
 			{Lang: "en", Text: "ALLEY — BEHIND NOODLE'S HOUSE"},
 			{Lang: "hu", Text: "SIKÁTOR — NOODLE HÁZA MÖGÖTT"},
 		},
-		Background: inc.BackgroundAlley,
 		Exits: []inkwell.Exit{
 			{
 				To: inc.SceneNoodleHouse,
@@ -37,7 +36,10 @@ func init() {
 				},
 			},
 		},
-		OnEnter:  armilla.StripIfEmpty("SRP: 1 tape"),
+		OnEnter: armilla.StripIfEmpty(inkwell.Text{
+			{Lang: "en", Text: "SRP: 1 tape"},
+			{Lang: "hu", Text: "SRP: 1 kazetta"},
+		}),
 		Hotspots: []inkwell.Hotspot{hotspots.hidingPlace(), hotspots.backDoor(), hotspots.bin(), hotspots.fireEscape()},
 	})
 }

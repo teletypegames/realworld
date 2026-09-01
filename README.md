@@ -31,7 +31,7 @@ go run . -scene hospital   # any scene in the deck, e.g. to look at the art
 go run . -debug            # with the debug menu on d — see The debug menu below
 ```
 
-Scene names are the constants in `names.manager.go` (`selector`, `paul_shop`,
+Scene names are the constants in `inc/constants.go` (`selector`, `paul_shop`,
 `noodle_house`, `alley`, `norman_apartment`, `police_station`, `hackerspace`,
 `ice_cream_shop`, `trinket_shop`, `small_restaurant`, `secret_club`,
 `bbs_terminal`, `street`, `hospital`, `server_farm`, `secret_lab`,
@@ -67,7 +67,6 @@ Release metadata lives in `metadata.json`.
 | right click | verb coin (Look / Use / Talk / Take) |
 | `F1` | toggle hotspot outlines |
 | `d` | the debug menu, in a debug run or build — see below |
-| `SPACE` | during a cutscene: let the tape speak, if it offered |
 
 Screenshots: `EBITEN_SCREENSHOT_KEY=q go run .`, then press `q` in the window.
 
@@ -113,8 +112,8 @@ That size is not a taste call. inkwell scales a scene background over the
 *whole* screen (`core.engine.go`), not over the region the HUD leaves free — so
 at any screen size other than the art's own, every painting is squashed to fit.
 The deck is drawn at 640×380, so the screen is 640×380 and the art lands pixel
-for pixel. `TestSceneBackgroundsResolve` keeps the two in step: a background of
-any other size fails the build.
+for pixel. Nothing enforces it — correctness here is checked by looking at the
+game — so a background of any other size will simply come out squashed.
 
 It still gives the wiki's "320×200 VGA look" brief what it was after — a low,
 wide VGA frame at an exact 2× of a 320-wide canvas — and it still keeps the
@@ -142,8 +141,8 @@ Every pixel it gives back is a pixel of art.
 
 Every vertical measurement derives from `LineHeight` (glyph cell + leading) and
 from `ScreenHeight`, both in `widget/widget.manager.go`, not from the wireframe deck's ratios, so
-the layout cannot drift out of step with the font — or with the art — again;
-`TestLayoutFitsTheFont` guards it. The tape channel comes out at 4 rows of 38
+the layout cannot drift out of step with the font — or with the art — again.
+The tape channel comes out at 4 rows of 38
 columns, which is about one and a half of Dex's remarks on screen at once.
 
 The vertical divider at x=394 is the one proportion carried over from the
@@ -236,9 +235,9 @@ main.debug.go  main.release.go         debugBuild, the -tags debug pair
 inc/constants.go                       every name and state key; imports nothing
 inc/util/                              RGB and RGBA over image/color; imports nothing
 
-inc/system/system.go                   System: the binding, the mode, the note, the actions
-inc/system/widget/                     HUD layout, visibility conditions, 14 widgets
-inc/system/armilla/                    Paul's Armilla: two slots, the strip, the offer
+inc/system/system.go                   System: the binding, the mode, the note
+inc/system/widget/                     HUD layout, visibility conditions, 13 widgets
+inc/system/armilla/                    Paul's Armilla: slot two and the strip
 inc/system/theme/                      the Theme alias, realworld-93, nokia-punk
 
 inc/content/scene/  …/background/       one file per location, twice
@@ -255,13 +254,24 @@ by what it imports, so the wiring is `main.go`.
 
 The groups say who writes a file rather than which way an import points:
 `content` is what a writer adds a file to, `system` is the machine that runs it.
-Mostly that agrees with the graph — a character names a `theme` colour, a scene
-names a `system` action, and neither knows the caller back — but one edge crosses
-the other way on purpose: `widget` reads `tape`, because the tape slots ask which
-cassette a tape is in. The layering itself is still the import graph, and the
-compiler keeps it whichever directory a package sits in. `inc/system` is the one
-directory that is both a group and a package — the group is its subdirectories,
-the package is `System`.
+They agree with the graph, and there is no edge crossing the other way any
+more: a character names a `theme` colour, a scene names a `system` action, a
+cassette names the `widget` manager it registers into, and none of them is
+known back.
+
+`widget → tape` used to be the exception, because the tape slots asked which
+cassette a tape was in. Both halves of it went. The tape channel no longer asks
+`tape.Is` — it asks the engine which **voice** a speaker has, and a tape is a
+`VoiceLog` character, so the filter is one field
+(`Voices: []inkwell.Voice{inkwell.VoiceLog}`) and the HUD learns nothing about
+cassettes. The tape slots went the other way: a slot you push a cassette into
+is a cassette thing, so `tape/tape.slots.go` is a content file that registers a
+widget, like every other content file registering into a manager.
+
+The layering itself is still the import graph, and the compiler keeps it
+whichever directory a package sits in. `inc/system` is the one directory that is
+both a group and a package — the group is its subdirectories, the package is
+`System`.
 
 The module is plain `realworld` — no host in front of it, because nothing
 imports this repository; it is an executable, not a library. Own packages read
@@ -272,13 +282,16 @@ The layering is no longer a rule kept by hand — it is the import graph, and th
 compiler rejects the arrow that points the wrong way:
 
 ```
-inc ← theme ← system ← armilla ← tape ← widget ← main
-        ↑        ↑                              ↑
-        └── content ──────────────────────────--┘
+inc ← theme ← system ← armilla ← widget ← tape ← main
+        ↑        ↑                          ↑
+        └── content ──────────────────────--┘
 ```
 
-Adding a scene means adding `inc/content/scene/scene.<name>.go` and
-`inc/content/background/background.<name>.go`. Nothing else moves.
+Adding a scene means adding `inc/content/scene/scene.<name>.go` and a
+`assets/bg/<name>.png` beside it. Nothing else moves — a scene that says nothing
+about its `Background` takes an asset named after itself, and
+`background/background.manager.go` registers one per registered scene, so the
+file name is the whole of the pairing.
 
 Every category owns a manager, and they are all the engine's own
 `inkwell.Manager[T]` — the same registry the `*Game` hangs its content off, kept
@@ -300,13 +313,13 @@ var CharacterManager = inkwell.NewManager[Character]()
 An entity file is a literal that hands itself over in an `init()`:
 
 ```go
-package background
+package tape
 
 func init() {
-	BackgroundManager.Register(Background{
-		Name: inc.BackgroundServerFarm,
-		Path: "assets/bg/server_farm.png",
-		Kind: inkwell.AssetImage,
+	TapeManager.Register(Tape{
+		Name:   inc.TapeMystery,
+		Item:   inc.ItemMysteryTape,
+		Dialog: inc.DialogMysteryTape,
 	})
 }
 ```
@@ -318,7 +331,7 @@ the list is per package, not per entity, so adding a file is still adding a
 file.
 
 Widgets go the same way, the engine's own included: `widget/widget.cursor.go` registers
-an `inkwell.Cursor` exactly as `background/background.street.go` registers an image. What
+an `inkwell.Cursor` exactly as `tape/tape.mystery.go` registers a cassette. What
 they cannot take from alphabetical order is their place in the stack, so each
 widget names a **layer** — `LayerScene`, `LayerPanel`, `LayerHUD`, `LayerSpeech`,
 `LayerDialog`, `LayerMenu`, `LayerCurtain`, `LayerCursor` — and inkwell draws
@@ -329,7 +342,7 @@ happen to be. The layer was added to inkwell for this; the alternative was a
 registration list, which is the thing this package spent its life deleting.
 
 The second thing a widget declares is when it is on screen at all: `When` is an
-`inkwell.Condition` over game state, and the HUD's is `whenPlaying`, which reads
+`inkwell.Condition` over game state, and the HUD's is `WhenPlaying`, which reads
 `VarMode` out of the engine's `State`. Hiding the HUD for a cutscene is
 therefore one word per widget rather than a wrapper around each of them and an
 `if` at the top of every `Draw`.
@@ -362,19 +375,24 @@ The defaults a scene may leave out are not written into it at all any more:
 his `Start`, and `g.Walkboxes` is the floor a scene without one walks on. Both
 are fields on the `*Game`, so a scene file that says nothing about either means
 "the usual", and the selector opts out by declaring both empty. What is still
-written back before the hand-off is the derived half of the map:
-`scene.FillSelectorPins` reads the exit graph backwards and `Set`s the selector.
+derived half of the map is no longer written back from the wiring at all: the
+selector declares `Derived: pins.fromGraph`, and inkwell asks every scene for
+its derived exits once, before validation. The map screen is a literal like
+every other scene file, and `main` says nothing about it.
 
 There is one game, so there is one system, and it is a value rather than a type
 anyone constructs: `var System = &system{}`, with `system` unexported so no
 second one can exist. Everything the package offers is a method on it —
-`System.Do(…)`, `System.Game()`, `System.Func(…)`, `System.Paused(…)` — and there
-are no package functions beside them, and no hand-written `Action` or `Runner`
-types either — `Func` and `Paused` are `inkwell.Custom` closures, which is what
-keeps the package to one file. Nothing takes a system parameter and no
-widget holds a back-reference, which is what lets a script file be a literal: the
-tape-insert script closes over `system.System` rather than over a parameter
-someone would have had to thread to it. `System` itself is down to the binding:
+`System.Do(…)`, `System.Game()`, `System.SetMode(…)`, `System.Paused(…)` — and
+there are no package functions beside them, no hand-written `Action` or `Runner`
+types, and now no closures either: `SetMode` is `inkwell.SetVar` over
+`VarMode`, and `Paused` is `inkwell.Noting`, the engine's own "hold this var for
+exactly as long as the action runs". `System.Func`, the escape hatch to
+arbitrary Go, went with its last caller; `System.UseTheme` became
+`inkwell.UseTheme`, because a theme switch mid-script is not this game's idea.
+Nothing takes a system parameter and no
+widget holds a back-reference, which is what lets a script file be a literal.
+`System` itself is down to the binding:
 the engine pointer, the mode and the top bar's note, the last two being `State`
 vars the engine can see for itself. What it deliberately does not hold is the
 assembly — every content package imports `system`, so the wiring lives in
@@ -382,14 +400,28 @@ assembly — every content package imports `system`, so the wiring lives in
 
 The device came out of it. **Armilla** is the wiki's word for the wrist-worn
 runtime a Personal Tape snaps into, and Paul's is the one piece of the fiction
-with enough state to earn a package: `armilla.Slot2()`, `armilla.SetPending(…)`,
-`armilla.SetStrip(…)`, `armilla.Offer(…)`. Two of those are `State` vars that
-were already spelled `armilla.slot2` and `armilla.strip` in the save file, and
-the strip in particular had been written by whoever happened to be nearby — a
-raw `SetVar` in the tape-insert script, a `setVarIfEmpty` helper in `scene`, a
-read in the top bar. Now the device owns it, and the helper is gone. What
-`armilla` does not know is `tape`: which dialog a cassette plays is
-`tape.Dialog`, asked by the HUD, because that is a fact about the cassette and
+with enough state to earn a package — though barely, now: `armilla.Slot2()`,
+`armilla.Insert(item)`, `armilla.StripIfEmpty(text)`, and nothing else. Both
+values are `State` vars already spelled `armilla.slot2` and `armilla.strip` in
+the save file, so there is no package state left and no `Reset` either.
+
+Two things went. `SetPending`/`TakePending` existed only because a script could
+not be told which cassette the player had just pushed in; now the slot is a
+`Hotspot` and the cassette is the key of its `OnUseWith`, so
+`armilla.Insert(item)` is built per cassette with the name already in it, out of
+three engine actions and no Go. And `Offer`/`Waiting`/`TakeOffer` — the tape
+that wanted to speak during a cutscene, once documented in the table above as a
+`SPACE` control — went because nothing ever called `Offer`. The mechanic was
+written, never wired, and therefore never seen. When content wants it back, the
+declarative shape is an engine action that waits for a key, not a package
+holding a flag the letterbox polls each frame.
+
+The strip is an `inkwell.Text` now rather than a bare English string, because
+`TopBar` resolves a `Text`-valued var into the player's language — so the one
+player-visible string in the game that had no Hungarian has one.
+
+What `armilla` does not know is `tape`: which dialog a cassette plays is
+`tape.Dialog`, asked by the slot, because that is a fact about the cassette and
 not about the thing it is plugged into.
 
 **On the word "scene".** The wiki, the concept-art deck and the beat tables all

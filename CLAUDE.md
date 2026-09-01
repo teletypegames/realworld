@@ -18,13 +18,13 @@ are instructions to the toolchain rather than prose.
 No abbreviations, anywhere an identifier is ours: not in a local, not in a
 parameter, not in a receiver, not in a constant, not in a field. It is `game`,
 not `g`; `theme`, not `th`; `destination`, not `dst`; `context`, not `ctx`;
-`mousePoint`, not `mp`; `ScreenWidth`, not `ScreenW`; `BackgroundAlley`, not
-`BgAlley`. A one-letter name is a comment the compiler cannot check, and this
+`mousePoint`, not `mp`; `ScreenWidth`, not `ScreenW`; `SceneNoodleHouse`, not
+`SceneNoodle`. A one-letter name is a comment the compiler cannot check, and this
 file already forbids the checkable kind.
 
 Receivers are spelled out too, which means Go's one-letter receiver convention
-does not apply here: `func (frame *hudFrame)`, `func (channel *tapeChannel)`,
-`func (slots *tapeSlots)`. The receiver takes the noun the type is *an instance
+does not apply here: `func (frame *hudFrame)`, `func (slots *slotPanel)`,
+`func (fail useWithFail)`. The receiver takes the noun the type is *an instance
 of*, so it never has to repeat the type name and never shadows it.
 
 `func (system *system)` is the one place the two words are the same, and it is
@@ -138,10 +138,10 @@ main.release.go                          debugBuild = false, without it
 inc/constants.go                         entity names and world-state keys
 inc/util/util.color.go                   RGB and RGBA, hex to color.Color
 
-inc/system/system.go                     System: the binding, the mode, the note, the actions
+inc/system/system.go                     System: the binding, the mode, the note
 inc/system/widget/widget.manager.go      the Widget alias, HUD layout, the conditions
 inc/system/widget/widget.*.go            one widget per file, registering itself
-inc/system/armilla/armilla.manager.go    Paul's Armilla: two slots, the strip
+inc/system/armilla/armilla.manager.go    Paul's Armilla: slot two and the strip
 inc/system/theme/theme.manager.go        the Theme alias and its Manager
 inc/system/theme/theme.realworld.go      realworld-93
 inc/system/theme/theme.nokia_punk.go     nokia-punk
@@ -149,12 +149,13 @@ inc/system/theme/theme.nokia_punk.go     nokia-punk
 inc/content/scene/scene.manager.go       the Scene alias, its Manager, the floor
 inc/content/scene/scene.selector.go      the map screen: pins derived from the graph
 inc/content/scene/scene.*.go             one file per scene
-inc/content/background/background.*.go   one image asset per scene
+inc/content/background/background.manager.go  one asset per registered scene
 inc/content/character/character.*.go     the cast, tapes included
 inc/content/item/item.*.go               inventory
 inc/content/dialog/dialog.*.go           dialog trees
 inc/content/script/script.*.go           named action sequences
 inc/content/tape/tape.manager.go         the Tape entity and the lookups over it
+inc/content/tape/tape.slots.go           the two Armilla slots, as hotspots
 inc/content/tape/tape.*.go               one tape per file
 ```
 
@@ -164,19 +165,26 @@ that has to name every package at once, so it can be named by none of them, and
 it sits in `main.go`. It cannot live in `system` beside `System` — half the game
 imports `system`, and a package cannot be imported by what it imports.
 
-The two groups say who writes a file, not which way an import points. `content`
-is what a writer adds a file to; `system` is the machine that runs it. Mostly
-that agrees with the graph — a character names a `theme` colour, a scene names a
-`system` action, and neither `theme` nor `system` knows the caller back — but one
-edge crosses the other way, and it is meant to: `widget` reads `tape`, because
-the tape slots ask which cassette a tape is in.
+The two groups say who writes a file, not which way an import points — but they
+agree, and there is no longer an edge that crosses the other way. A character
+names a `theme` colour, a scene names a `system` action, a cassette names the
+`widget` manager it registers into, and none of `theme`, `system` or `widget`
+knows the caller back.
 
-So the grouping is not the layering. The layering is the import graph and the
-compiler keeps it on its own, whichever directory a package sits in; the
-directories are there so that opening `content/` shows the game and opening
-`system/` shows the machine. A cassette is something somebody writes — a voice,
-an item, a dialog — so `tape` is content, even though the HUD reaches across
-for it.
+`widget → tape` used to be the exception, and it was defended here: the tape
+slots asked which cassette a tape was in. It is gone, and both halves of it are
+worth knowing why. The tape channel no longer asks `tape.Is` — it asks the
+engine which **voice** a speaker has, and a tape is a `VoiceLog` character, so
+the filter is `Voices: []inkwell.Voice{inkwell.VoiceLog}` and the HUD learns
+nothing about cassettes. The tape slots moved the other way: they are a
+*cassette* thing, so `tape.slots.go` is a content file that registers a widget,
+the way every other content file registers into a manager.
+
+A cassette is something somebody writes — a voice, an item, a dialog, a slot
+you push it into — so `tape` is content, and the HUD no longer reaches across
+for it. The layering is still the import graph, and the compiler keeps it on its
+own whichever directory a package sits in; the directories are there so that
+opening `content/` shows the game and opening `system/` shows the machine.
 
 The module is plain `realworld`, with no host in front of it, because nothing
 imports this repository — it is an executable, not a library. Own packages are
@@ -238,16 +246,37 @@ somewhere else to keep in step — the file hands itself to its manager in an
 `init()`:
 
 ```go
-package background
+package tape
 
 func init() {
-	BackgroundManager.Register(Background{
-		Name: inc.BackgroundServerFarm,
-		Path: "assets/bg/server_farm.png",
-		Kind: inkwell.AssetImage,
+	TapeManager.Register(Tape{
+		Name:   inc.TapeMystery,
+		Item:   inc.ItemMysteryTape,
+		Dialog: inc.DialogMysteryTape,
 	})
 }
 ```
+
+Backgrounds are the one category with no per-entity file, and it is not an
+exception to the rule so much as the rule reaching its limit: every one of the
+twenty-four was the same three fields, and two of the three were the scene's own
+name spelled twice more. `Scene.Background` now defaults to the scene's `Name`
+(`inkwell.Scene.BackgroundAsset`), so a scene file says nothing about its
+picture, and `background.manager.go` registers one asset per registered scene:
+
+```go
+scene.SceneManager.Each(func(entity scene.Scene) {
+	BackgroundManager.Register(Background{
+		Name: entity.Name,
+		Path: "assets/bg/" + entity.Name + ".png",
+		Kind: inkwell.AssetImage,
+	})
+})
+```
+
+That is what makes `background → scene` the right direction: the asset is
+*derived from* the deck, so the deriving package imports the source. Adding a
+scene is now a PNG whose name matches.
 
 Adding an entity is adding a file. Deleting one is deleting a file. Package-level
 variables are initialised before any `init()` runs, whatever file each sits in,
@@ -280,12 +309,12 @@ func (alley) bin() inkwell.Hotspot { … }
 The receiver is the namespace, so the method name drops what the type already
 says — `selector.leadsTo`, not `leadsToSelector`. Where the helpers read from
 data rather than build it, the type is not empty and the data are its fields:
-`script.usewith_fail.go` carries the four line-sets as fields of `useWithFail`
-and answers with `fail.paul(n)` and `fail.dex(n)`.
+`script.usewith_fail.go` carries the two `inkwell.Ladder` values as fields of
+`useWithFail` and answers with `fail.paul.At(n)` and `fail.dex.At(n)`.
 
 The rule stops where the package is already the namespace: `armilla.Slot2`,
-`tape.Dialog` and `scene.FillSelectorPins` stay functions, because a receiver
-there would be an empty word. `system` is the other way round — the receiver is
+`armilla.Insert` and `tape.Dialog` stay functions, because a receiver there
+would be an empty word. `system` is the other way round — the receiver is
 the whole point, so everything it offers is a method on `System`.
 
 `init()` order is file-name order, so **registration order is alphabetical**.
@@ -334,13 +363,16 @@ and not an `if` at the top of every `Draw`:
 ```go
 WidgetManager.Register(&inkwell.StatusLine{
 	Name: "status",
-	When: whenPlaying,
+	When: WhenPlaying,
 	Y:    statusY,
 })
 ```
 
-`whenPlaying`, `whenCutscene` and `whenDebug` are in `widget.manager.go`, and
-they read `inc.VarMode` and `inc.FlagDebug` out of the engine's own `State`. A widget of
+`WhenPlaying`, `whenCutscene` and `whenDebug` are in `widget.manager.go`, and they
+read `inc.VarMode` and `inc.FlagDebug` out of the engine's own `State`.
+`WhenPlaying` is the one of the three that is exported, because `tape.slots.go`
+is a content file that has to name it; the other two are read inside the package
+only. A widget of
 ours says the same thing with a method — `VisibleWhen() inkwell.Condition` —
 because it has no literal to put a field in. A widget that is switched off
 neither ticks nor draws nor blocks a click, so nothing else has to ask.
@@ -368,8 +400,10 @@ to that set instead.
 
 One consequence of not copying: a manager swapped in this way must be in place
 before `inkwell.Run`, which is where the engine wires up the parts that hold a
-registry directly. `scene.FillSelectorPins` runs before the hand-off for the same
-reason — it writes the derived pins back into `SceneManager` with `Set`.
+registry directly. Nothing else has to run before the hand-off any more — the
+selector's derived pins used to, and now `inkwell.Run` asks every scene for its
+`Derived` exits itself, before validation, so the map screen needs no line in
+the wiring.
 
 The defaults a scene leaves out are no longer written into it at all.
 `game.Player` names the character a scene with no actors of its own gets, placed
@@ -424,9 +458,13 @@ var System = &system{}
 
 The type is unexported, so `System` is the only instance that can exist, and
 every name the package offers is a method on it: `System.Do(…)`, `System.Game()`,
-`System.Func(…)`, `System.Paused(…)`, `System.SetMode(…)`, `System.UseTheme(…)`.
-There are no package functions beside it, and no `Action` or `Runner` types of
-its own either: `Func` and `Paused` are `inkwell.Custom` closures, so one file
+`System.Paused(…)`, `System.SetMode(…)`. There are no package functions beside
+it, and no `Action` or `Runner` types of its own either — nor any closure now:
+`SetMode` is `inkwell.SetVar` over `inc.VarMode`, and `Paused` is
+`inkwell.Noting`, the engine's own "hold this var for exactly as long as the
+action runs". `System.Func`, the escape hatch to arbitrary Go, is gone with its
+last caller, and so is `System.UseTheme`, which is now `inkwell.UseTheme` — a
+theme switch mid-script is not this game's idea. One short file
 holds the whole package. The mutable state is the struct's
 fields rather than package variables, so `Attach` is a hand-off to one value and
 not a sweep over several — and nothing is threaded anywhere: a widget holds no
@@ -451,26 +489,37 @@ it can import none of them, and the wiring lives in `main.go` instead.
 
 The Armilla is the wrist-worn runtime a Personal Tape snaps into — the wiki's
 term, and the game's device. Paul wears one, and it is the only piece of the
-fiction the code models as a package of its own, because it is the only one that
-holds state: two slots, a phosphor text strip, and a tape with something to say.
+fiction the code models as a package of its own: slot two and a phosphor text
+strip.
 
 ```go
-armilla.Slot2()                      armilla.SetSlot2(item)
-armilla.SetPending(item)             armilla.TakePending()
-armilla.SetStrip("SLOT2: READING")   armilla.StripIfEmpty("SRP: 1 tape")
-armilla.Offer(line)                  armilla.Waiting()   armilla.TakeOffer()
+armilla.Slot2()          armilla.Insert(item)          armilla.StripIfEmpty(text)
 ```
 
-Slot 2 and the strip are `State` vars — `inc.VarSlot2` and `inc.VarArmillaStrip`,
-both spelled `armilla.…`, so the save file says the same word the package does.
-The other two are the things the engine has no notion of: the cassette on its way
-into the slot, and the tape waiting to speak. Only `armilla.Reset()` clears them,
-and `main` calls it straight after `System.Attach`.
+Both are `State` vars — `inc.VarSlot2` and `inc.VarArmillaStrip`, both spelled
+`armilla.…`, so the save file says the same word the package does. There is no
+package state left at all, which is why there is no `Reset` either: it had
+nothing to clear once the pending cassette and the waiting tape went.
 
-`armilla` builds on `system` — slot 2 and the strip go through
-`system.System.Game()`, and `TakeOffer` hands its line to `system.System.Do` —
-and it knows nothing of `tape`: which dialog a cassette plays is
-`tape.Dialog`, asked by the HUD, not by the device. It is `inc/system/` because
+Those two went for different reasons. `SetPending`/`TakePending` existed only
+because a script could not be told which cassette the player had just pushed in
+— and now it need not be told, because the slot is a `Hotspot` and the cassette
+is the key of its `OnUseWith`, so `armilla.Insert(item)` is built per cassette
+with the name already in it. `Offer`/`Waiting`/`TakeOffer` — the tape that wanted
+to speak during a cutscene — went because **nothing ever called `Offer`**: the
+mechanic was authored, documented as a `SPACE` control, and dead. When content
+wants it back, the declarative shape is an engine action that waits for a key,
+not a package holding a flag the letterbox polls.
+
+`armilla.Insert` is a `Seq` of three engine actions and no Go: set slot two,
+take the cassette out of the inventory, write the strip. `StripIfEmpty` is
+`inkwell.SetVarIfEmpty` and nothing else. The strip is an `inkwell.Text` now
+rather than a bare English string, because `TopBar` resolves a `Text`-valued
+var into the player's language.
+
+`armilla` builds on `system` — slot 2 reads through `system.System.Game()` —
+and it knows nothing of `tape`: which dialog a cassette plays is `tape.Dialog`,
+asked by the slot, not by the device. It is `inc/system/` because
 nobody authors a file into it, diegetic object or not. Its own names stay package
 functions, because `armilla` holds no `Armilla` value the way `system` holds
 `System` — there is one wrist, and the package is it.
@@ -486,7 +535,7 @@ already says. It is `scene.Floor`, not `scene.SceneFloor`; `tape.Dialog`, not
 the declaration, when choosing a name:
 
 ```go
-scene.FillSelectorPins()   tape.Is(speaker)   system.System.Do(action)   widget.ScreenWidth
+scene.Floor   tape.Is(speaker)   system.System.Do(action)   widget.ScreenWidth
 ```
 
 The manager is the one exception, and it keeps its prefix on purpose:
@@ -504,16 +553,15 @@ the constants in `inc/constants.go`, each package's
 `<Category>Manager` and entity type, the colour tokens, the tape lookups
 (`tape.Is`, `tape.Of`, `tape.IsItem`, `tape.Dialog`), the system
 (`system.System` and its methods `Do`, `Game`, `Attach`, …), the Armilla
-(`armilla.Slot2`, `armilla.SetStrip`, …) and the action constructors
-(`System.Paused`, `System.SetMode`, `System.UseTheme`, `System.Func`,
-`armilla.Offer`). A tape's line is `inkwell.Say`
+(`armilla.Slot2`, `armilla.Insert`, `armilla.StripIfEmpty`), the action
+constructors (`System.Paused`, `System.SetMode`) and the one HUD condition a
+content file has to name, `widget.WhenPlaying`. A tape's line is `inkwell.Say`
 like anyone else's — the tape voice is on the character, not on a second
 spelling of Say.
 
 Everything else stays unexported, and now the compiler holds the line: the HUD
-widgets (`tapeSlots`, `letterbox`, `hudFrame`, …), the conditions
-(`whenPlaying`, `whenCutscene`, `whenDebug`), the runners, `setMode`,
-`setNote`, `setVarIfEmpty`.
+widgets (`hudFrame`, `slots`, …), the conditions `whenCutscene` and `whenDebug`,
+and the file-local helpers.
 
 The word is **scene**, the engine's own. The wiki and the concept-art deck count
 *screens*, and this code used to as well, but everything a screen had that a
@@ -525,33 +573,38 @@ display: `ScreenWidth`, `ScreenHeight`.
 The layering is the import graph, so the compiler keeps it:
 
 ```
-inc ← theme ← system ← armilla ← tape ← widget ← main
- ↑      ↑        ↑                              ↑
-util    └── content ──────────────────────────--┘
+inc ← theme ← system ← armilla ← widget ← tape ← main
+ ↑      ↑        ↑                          ↑
+util    └── content ──────────────────────--┘
 ```
 
 `inc` imports nothing and everything imports it, and `util` sits beside it on
 the same footing — standard library only, no game in it. `system` knows nothing
 about the HUD or the content; both build on it, never the other way round — and
-an arrow pointing back is now an import cycle, not a review comment. The one edge
-worth knowing is `widget → tape`: the tape slots ask which cassette a tape is in,
-so the tape concept sits below the HUD rather than beside it.
+an arrow pointing back is now an import cycle, not a review comment.
+
+Two edges inside the arrow are worth knowing, and both point from a thing to
+what it is derived from. `tape → widget`: the tape slots are a cassette thing
+that registers a widget, so the cassette sits above the HUD rather than below
+it — this is the arrow that used to run the other way. And
+`background → scene`: an asset is derived from the deck, so the deriving
+package imports the source.
 
 `main` is at the very top, and it is the only place that names every package at
-once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other six,
-`tape` among them, are `inc/content/`, which makes `widget → tape` the one edge
-that leaves `system` for `content`.
+once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other six
+are `inc/content/`, and no arrow leaves `system` for `content` any more.
 
 ## Adding a scene
 
-1. Constants in `inc/constants.go`: `Scene<Name>`, `Background<Name>`
+1. One constant in `inc/constants.go`: `Scene<Name>`
 2. `inc/content/scene/scene.<name>.go` — an `init()` registering a `Scene`, its
    `Title` and every `Label` written in both languages
-3. `inc/content/background/background.<name>.go` — an `init()` registering a
-   `Background`
-4. A 640×380 PNG in `assets/bg/`
+3. A 640×380 PNG at `assets/bg/<name>.png`
 
-Nothing else moves. There is no list to update.
+Nothing else moves. There is no list to update, and nothing names the picture:
+a scene that says nothing about its `Background` takes an asset named after
+itself, and `background.manager.go` registers one per registered scene. The PNG
+file name is the pairing.
 
 ## The engine next door
 

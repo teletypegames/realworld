@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "STREET"},
 			{Lang: "hu", Text: "UTCA"},
 		},
-		Background: inc.BackgroundStreet,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

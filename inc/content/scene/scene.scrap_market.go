@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "SCRAP MARKET"},
 			{Lang: "hu", Text: "ÓCSKAPIAC"},
 		},
-		Background: inc.BackgroundScrapMarket,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

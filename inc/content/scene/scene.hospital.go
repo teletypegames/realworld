@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "HOSPITAL — PSYCHIATRIC WING"},
 			{Lang: "hu", Text: "KÓRHÁZ — PSZICHIÁTRIAI SZÁRNY"},
 		},
-		Background: inc.BackgroundHospital,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

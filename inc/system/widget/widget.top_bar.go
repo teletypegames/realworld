@@ -9,7 +9,7 @@ import (
 func init() {
 	WidgetManager.Register(&inkwell.TopBar{
 		Name:    "topbar",
-		When:    whenPlaying,
+		When:    WhenPlaying,
 		Height:  TopBarHeight,
 		TimeVar: inc.VarArmillaStrip,
 		NoteVar: inc.VarNote,

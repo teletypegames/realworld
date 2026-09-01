@@ -18,7 +18,7 @@ func init() {
 				{Lang: "hu", Text: "Beteszem. Ennyi az egész."},
 			}),
 			inkwell.Wait(0.4),
-			system.System.UseTheme(inc.NokiaPunk),
+			inkwell.UseTheme(inc.NokiaPunk),
 			inkwell.Say("norman", inkwell.Text{
 				{Lang: "en", Text: "No — this isn't what you were supposed to do!"},
 				{Lang: "hu", Text: "Ne — nem ezt kellett volna tenned!"},

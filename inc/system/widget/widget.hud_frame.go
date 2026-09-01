@@ -17,7 +17,7 @@ type hudFrame struct {
 }
 
 func (frame *hudFrame) GetName() string                { return frame.Name }
-func (frame *hudFrame) VisibleWhen() inkwell.Condition { return whenPlaying }
+func (frame *hudFrame) VisibleWhen() inkwell.Condition { return WhenPlaying }
 func (frame *hudFrame) Layer() inkwell.Layer           { return inkwell.LayerPanel }
 func (frame *hudFrame) Tick(context *inkwell.UICtx)    {}
 

@@ -17,29 +17,26 @@ var exitToSelector = inkwell.Exit{
 	Side: inkwell.ExitNear,
 }
 
+type selector struct{}
+
 func init() {
+	pins := selector{}
 	SceneManager.Register(Scene{
 		Name: inc.SceneSelector,
 		Title: inkwell.Text{
 			{Lang: "en", Text: "SAN FRANCISCO"},
 			{Lang: "hu", Text: "SAN FRANCISCO"},
 		},
-		Background: inc.BackgroundSelector,
-		Actors:     []inkwell.SceneActor{},
-		Walkboxes:  []inkwell.Polygon{},
+		Actors:    []inkwell.SceneActor{},
+		Walkboxes: []inkwell.Polygon{},
+		Derived:   pins.fromGraph,
 	})
 }
 
-type selector struct{}
-
-func FillSelectorPins() {
-	selectorScene, found := SceneManager.Get(inc.SceneSelector)
-	if !found {
-		return
-	}
+func (selector) fromGraph(game *inkwell.Game) []inkwell.Exit {
 	pins := selector{}
 	var exits []inkwell.Exit
-	for _, entity := range SceneManager.All() {
+	for _, entity := range game.SceneManager.All() {
 		if !pins.leadsTo(entity) {
 			continue
 		}
@@ -49,8 +46,7 @@ func FillSelectorPins() {
 			Area:  pins.area(len(exits)),
 		})
 	}
-	selectorScene.Exits = exits
-	SceneManager.Set(selectorScene)
+	return exits
 }
 
 func (selector) leadsTo(scene Scene) bool {

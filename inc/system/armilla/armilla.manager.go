@@ -7,15 +7,10 @@ import (
 	"realworld/inc/system"
 )
 
-type armillaState struct {
-	pending string
-	waiting bool
-	line    inkwell.Action
+var stripReading = inkwell.Text{
+	{Lang: "en", Text: "SLOT2: READING"},
+	{Lang: "hu", Text: "2. FOGL: OLVAS"},
 }
-
-var state armillaState
-
-func Reset() { state = armillaState{} }
 
 func Slot2() string {
 	if value, isText := system.System.Game().State.Var(inc.VarSlot2).(string); isText {
@@ -24,41 +19,14 @@ func Slot2() string {
 	return ""
 }
 
-func SetSlot2(item string) { system.System.Game().State.SetVar(inc.VarSlot2, item) }
-
-func SetPending(item string) { state.pending = item }
-
-func TakePending() string {
-	item := state.pending
-	state.pending = ""
-	return item
+func Insert(item string) inkwell.Action {
+	return inkwell.Seq(
+		inkwell.SetVar(inc.VarSlot2, item),
+		inkwell.TakeAway(item),
+		inkwell.SetVar(inc.VarArmillaStrip, stripReading),
+	)
 }
 
-func SetStrip(text string) { system.System.Game().State.SetVar(inc.VarArmillaStrip, text) }
-
-func StripIfEmpty(text string) inkwell.Action {
-	return system.System.Func(func(context *inkwell.Ctx) {
-		if context.Game.State.Var(inc.VarArmillaStrip) == nil {
-			context.Game.State.SetVar(inc.VarArmillaStrip, text)
-		}
-	})
-}
-
-func Waiting() bool { return state.waiting }
-
-func Offer(line inkwell.Action) inkwell.Action {
-	return system.System.Func(func(*inkwell.Ctx) {
-		state.line = line
-		state.waiting = true
-	})
-}
-
-func TakeOffer() {
-	if !state.waiting {
-		return
-	}
-	state.waiting = false
-	line := state.line
-	state.line = nil
-	system.System.Do(line)
+func StripIfEmpty(text inkwell.Text) inkwell.Action {
+	return inkwell.SetVarIfEmpty(inc.VarArmillaStrip, text)
 }

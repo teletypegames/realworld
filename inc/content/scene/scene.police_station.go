@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "SFPD — STATION AND HOLDING"},
 			{Lang: "hu", Text: "SFPD — ŐRS ÉS FOGDA"},
 		},
-		Background: inc.BackgroundPoliceStation,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

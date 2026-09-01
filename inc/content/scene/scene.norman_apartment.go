@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "NORMAN'S APARTMENT"},
 			{Lang: "hu", Text: "NORMAN LAKÁSA"},
 		},
-		Background: inc.BackgroundNormanApartment,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 			{

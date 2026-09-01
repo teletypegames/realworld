@@ -13,7 +13,6 @@ func init() {
 			{Lang: "en", Text: "SECRET RESEARCH LABORATORY"},
 			{Lang: "hu", Text: "TITKOS KUTATÓLABOR"},
 		},
-		Background: inc.BackgroundSecretLab,
 		Exits: []inkwell.Exit{
 			exitToSelector,
 		},

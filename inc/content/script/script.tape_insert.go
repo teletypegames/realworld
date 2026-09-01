@@ -4,23 +4,12 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
-	"realworld/inc/system"
-	"realworld/inc/system/armilla"
 )
 
 func init() {
 	ScriptManager.Register(Script{
 		Name: inc.ScriptTapeInsert,
 		Actions: inkwell.Seq(
-			system.System.Func(func(context *inkwell.Ctx) {
-				item := armilla.TakePending()
-				if item == "" {
-					return
-				}
-				armilla.SetSlot2(item)
-				context.Game.Inventory.Remove(item)
-				armilla.SetStrip("SLOT2: READING")
-			}),
 			inkwell.Say(inc.Paul, inkwell.Text{
 				{Lang: "en", Text: "Right. Let's see who you are."},
 				{Lang: "hu", Text: "Jól van. Lássuk, ki vagy."},
