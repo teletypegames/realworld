@@ -66,7 +66,7 @@ Release metadata lives in `metadata.json`.
 |---|---|
 | left click | run the selected verb |
 | right click | verb coin (Look / Use / Talk / Take) |
-| `F1` | toggle hotspot outlines |
+| `F1` | toggle the debug overlay: a coloured plate and its name over every clickable — on from the start in a debug run or build |
 | `d` | the debug menu, in a debug run or build — see below |
 | `ESC` | in the game: the main menu. On a menu screen: back to the main menu |
 
@@ -90,6 +90,13 @@ make debug          # a binary with it on from the start (-tags debug)
 Both do the same one thing: set `inc.FlagDebug`, which is what the widget's
 `whenDebug` reads. A release build with no flag never ticks the widget, so `d`
 does nothing at all.
+
+The same flag switches on the engine's `HotspotDebug` overlay, registered in
+`widget.hotspot_debug.go` with `When: whenDebug` and `Enabled: true`: every
+clickable on screen gets a translucent plate with its name written across it,
+a different colour per kind — hotspots, exits, the characters in the scene,
+the items in the inventory, the two Armilla slots. `F1` hides and shows it
+during a debug run; outside one the widget never ticks, like the menu.
 
 ```
 DEBUG

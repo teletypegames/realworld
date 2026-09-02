@@ -776,8 +776,10 @@ go run . -debug            with the debug menu on d
 The debug menu is the engine's `Menu` widget with `inkwell.DebugMenuRoot`
 handed to it, registered in `widget.debug_menu.go`. Either `-debug` or a
 `-tags debug` build sets `inc.FlagDebug`, which is what its `whenDebug`
-condition reads; without the flag the widget never ticks. `README.md` has the
-rest, under **The debug menu**.
+condition reads; without the flag the widget never ticks. The same flag
+switches on the engine's `HotspotDebug` overlay, `widget.hotspot_debug.go`,
+which plates every clickable on screen in a colour per kind with its name on
+it, `F1` to hide. `README.md` has the rest, under **The debug menu**.
 
 Art is embedded into the binary (`//go:embed assets` in `main.go`), because
 js/wasm has no OS filesystem and `make binaries` ships the executable alone.
