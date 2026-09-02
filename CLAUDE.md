@@ -239,15 +239,21 @@ the engine, so there is nothing left for a second type to hold.
 a device, and it talks back like a chatbot — a thing inkwell has no notion of.
 It is **not a character**: nobody on a cassette stands in a scene, walks, or
 has a sprite. A tape file is the card in one literal — its `Label`, its
-`Color`, the `Item` that carries it and the name of the `Dialog` it plays. The
+`Color`, the `Item` that carries it, the name of the `Dialog` it plays and
+`OnInsert`, the first thing it says when it clicks into slot two. The
 dialog itself is a file in `dialog/` like every other tree, because a
 conversation is written and read on its own, and the card only has to say
-which one is its.
+which one is its. `OnInsert` runs after `script.tape_insert.go`, which is the
+part of an insertion every card shares — Paul's hand and Dex's remark — so the
+generic script never has to know which card went in.
 
 `tape.manager.go` derives the voice. Every tape is an `inkwell.Speaker` with
 `VoiceLog`, registered into `tape.Speakers`, which is what `main.go` hands the
 engine as its `SpeakerManager`. Dex is one of these cards — the one in slot
-one — which is why `character/` holds Paul alone. The two lookups are
+one — which is why he is not in `character/` beside Paul and the people Paul
+meets. One voice there is a character with no body on purpose: the security
+ACP is a room-scale system, so it stands in its scene as a `Character` with
+`Voice: inkwell.VoiceLog`, and speaks through the log. The two lookups are
 `tape.Of`, the tape an item is, and `tape.Dialog`, the dialog to run for a
 loaded item, which is the card's own or Dex's when the card names none.
 

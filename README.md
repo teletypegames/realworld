@@ -331,12 +331,17 @@ var _ = TapeManager.Register(Tape{
 
 A tape is a card, not a character. It is pushed into a device and talks back
 like a chatbot, so nothing about it stands in a scene, and the file is the
-card: its label, its colour, the item it travels in, and the name of the
-dialog it plays, which is a file in `dialog/` like every other tree.
+card: its label, its colour, the item it travels in, the name of the
+dialog it plays, which is a file in `dialog/` like every other tree, and
+`OnInsert`, its first words when it clicks into slot two — run after the
+generic `tape_insert` script, which is the part of an insertion every card
+shares.
 `tape.manager.go` derives an `inkwell.Speaker` from each one — `VoiceLog`, so
 the line lands in the channel and never in a bubble — into `tape.Speakers`,
 which `main.go` hands the engine as its `SpeakerManager`. Dex is such a card,
-so `character/` holds Paul alone.
+so he is not in `character/`, which holds Paul and everyone he meets — and one
+voice with no body, the security ACP, a `Character` with `Voice: VoiceLog`
+because it is a room, not a cassette.
 
 A choice a card only offers under a condition says so in `Show`, and the
 condition is a literal: `inkwell.Given{Item: …, NotFlag: …}`, every set field

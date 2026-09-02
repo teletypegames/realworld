@@ -74,7 +74,7 @@ func (chosen options) startStage() string {
 
 func (chosen options) scene() string {
 	if chosen.startScene == "" {
-		return inc.SceneAlley
+		return inc.ScenePaulShop
 	}
 	return chosen.startScene
 }

@@ -6,6 +6,8 @@ import (
 	"realworld/inc"
 )
 
+type rooftopHideout struct{}
+
 var _ = SceneManager.Register(Scene{
 	Name: inc.SceneRooftopHideout,
 	Title: inkwell.Text{
@@ -30,4 +32,96 @@ var _ = SceneManager.Register(Scene{
 			Side: inkwell.ExitRight,
 		},
 	},
+	Hotspots: rooftopHideout{}.hotspots(),
 })
+
+func (place rooftopHideout) hotspots() []inkwell.Hotspot {
+	return []inkwell.Hotspot{
+		place.crate(),
+		place.chair(),
+		place.view(),
+	}
+}
+
+func (rooftopHideout) crate() inkwell.Hotspot {
+	taken := inkwell.Say(inc.Paul, inkwell.Text{
+		{Lang: "en", Text: "Empty crate. The notes are with me."},
+		{Lang: "hu", Text: "Üres láda. A jegyzetek nálam vannak."},
+	})
+	return inkwell.Hotspot{
+		Name: "crate",
+		Label: inkwell.Text{
+			{Lang: "en", Text: "crate of papers"},
+			{Lang: "hu", Text: "papírokkal teli láda"},
+		},
+		Area: inkwell.Rect(120, 170, 80, 60),
+		OnLook: inkwell.If(inkwell.HasItem(inc.ItemNormanNotes),
+			taken,
+			inkwell.Say(inc.Paul, inkwell.Text{
+				{Lang: "en", Text: "A fruit crate under a tarp. Notebooks, loose sheets, a pencil worn to the metal."},
+				{Lang: "hu", Text: "Gyümölcsösláda ponyva alatt. Füzetek, kitépett lapok, egy fémig kopott ceruza."},
+			}),
+		),
+		OnTake: inkwell.If(inkwell.HasItem(inc.ItemNormanNotes),
+			taken,
+			inkwell.Seq(
+				inkwell.Give(inc.ItemNormanNotes),
+				inkwell.Say(inc.Paul, inkwell.Text{
+					{Lang: "en", Text: "Norman's handwriting. All of it."},
+					{Lang: "hu", Text: "Norman kézírása. Az egész."},
+				}),
+				inkwell.Say(inc.Dex, inkwell.Text{
+					{Lang: "en", Text: "This is where he came to be nobody's engineer. Read it later, Paul. Not up here."},
+					{Lang: "hu", Text: "Ide jött fel, hogy ne legyen senki mérnöke. Később olvasd el, Paul. Ne itt fent."},
+				}),
+			),
+		),
+		OnUse: inkwell.If(inkwell.HasItem(inc.ItemNormanNotes),
+			taken,
+			inkwell.Say(inc.Paul, inkwell.Text{
+				{Lang: "en", Text: "I'll take the lot. It'll get rained on otherwise."},
+				{Lang: "hu", Text: "Elviszem az egészet. Különben eláztatja az eső."},
+			}),
+		),
+	}
+}
+
+func (rooftopHideout) chair() inkwell.Hotspot {
+	return inkwell.Hotspot{
+		Name: "chair",
+		Label: inkwell.Text{
+			{Lang: "en", Text: "folding chair"},
+			{Lang: "hu", Text: "kempingszék"},
+		},
+		Area: inkwell.Rect(260, 160, 60, 70),
+		OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+			{Lang: "en", Text: "One chair, facing the bridge. Nobody was ever meant to sit next to him up here."},
+			{Lang: "hu", Text: "Egy szék, a híd felé fordítva. Ide fent soha nem kellett volna senkinek mellé ülnie."},
+		}),
+		OnUse: inkwell.Say(inc.Dex, inkwell.Text{
+			{Lang: "en", Text: "Sit if you want. He won't mind. He can't."},
+			{Lang: "hu", Text: "Ülj le, ha akarsz. Nem bánja. Nem tudja."},
+		}),
+	}
+}
+
+func (rooftopHideout) view() inkwell.Hotspot {
+	return inkwell.Hotspot{
+		Name: "view",
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the bay"},
+			{Lang: "hu", Text: "az öböl"},
+		},
+		Area: inkwell.Rect(360, 30, 260, 110),
+		OnLook: inkwell.If(inkwell.Flag(inc.FlagLabLocated),
+			inkwell.Say(inc.Paul, inkwell.Text{
+				{Lang: "en", Text: "The Golden Gate, right there. He sat up here every night looking straight at the place they'd put him."},
+				{Lang: "hu", Text: "A Golden Gate, pont ott. Minden este itt ült, és egyenesen arra a helyre nézett, ahová aztán bedugták."},
+			}),
+			inkwell.Say(inc.Paul, inkwell.Text{
+				{Lang: "en", Text: "Fog, the bridge, and a city that keeps saying nothing happened here."},
+				{Lang: "hu", Text: "Köd, a híd, és egy város, ami folyton azt mondja, itt nem történt semmi."},
+			}),
+		),
+	}
+}

@@ -1,0 +1,25 @@
+package item
+
+import (
+	inkwell "git.teletypegames.org/engines/inkwell"
+
+	"realworld/inc"
+)
+
+var _ = ItemManager.Register(Item{
+	Name: inc.ItemServerFarmTape,
+	Description: inkwell.Text{
+		{Lang: "en", Text: "datacenter access tape"},
+		{Lang: "hu", Text: "adatközponti belépőkazetta"},
+	},
+	OnUseSelf: inkwell.Seq(
+		inkwell.Say(inc.Paul, inkwell.Text{
+			{Lang: "en", Text: "Somebody's badge, cloned onto a tape. No name on it."},
+			{Lang: "hu", Text: "Valakinek a kitűzője, kazettára klónozva. Név nincs rajta."},
+		}),
+		inkwell.Say(inc.Dex, inkwell.Text{
+			{Lang: "en", Text: "It's a key, not a person. Put it in slot two when a door asks for it, and take it out after."},
+			{Lang: "hu", Text: "Ez kulcs, nem személy. Tedd a kettes foglalatba, amikor egy ajtó kéri, aztán vedd ki."},
+		}),
+	),
+})

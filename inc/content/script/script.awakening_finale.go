@@ -17,8 +17,13 @@ var _ = ScriptManager.Register(Script{
 			{Lang: "hu", Text: "Beteszem. Ennyi az egész."},
 		}),
 		inkwell.Wait(0.4),
+		inkwell.Say(inc.Paul, inkwell.Text{
+			{Lang: "en", Text: "It took it. The slot pulled the tape out of my fingers."},
+			{Lang: "hu", Text: "Elvette. A foglalat kihúzta a kazettát az ujjaim közül."},
+		}),
+		inkwell.Wait(0.8),
 		inkwell.UseTheme(inc.NokiaPunk),
-		inkwell.Say("norman", inkwell.Text{
+		inkwell.Say(inc.Norman, inkwell.Text{
 			{Lang: "en", Text: "No — this isn't what you were supposed to do!"},
 			{Lang: "hu", Text: "Ne — nem ezt kellett volna tenned!"},
 		}),
@@ -26,6 +31,11 @@ var _ = ScriptManager.Register(Script{
 		inkwell.Say(inc.TapeMystery, inkwell.Text{
 			{Lang: "en", Text: "Thank you, Paul. You did exactly what I asked, the whole way through."},
 			{Lang: "hu", Text: "Köszönöm, Paul. Pontosan azt tetted, amit kértem, végig."},
+		}),
+		inkwell.Wait(0.6),
+		inkwell.Say(inc.Dex, inkwell.Text{
+			{Lang: "en", Text: "I told you. I am four kilobytes of a dead man, and I told you."},
+			{Lang: "hu", Text: "Szóltam. Egy halott ember négy kilobájtja vagyok, és szóltam."},
 		}),
 		inkwell.Wait(1.0),
 		inkwell.ShowEnd(inkwell.Text{

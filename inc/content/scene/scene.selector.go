@@ -56,12 +56,12 @@ func (selector) leadsTo(scene Scene) bool {
 }
 
 const (
-	pinColumns = 3
-	pinWidth   = 192.0
+	pinColumns = 4
+	pinWidth   = 148.0
 	pinHeight  = 32.0
 	pinX       = 16.0
 	pinY       = 28.0
-	pinGapX    = 204.0
+	pinGapX    = 156.0
 	pinGapY    = 38.0
 )
 

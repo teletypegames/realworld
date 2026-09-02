@@ -9,11 +9,12 @@ import (
 )
 
 type Tape struct {
-	Name   string
-	Item   string
-	Label  inkwell.Text
-	Color  color.Color
-	Dialog string
+	Name     string
+	Item     string
+	Label    inkwell.Text
+	Color    color.Color
+	Dialog   string
+	OnInsert inkwell.Action
 }
 
 var TapeManager = inkwell.NewManager[Tape]()

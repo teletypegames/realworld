@@ -4,6 +4,7 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/system"
 	"realworld/inc/system/armilla"
 )
 
@@ -23,6 +24,39 @@ var _ = SceneManager.Register(Scene{
 				{Lang: "hu", Text: "vissza az utcára"},
 			},
 			Side: inkwell.ExitLeft,
+		},
+		{
+			To: inc.SceneNoodleSecretRoom,
+			Label: inkwell.Text{
+				{Lang: "en", Text: "the back door"},
+				{Lang: "hu", Text: "a hátsó ajtó"},
+			},
+			Side:  inkwell.ExitBack,
+			Needs: inc.FlagSecretRoomOpen,
+			Blocked: inkwell.Say(inc.Paul, inkwell.Text{
+				{Lang: "en", Text: "Locked. Four digits between me and whatever's behind it."},
+				{Lang: "hu", Text: "Zárva. Négy számjegy köztem és aközött, ami mögötte van."},
+			}),
+		},
+	},
+	Triggers: []inkwell.Trigger{
+		{
+			Name: "arrival",
+			When: inkwell.Given{
+				Flag:    inc.FlagPoliceTip,
+				NotFlag: inc.FlagHasTape,
+			},
+			Do: inkwell.Seq(
+				inkwell.Say(inc.Paul, inkwell.Text{
+					{Lang: "en", Text: "Back alley. Just like the clerk said."},
+					{Lang: "hu", Text: "Hátsó sikátor. Pont, ahogy az ügyintéző mondta."},
+				}),
+				inkwell.Say(inc.Dex, inkwell.Text{
+					{Lang: "en", Text: "A government office tipped you off to remove something from a scene. That doesn't strike you as odd?"},
+					{Lang: "hu", Text: "Egy állami hivatal súgta meg, hogy vigyél el valamit egy helyszínről. Ez neked nem furcsa?"},
+				}),
+			),
+			Once: true,
 		},
 	},
 	Actors: []inkwell.SceneActor{
@@ -111,19 +145,22 @@ func (alley) backDoor() inkwell.Hotspot {
 			{Lang: "hu", Text: "zárt hátsó ajtó"},
 		},
 		Area: inkwell.Rect(72, 106, 80, 124),
-		OnLook: inkwell.Say(inc.Paul, inkwell.Text{
-			{Lang: "en", Text: "Keypad. Four digits, worn keys."},
-			{Lang: "hu", Text: "Számbillentyűzet. Négy számjegy, kopott gombok."},
-		}),
-		OnUse: inkwell.Seq(
+		OnLook: inkwell.Seq(
 			inkwell.Say(inc.Paul, inkwell.Text{
-				{Lang: "en", Text: "Locked. And I'm not guessing four digits."},
-				{Lang: "hu", Text: "Zárva. És nem fogok négy számjegyet találgatni."},
+				{Lang: "en", Text: "Keypad. Four digits, worn keys."},
+				{Lang: "hu", Text: "Számbillentyűzet. Négy számjegy, kopott gombok."},
 			}),
 			inkwell.Say(inc.Dex, inkwell.Text{
 				{Lang: "en", Text: "The wear is heaviest on the two and the seven. That isn't a code. It's fewer options."},
 				{Lang: "hu", Text: "A kettes és a hetes kopott a legjobban. Az nem a kód. Az kevesebb lehetőség."},
 			}),
+		),
+		OnUse: inkwell.If(inkwell.Flag(inc.FlagSecretRoomOpen),
+			inkwell.Say(inc.Paul, inkwell.Text{
+				{Lang: "en", Text: "It's open. I don't need to type it twice."},
+				{Lang: "hu", Text: "Nyitva van. Nem kell kétszer beütnöm."},
+			}),
+			system.System.Paused(inkwell.RunDialog(inc.DialogKeypad)),
 		),
 		OnTalk: inkwell.Say(inc.Paul, inkwell.Text{
 			{Lang: "en", Text: "To the door? I'm not there yet."},

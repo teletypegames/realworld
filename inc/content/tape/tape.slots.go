@@ -113,6 +113,7 @@ func (slotPanel) insertions() map[string]inkwell.Action {
 		pairs[candidate.Item] = inkwell.Seq(
 			armilla.Insert(candidate.Item),
 			inkwell.RunScript(inc.ScriptTapeInsert),
+			candidate.OnInsert,
 		)
 	}
 	return pairs
