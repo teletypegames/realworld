@@ -5,5 +5,7 @@ import (
 )
 
 var _ = WidgetManager.Register(&inkwell.HotspotDebug{
-	Name: "hotspot_debug",
+	Name:    "hotspot_debug",
+	When:    whenDebug,
+	Enabled: true,
 })
