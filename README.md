@@ -95,8 +95,10 @@ The same flag switches on the engine's `HotspotDebug` overlay, registered in
 `widget.hotspot_debug.go` with `When: whenDebug` and `Enabled: true`: every
 clickable on screen gets a translucent plate with its name written across it,
 a different colour per kind — hotspots, exits, the characters in the scene,
-the items in the inventory, the two Armilla slots. `F1` hides and shows it
-during a debug run; outside one the widget never ticks, like the menu.
+the items in the inventory, the two Armilla slots. The HUD's own targets get
+the plate alone, since the HUD already prints its labels, and the menu opens
+on top of the overlay. `F1` hides and shows it during a debug run; outside
+one the widget never ticks, like the menu.
 
 ```
 DEBUG
