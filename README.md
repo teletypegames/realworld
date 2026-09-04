@@ -616,7 +616,7 @@ field in a literal:
 | `TapeSay`, a second spelling of `Say` that skipped the speech bubble | `Speaker.Voice` — `VoiceLog` sends a speaker's lines to the log |
 | a `Tapes` map of display names | `Speaker.Label` |
 | a `Character` per cassette, so that it could speak | `inkwell.Speaker` and `Game.SpeakerManager`: a voice with no body |
-| `inc.SceneAlley`, `inc.ItemMysteryTape`: a string constant per entity, looked up by name at boot | every manager holds pointers and every reference is typed — `*Asset`, `*Item`, `*Stage`, `Talker`, `SceneRef` — so the compiler holds the graph and the editor follows a field to its struct |
+| `inc.SceneAlley`, `inc.ItemMysteryTape`: a string constant per entity, looked up by name at boot | every manager holds pointers and every reference is typed — `*Asset`, `*Item`, `*Stage`, `*Scene`, `Talker` — so the compiler holds the graph and the editor follows a field to its struct |
 | a dialog node per game state a cassette answers from | `inkwell.Reply(speaker, func(*State) Text)`: the line decided when spoken |
 | a `gate` wrapper and `if !World.HUDVisible()` at the top of every `Draw` | `Widget.When`, an `inkwell.Condition` the engine evaluates |
 | a `titleBar` widget that pushed the scene title into the top bar | `TopBar` already discovers the title; `NoteVar` adds the "— paused" |
