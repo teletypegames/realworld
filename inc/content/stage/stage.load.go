@@ -9,8 +9,8 @@ import (
 
 type loadScreen struct{}
 
-var _ = StageManager.Register(Stage{
-	Name: inc.StageLoad,
+var Load = StageManager.Register(&Stage{
+	Name: "load",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "LOAD"},
 		{Lang: "hu", Text: "BETÖLTÉS"},
@@ -19,7 +19,7 @@ var _ = StageManager.Register(Stage{
 
 var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	Name:   "load_menu",
-	When:   inkwell.OnStage(inc.StageLoad),
+	When:   inkwell.OnStage(Load),
 	Sticky: true,
 	Bounds: window(360, 180),
 	Root: inkwell.MenuItem{
@@ -31,7 +31,7 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	},
 })
 
-var _ = widget.WidgetManager.Register(escapeToMenu("load_escape", inc.StageLoad))
+var _ = widget.WidgetManager.Register(escapeToMenu("load_escape", Load))
 
 func (loadScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 	var rows []inkwell.MenuItem
@@ -42,7 +42,7 @@ func (loadScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 			Enabled: fixed(info.Exists),
 			Do: inkwell.Seq(
 				inkwell.LoadSlot(info.Slot),
-				inkwell.GoToStage(inc.StageGame),
+				inkwell.GoToStage(Game),
 			),
 		})
 	}

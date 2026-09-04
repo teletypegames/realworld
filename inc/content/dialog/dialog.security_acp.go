@@ -4,15 +4,19 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/item"
+	"realworld/inc/content/script"
+	"realworld/inc/content/speaker"
 )
 
-var _ = DialogManager.Register(Dialog{
-	Name:  inc.DialogSecurityACP,
+var SecurityACP = DialogManager.Register(&Dialog{
+	Name:  "security_acp",
 	Start: "root",
 	Nodes: []inkwell.DialogNode{{
 		Name: "root",
 		Lines: []inkwell.DialogLine{{
-			Speaker: inc.SecurityACP,
+			Speaker: character.SecurityACP,
 			Text: inkwell.Text{
 				{Lang: "en", Text: "UNREGISTERED PRESENCE. STATE YOUR BUSINESS."},
 				{Lang: "hu", Text: "NEM REGISZTRÁLT JELENLÉT. KÖZÖLJE A CÉLJÁT."},
@@ -25,15 +29,15 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Kitől kaptad az utasításaidat?"},
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.SecurityACP, inkwell.Text{
+					inkwell.Say(character.SecurityACP, inkwell.Text{
 						{Lang: "en", Text: "THE OPERATOR. NOBODY ENTERS. THE SIMULATION IS NOT INTERRUPTED. NO TAPE IS CARRIED IN."},
 						{Lang: "hu", Text: "AZ OPERÁTOR. SENKI NEM LÉP BE. A SZIMULÁCIÓ NEM SZAKÍTHATÓ MEG. KAZETTA NEM VIHETŐ BE."},
 					}),
-					inkwell.Say(inc.SecurityACP, inkwell.Text{
+					inkwell.Say(character.SecurityACP, inkwell.Text{
 						{Lang: "en", Text: "VOICEPRINT OF THE OPERATOR MATCHES THE SUBJECT IN THE CHAIR. THIS IS NOT A CONTRADICTION."},
 						{Lang: "hu", Text: "AZ OPERÁTOR HANGMINTÁJA EGYEZIK A SZÉKBEN ÜLŐ ALANYÉVAL. EZ NEM ELLENTMONDÁS."},
 					}),
-					inkwell.Say(inc.Dex, inkwell.Text{
+					inkwell.Say(speaker.Dex, inkwell.Text{
 						{Lang: "en", Text: "Norman locked himself in. Or somebody with his voice did."},
 						{Lang: "hu", Text: "Norman zárta be magát. Vagy valaki az ő hangjával."},
 					}),
@@ -46,7 +50,7 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Hadd beszéljek Normannel."},
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.SecurityACP, inkwell.Text{
+					inkwell.Say(character.SecurityACP, inkwell.Text{
 						{Lang: "en", Text: "DENIED. THE SUBJECT IS NOT AVAILABLE FOR CONVERSATION. THE SUBJECT IS THE CONVERSATION."},
 						{Lang: "hu", Text: "MEGTAGADVA. AZ ALANY NEM ELÉRHETŐ BESZÉLGETÉSRE. AZ ALANY MAGA A BESZÉLGETÉS."},
 					}),
@@ -59,11 +63,11 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Mi az a szimuláció?"},
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.SecurityACP, inkwell.Text{
+					inkwell.Say(character.SecurityACP, inkwell.Text{
 						{Lang: "en", Text: "CLASSIFIED. BVK NEURAL INTERFACE, PROTOTYPE TWO. HOST: ONE. UPTIME: CLASSIFIED."},
 						{Lang: "hu", Text: "MINŐSÍTETT. BVK NEURÁLIS INTERFÉSZ, KETTES PROTOTÍPUS. GAZDA: EGY. ÜZEMIDŐ: MINŐSÍTETT."},
 					}),
-					inkwell.Say(inc.Paul, inkwell.Text{
+					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "Host: one. He's not running it. He is it."},
 						{Lang: "hu", Text: "Gazda: egy. Nem ő futtatja. Ő maga az."},
 					}),
@@ -77,11 +81,11 @@ var _ = DialogManager.Register(Dialog{
 				},
 				Show: inkwell.Given{
 					Var:     inc.VarSlot2,
-					Is:      inc.ItemSupportTape,
+					Is:      item.SupportTape,
 					NotFlag: inc.FlagACPDistracted,
 				},
 				Actions: []inkwell.Action{
-					inkwell.RunScript(inc.ScriptACPDistracted),
+					inkwell.RunScript(script.ACPDistracted),
 					inkwell.EndDialog(),
 				},
 			},
@@ -91,7 +95,7 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Hagyjuk."},
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.SecurityACP, inkwell.Text{
+					inkwell.Say(character.SecurityACP, inkwell.Text{
 						{Lang: "en", Text: "ACCESS DENIED."},
 						{Lang: "hu", Text: "HOZZÁFÉRÉS MEGTAGADVA."},
 					}),

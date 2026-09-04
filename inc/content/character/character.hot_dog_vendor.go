@@ -3,12 +3,11 @@ package character
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
 	"realworld/inc/system/theme"
 )
 
-var _ = CharacterManager.Register(Character{
-	Name: inc.HotDogVendor,
+var HotDogVendor = CharacterManager.Register(&Character{
+	Name: "hot_dog_vendor",
 	Label: inkwell.Text{
 		{Lang: "en", Text: "hot dog vendor"},
 		{Lang: "hu", Text: "hotdogárus"},

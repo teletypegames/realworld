@@ -50,7 +50,7 @@ carrying English first and every other language the game speaks after it, in
 the same file, at the same place:
 
 ```go
-OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+OnLook: inkwell.Say(character.Paul, inkwell.Text{
 	{Lang: "en", Text: "Keypad. Four digits, worn keys."},
 	{Lang: "hu", Text: "Billentyűzet. Négy számjegy, kopott gombok."},
 }),
@@ -118,11 +118,10 @@ already fallen off, and now two directories have.
   type, its `Manager`, and whatever else the category shares.
 - Every other file in a package holds exactly one entity: one scene, one
   item, one screen. The file registers it itself, as a declaration.
-- Two things have no category. `inc/constants.go` is the vocabulary every
-  package imports, and `main.go` builds the game — flags, one `inkwell.Game`
-  literal, and
-  `inkwell.Run` — beside the two one-line files a `-tags debug` build picks
-  between.
+- Two things have no category. `inc/constants.go` holds the world-state keys
+  every package imports — flags, vars, notes — and `main.go` builds the game:
+  flags, one `inkwell.Game` literal, and `inkwell.Run`, beside the two one-line
+  files a `-tags debug` build picks between.
 - `inc/system/` is the one directory that is a group *and* a package. The group
   is its subdirectories; the package is the single file `system.go`, which holds
   `System`, the singleton every other package reaches through.
@@ -136,7 +135,7 @@ already fallen off, and now two directories have.
 main.go                                  flags, one Game literal, inkwell.Run
 main.debug.go                            debugBuild = true, behind -tags debug
 main.release.go                          debugBuild = false, without it
-inc/constants.go                         entity names and world-state keys
+inc/constants.go                         world-state keys: flags, vars, notes
 inc/util/util.color.go                   RGB and RGBA, hex to color.Color
 
 inc/system/system.go                     System: the binding, the mode, the note
@@ -155,16 +154,20 @@ inc/content/scene/scene.selector.go      the map screen: pins derived from the g
 inc/content/scene/scene.*.go             one file per scene
 inc/content/background/background.manager.go  one asset per registered scene
 inc/content/character/character.*.go     the cast: people who stand in a scene
+inc/content/speaker/speaker.*.go         the voices with no body: Dex and the tape cards
 inc/content/item/item.*.go               inventory
 inc/content/dialog/dialog.*.go           dialog trees
 inc/content/script/script.*.go           named action sequences
-inc/content/tape/tape.manager.go         the Tape entity, the Speakers derived from it
+inc/content/tape/tape.manager.go         the Tape entity and the lookups over it
 inc/content/tape/tape.slots.go           the two Armilla slots, as hotspots
-inc/content/tape/tape.*.go               one card per file: label, colour, the dialog it plays
+inc/content/tape/tape.channel.go         the log the tapes talk into
+inc/content/tape/tape.*.go               one card per file: its item, its voice, the dialog it plays
 ```
 
-`inc` is constants and nothing else, so every package can import it and it can
-import none of them. The assembly is the other end of that: it is the one thing
+`inc` is state keys and nothing else — the strings a `State` is indexed by,
+which a save file writes down — so every package can import it and it can
+import none of them. Everything that used to be a name constant beside them is
+an entity variable in its own package now; see **References are pointers**. The assembly is the other end of that: it is the one thing
 that has to name every package at once, so it can be named by none of them, and
 it sits in `main.go`. It cannot live in `system` beside `System` — half the game
 imports `system`, and a package cannot be imported by what it imports.
@@ -212,15 +215,18 @@ package character
 
 type Character = inkwell.Character
 
-var CharacterManager = inkwell.NewManager[Character]()
+var CharacterManager = inkwell.NewManager[*Character]()
 ```
 
-Read from `main.go` the nine of them still line up as a list —
-`background.BackgroundManager`, `character.CharacterManager`,
-`dialog.DialogManager`, `item.ItemManager`, `scene.SceneManager`,
-`script.ScriptManager`, `tape.TapeManager`, `theme.ThemeManager`,
-`widget.WidgetManager` — only now the list is a consequence of the imports
-rather than a block someone has to keep in step.
+Every manager holds **pointers**, `Manager[*Character]` and never
+`Manager[Character]`, so the variable an entity file binds and the entry the
+engine looks up are one instance. Read from `main.go` the ten of them still
+line up as a list — `background.BackgroundManager`,
+`character.CharacterManager`, `dialog.DialogManager`, `item.ItemManager`,
+`scene.SceneManager`, `script.ScriptManager`, `speaker.SpeakerManager`,
+`tape.TapeManager`, `theme.ThemeManager`, `widget.WidgetManager` — only now
+the list is a consequence of the imports rather than a block someone has to
+keep in step.
 
 Aliases of engine structs already carry `GetName()` and satisfy
 `inkwell.Named`, which is the whole of what a manager asks of them.
@@ -238,29 +244,35 @@ the engine, so there is nothing left for a second type to hold.
 `Tape` is the exception, and it is a real one: a tape is a card you push into
 a device, and it talks back like a chatbot — a thing inkwell has no notion of.
 It is **not a character**: nobody on a cassette stands in a scene, walks, or
-has a sprite. A tape file is the card in one literal — its `Label`, its
-`Color`, the `Item` that carries it, the name of the `Dialog` it plays and
-`OnInsert`, the first thing it says when it clicks into slot two. The
-dialog itself is a file in `dialog/` like every other tree, because a
-conversation is written and read on its own, and the card only has to say
-which one is its. `OnInsert` runs after `script.tape_insert.go`, which is the
-part of an insertion every card shares — Paul's hand and Dex's remark — so the
-generic script never has to know which card went in.
+has a sprite. A tape file is the card in one literal — the `Item` that carries
+it, the `Speaker` that is its voice, the `Dialog` it plays and `OnInsert`, the
+first thing it says when it clicks into slot two. All three are pointers to the
+entity itself, in the package that owns it. The dialog is a file in `dialog/`
+like every other tree, because a conversation is written and read on its own,
+and the card only has to say which one is its. `OnInsert` runs after
+`script.tape_insert.go`, which is the part of an insertion every card shares —
+Paul's hand and Dex's remark — so the generic script never has to know which
+card went in.
 
-`tape.manager.go` derives the voice. Every tape is an `inkwell.Speaker` with
-`VoiceLog`, registered into `tape.Speakers`, which is what `main.go` hands the
-engine as its `SpeakerManager`. Dex is one of these cards — the one in slot
-one — which is why he is not in `character/` beside Paul and the people Paul
-meets. One voice there is a character with no body on purpose: the security
-ACP is a room-scale system, so it stands in its scene as a `Character` with
-`Voice: inkwell.VoiceLog`, and speaks through the log. The two lookups are
-`tape.Of`, the tape an item is, and `tape.Dialog`, the dialog to run for a
-loaded item, which is the card's own or Dex's when the card names none.
+The voice is declared, not derived. `speaker/` holds one `inkwell.Speaker` per
+voice with no body — `speaker.Dex`, `speaker.TapeSupport`, … — each with its
+`Label`, its `Color` and `VoiceLog`, so the line lands in the channel and never
+in a bubble; `speaker.SpeakerManager` is what `main.go` hands the engine. It
+used to be derived from the cards, and that is exactly why a dialog could not
+name the voice it was giving a line to: the voice lived one package *above*
+it. Dex is such a voice and such a card — `speaker.Dex` says how he sounds,
+`tape.Dex` is the cassette in slot one — which is why he is in neither
+`character/` nor only in `tape/`. One voice stays a character on purpose: the
+security ACP is a room-scale system, so it stands in its scene as a
+`Character` with `Voice: inkwell.VoiceLog`, and speaks through the log. The
+two lookups are `tape.Of`, the card an item is, and `tape.DialogOf`, the
+dialog to run for a loaded item, which is the card's own or Dex's when the
+card names none.
 
 What a dialog answers with, and when, is the engine's. A choice that is only
 offered under a condition says so in `Show`, and the condition is written as a
 literal, `inkwell.Given`, with every requirement a field: `Flag`, `NotFlag`,
-`Item`, `NotItem`, `Var` with `Is`. An answer that branches is an `inkwell.If`
+`Item` and `NotItem` as the `*Item` itself, `Var` with `Is`. An answer that branches is an `inkwell.If`
 over the same `Given`; an answer that has to be computed is
 `inkwell.Reply(speaker, func(*inkwell.State) inkwell.Text)`, `Say` with the
 line decided when it is spoken.
@@ -269,25 +281,76 @@ line decided when it is spoken.
 
 An entity file is a literal and nothing else. No constructor function, no list
 somewhere else to keep in step, and no procedure either — the file *is* the
-declaration that hands itself to its manager:
+declaration that hands itself to its manager, and binds the result to the one
+exported variable every other file refers to it by:
 
 ```go
 package tape
 
-var _ = TapeManager.Register(Tape{
-	Name: inc.TapeSupport,
-	Label: inkwell.Text{
-		{Lang: "en", Text: "TECH SUPPORT"},
-		{Lang: "hu", Text: "ÜGYFÉLSZOLGÁLAT"},
-	},
-	Color: theme.AmberPale,
+var Support = TapeManager.Register(&Tape{
+	Name:    "tape_support",
+	Item:    item.SupportTape,
+	Speaker: speaker.TapeSupport,
+	Dialog:  dialog.SupportTape,
 })
 ```
 
 `Register` returns what it registered, which is the whole of what makes this
 possible: a statement can only stand in a function body, an expression can
-stand in a variable initialiser. The result goes to `_` because an entity
-needs no name — the file name says which one it is.
+stand in a variable initialiser. The variable is the entity's name in code;
+the `Name` field is its name in a save file, and nowhere else.
+
+### References are pointers
+
+A reference to an entity is the entity: `Item: item.SupportTape`, not a string
+somebody has to look up. The engine's fields and constructors are typed that
+way — `Stage.Background *Asset`, `SceneActor.Character *Character`,
+`Say(speaker Talker, …)`, `Give(*Item)`, `GoToStage(*Stage)` — so a name
+nobody registered is a compile error, the editor follows a field to the struct
+it names, and `inc/constants.go` is left with the strings that really are
+strings: the keys a `State` is indexed by.
+
+The cost is that a reference is an import, and imports may not form a cycle,
+so the content packages stand in a strict order and a reference only ever
+points **down**:
+
+```
+character, speaker ← item ← script ← dialog ← tape ← scene ← background ← stage
+```
+
+A dialog can give a line to `speaker.Dex` and hand out `item.NoodleLetter`,
+but it cannot move the player to a scene: `scene` is above it. That is not a
+gap in the engine but the price of the compiler holding the graph, and the
+answer is the one the layering always gave — the dialog sets a flag, and the
+scene's trigger does the moving.
+
+**Scenes name each other through their type.** Go forbids two package-level
+variables from referring to each other in their initialisers, and two scenes
+that lead to each other do exactly that, so `Exit.To` and `GoTo` take an
+`inkwell.SceneRef` rather than a `*Scene`. Every scene file already declares an
+empty type named after itself for its helpers; that type is the reference:
+
+```go
+type street struct{}
+
+var Street = SceneManager.Register(&Scene{ … })
+
+func (street) Scene() *inkwell.Scene { return Street }
+```
+
+Another scene writes `To: street{}`, the engine asks it at run time, and the
+cycle is gone because a type is not a dependency. The selector's pins are
+derived exits, built after every variable exists, so they hold the `*Scene`
+itself; `leadsTo` recognises an exit to the map by asserting `exit.To` to
+`selector`.
+
+**What stays a string.** `Name`, because a save file, a `State` var and the
+`-scene` flag have to find the entity again from outside the process — `main`
+turns the flag into a scene with `scene.SceneManager.MustGet`. Slot two is a
+`State` var holding an item's `Name`, and `armilla.Slot2()` turns it back into
+the `*Item` through the engine's `ItemManager`. Hotspot and trigger names, which
+are labels inside one literal. Dialog node names, which are inside one tree.
+And every flag and var, which is what `inc` is for.
 
 This is not only two lines and an indent level shorter than an `init()`. A
 package-level variable is initialised in **dependency order**, so the manager
@@ -297,9 +360,8 @@ variable is ready before any `init()` runs. The registration order is
 unchanged: still the order the files are presented in, which is alphabetical,
 and still nothing may depend on it.
 
-Three files keep an `init()`, and all three earn it. `background.manager.go`
-loops over the scene deck, and `tape.manager.go` loops over the cards to
-derive a speaker from each; a loop is not an expression. `tape.slots.go` builds a
+Two files keep an `init()`, and both earn it. `background.manager.go` loops
+over the scene deck; a loop is not an expression. `tape.slots.go` builds a
 value that has to be wired to itself — `panel.Hotspots = panel.hotspots` —
 which a composite literal cannot do. Where a file is assembly before it is an
 entity, `init()` is the honest word for it; contorting those two into
@@ -308,13 +370,13 @@ declarations would cost more than it saves.
 Backgrounds are the one category with no per-entity file, and it is not an
 exception to the rule so much as the rule reaching its limit: every one of the
 twenty-four was the same three fields, and two of the three were the scene's own
-name spelled twice more. `Scene.Background` now defaults to the scene's `Name`
-(`inkwell.Scene.BackgroundAsset`), so a scene file says nothing about its
-picture, and `background.manager.go` registers one asset per registered scene:
+name spelled twice more. A scene file says nothing about its picture, and
+`background.manager.go` registers one asset per registered scene and writes it
+into the scene, through the pointer the manager holds:
 
 ```go
-scene.SceneManager.Each(func(entity scene.Scene) {
-	BackgroundManager.Register(Background{
+scene.SceneManager.Each(func(entity *scene.Scene) {
+	entity.Background = BackgroundManager.Register(&Background{
 		Name: entity.Name,
 		Path: "assets/bg/" + entity.Name + ".png",
 		Kind: inkwell.AssetImage,
@@ -324,7 +386,9 @@ scene.SceneManager.Each(func(entity scene.Scene) {
 
 That is what makes `background → scene` the right direction: the asset is
 *derived from* the deck, so the deriving package imports the source. Adding a
-scene is now a PNG whose name matches.
+scene is now a PNG whose name matches. A picture that belongs to exactly one
+thing needs neither a file nor a variable: the splash logo is a literal nested
+in its stage's `Background`, registered in place.
 
 Adding an entity is adding a file. Deleting one is deleting a file.
 
@@ -340,7 +404,7 @@ hangs its helpers off that:
 ```go
 type alley struct{}
 
-var _ = SceneManager.Register(Scene{
+var Alley = SceneManager.Register(&Scene{
 	…
 	Hotspots: alley{}.hotspots(),
 })
@@ -350,7 +414,13 @@ func (place alley) hotspots() []inkwell.Hotspot {
 }
 
 func (alley) bin() inkwell.Hotspot { … }
+
+func (alley) Scene() *inkwell.Scene { return Alley }
 ```
+
+The last method is the one every scene file has, helpers or not: it is what
+makes `alley{}` a reference another scene can write in an `Exit`, under
+**References are pointers**.
 
 `alley{}` in the literal rather than a local is the same rule read from the
 other end: the type is the namespace, so naming an instance of it adds a word
@@ -365,7 +435,7 @@ data rather than build it, the type is not empty and the data are its fields:
 `useWithFail` and answers with `fail.paul.At(n)` and `fail.dex.At(n)`.
 
 The rule stops where the package is already the namespace: `armilla.Slot2`,
-`armilla.Insert` and `tape.Dialog` stay functions, because a receiver there
+`armilla.Insert` and `tape.DialogOf` stay functions, because a receiver there
 would be an empty word. `system` is the other way round — the receiver is
 the whole point, so everything it offers is a method on `System`.
 
@@ -374,9 +444,10 @@ alphabetical**. Nothing may depend on it — including the order the debug menu
 lists the scenes in, which is simply the order the files sit in.
 
 A package initialises only if something imports it. `main.go` names every one
-of them for a manager, which is import enough — `tape` for `tape.Speakers`.
-That list is **per package, not per entity** — a new scene file still touches
-nothing but itself.
+of them for a manager, which is import enough; `tape` is the one it imports
+blank, because the cards register into `speaker` and `widget` managers and
+nothing in the literal is theirs. That list is **per package, not per entity**
+— a new scene file still touches nothing but itself.
 
 ### Widgets name their layer instead of their order
 
@@ -443,7 +514,7 @@ game := inkwell.New(inkwell.Game{
 	ItemManager:      item.ItemManager,
 	SceneManager:     scene.SceneManager,
 	ScriptManager:    script.ScriptManager,
-	SpeakerManager:   tape.Speakers,
+	SpeakerManager:   speaker.SpeakerManager,
 	ThemeManager:     theme.ThemeManager,
 	WidgetManager:    widget.WidgetManager,
 })
@@ -451,9 +522,7 @@ game := inkwell.New(inkwell.Game{
 
 `New` fills in an empty manager for every category a caller leaves out, so the
 nine above are the nine we own and the tenth, `VerbManager`, is the engine's
-four SCUMM verbs untouched. `SpeakerManager` is the one that is not a package's
-own registry but derived from one: the cards in `tape`, each a voice with no
-body.
+four SCUMM verbs untouched.
 
 Themes used to be the odd one out — `NewGame` seeded its `ThemeManager` with
 four presets, so handing ours over would have thrown them away, and the game
@@ -488,13 +557,14 @@ game := inkwell.New(inkwell.Game{
 	Height:      widget.ScreenHeight,
 	WindowScale: 2,
 
-	StartScene:   *start,
-	StartScript:  inc.ScriptOpening,
-	FinaleScript: finaleScript,
-	StartTheme:   inc.RealWorld,
-	Flags:        flags,
+	StartStage:   chosen.startStage(),
+	StartScene:   chosen.scene(),
+	StartScript:  script.Opening,
+	FinaleScript: chosen.finaleScript(),
+	StartTheme:   theme.RealWorld,
+	Flags:        chosen.flags(),
 
-	Player:      inc.Paul,
+	Player:      character.Paul,
 	WalkOnClick: true,
 	Walkboxes:   scene.Floor,
 	ExitLook:    script.ExitLook,
@@ -507,10 +577,12 @@ game := inkwell.New(inkwell.Game{
 The opening a player sees is content like every other script, in
 `script/script.opening.go`, named by `StartScript` rather than built as a slice
 in the wiring. `FinaleScript` is the engine's slot for a closing script, queued
-straight after the opening; `-finale` is what fills it, which is why it is a
-local computed from the flag rather than a method called afterwards. `Flags` is
-the same shape for `-debug`: a boot flag list, not a reach into `State` after
-construction.
+straight after the opening; `-finale` is what fills it, and `nil` is an
+ordinary run. `Flags` is the same shape for `-debug`: a boot flag list, not a
+reach into `State` after construction. Every one of these is the entity
+itself — `script.Opening`, `theme.RealWorld`, `character.Paul` — and the one
+that arrives as a string, the `-scene` flag, becomes one through
+`scene.SceneManager.MustGet` before it reaches the literal.
 
 `ExitLook`, `ExitTake` and `UseWithFail` are the three responses the engine asks
 the game for, and all three are `script` functions — a line the player reads
@@ -518,8 +590,8 @@ belongs with the rest of the writing, not in the wiring.
 
 The command line is a type rather than four loose pointers: `options` carries
 what the flags chose, and the two answers the literal needs that a flag does not
-give directly are methods on it — `chosen.finaleScript()`, which is `""` for an
-ordinary run, and `chosen.flags()`, which is where `-debug` and `debugBuild`
+give directly are methods on it — `chosen.finaleScript()`, which is `nil` for
+an ordinary run, and `chosen.flags()`, which is where `-debug` and `debugBuild`
 meet. `chosen.game()` holds the literal. That is the same rule the entity files
 follow: a file's helpers hang off the file's own type, so `main` grows methods
 rather than package functions with names nobody else can use.
@@ -534,7 +606,7 @@ Six lines — `main` used to be twelve assignments and four method calls.
 A **stage** is one full-screen thing the game shows, and exactly one shows at
 a time: the main menu, the load and save screens, settings, the credits — and
 the game itself, which is the point. The world is not the thing every other
-screen floats over; it is one of the screens, `inc.StageGame`, the only one
+screen floats over; it is one of the screens, `stage.Game`, the only one
 with `World: true`.
 
 Off the world stage inkwell does not paint the scene, does not walk the
@@ -551,8 +623,11 @@ registers a `Stage` and an `inkwell.TextCard`. That is the same shape
 `tape.slots.go` already has: a content file registering a widget.
 
 The HUD needed one line, not fourteen. `widget.WhenPlaying` is now
-`And(OnStage(inc.StageGame), Not(inCutscene))`, so every HUD widget
-disappears off the game stage without knowing stages exist. Note which way
+`And(OnWorld(), Not(inCutscene))`, so every HUD widget disappears off the
+game stage without knowing stages exist — and without naming one, which it
+could not: `stage` registers its menus into `widget`, so `widget` naming
+`stage.Game` back would be an import cycle. `inkwell.OnWorld` says the thing
+the HUD means, "the Stage showing is the world", whichever Stage that is. Note which way
 round that is: **not being in a cutscene is the default**, so a fresh `State`
 after a New Game is a playing one, and nothing has to remember to set the
 mode back.
@@ -561,12 +636,12 @@ mode back.
 which is what lets a menu row say the whole of what it means at once:
 
 ```go
-Do: inkwell.Seq(inkwell.Restart(), inkwell.GoToStage(inc.StageGame)),
+Do: inkwell.Seq(inkwell.Restart(), inkwell.GoToStage(stage.Game)),
 ```
 
 The front door is two splash cards before the menu, `stage.splash_studio.go`
-— the Teletype Games logo, a 640×380 `Background` the file registers as an
-asset itself — and `stage.splash_title.go`, and each is a `Stage` that says
+— the Teletype Games logo, a 640×380 `Background` nested in the literal as the
+asset it is — and `stage.splash_title.go`, and each is a `Stage` that says
 how long it shows and where it goes: `Hold: 2`, `Next`, and a `Transition` of
 `inkwell.Fade(0.5)` it leaves through. A `Transition` is the leaving Stage's,
 so the menu and its sub-screens, which name none, keep cutting. The two
@@ -574,7 +649,7 @@ numbers are shared in `stage.manager.go`.
 
 `-scene` and `-finale` skip the front door: both mean somebody wants to look
 at the game, not at its splash cards or main menu, so `options.startStage`
-answers `inc.StageGame` for either.
+answers `stage.Game` for either.
 
 ## The system
 
@@ -626,11 +701,14 @@ fiction the code models as a package of its own: slot two and a phosphor text
 strip.
 
 ```go
-armilla.Slot2()          armilla.Insert(item)          armilla.StripIfEmpty(text)
+armilla.Slot2()          armilla.Insert(cassette)      armilla.StripIfEmpty(text)
 ```
 
 Both are `State` vars — `inc.VarSlot2` and `inc.VarArmillaStrip`, both spelled
-`armilla.…`, so the save file says the same word the package does. There is no
+`armilla.…`, so the save file says the same word the package does. The slot
+holds the cassette's `Name`, because a `State` var has to survive a save;
+`Slot2()` hands back the `*inkwell.Item` itself, found through the engine's
+`ItemManager`, and `Insert` takes one. There is no
 package state left at all, which is why there is no `Reset` either: it had
 nothing to clear once the pending cassette and the waiting tape went.
 
@@ -644,15 +722,16 @@ mechanic was authored, documented as a `SPACE` control, and dead. When content
 wants it back, the declarative shape is an engine action that waits for a key,
 not a package holding a flag the letterbox polls.
 
-`armilla.Insert` is a `Seq` of three engine actions and no Go: set slot two,
-take the cassette out of the inventory, write the strip. `StripIfEmpty` is
+`armilla.Insert` is a `Seq` of three engine actions and no Go: set slot two
+to the cassette's name, take the cassette out of the inventory, write the
+strip. `StripIfEmpty` is
 `inkwell.SetVarIfEmpty` and nothing else. The strip is an `inkwell.Text` now
 rather than a bare English string, because `TopBar` resolves a `Text`-valued
 var into the player's language.
 
 `armilla` builds on `system` — slot 2 reads through `system.System.Game()` —
-and it knows nothing of `tape`: which dialog a cassette plays is `tape.Dialog`,
-asked by the slot, not by the device. It is `inc/system/` because
+and it knows nothing of `tape`: which dialog a cassette plays is
+`tape.DialogOf`, asked by the slot, not by the device. It is `inc/system/` because
 nobody authors a file into it, diegetic object or not. Its own names stay package
 functions, because `armilla` holds no `Armilla` value the way `system` holds
 `System` — there is one wrist, and the package is it.
@@ -663,13 +742,18 @@ over `system.System`, not over a parameter it would have had to be handed.
 ## Naming
 
 The package is the namespace, so an identifier never repeats what the package
-already says. It is `scene.Floor`, not `scene.SceneFloor`; `tape.Dialog`, not
-`tape.TapeDialog`; `System.Do`, not `System.DoAction`. Read the call site, not
-the declaration, when choosing a name:
+already says. It is `scene.Alley`, not `scene.SceneAlley`; `item.Trinket`, not
+`item.ItemTrinket`; `tape.DialogOf`, not `tape.TapeDialogOf`; `System.Do`, not
+`System.DoAction`. Read the call site, not the declaration, when choosing a
+name:
 
 ```go
-scene.Floor   tape.Of(item)   system.System.Do(action)   widget.ScreenWidth
+scene.Alley   item.Trinket   speaker.Dex   tape.Of(cassette)   system.System.Do(action)
 ```
+
+Inside its own package an entity drops the qualifier too — `SupportTape` in an
+item file, `MainMenu` in a stage file — because that is what the call site
+reads there.
 
 The manager is the one exception, and it keeps its prefix on purpose:
 `widget.WidgetManager`, `scene.SceneManager`, `theme.ThemeManager`. A manager is
@@ -678,19 +762,21 @@ assigned onto a `*Game` field beside the engine's own `CharacterManager`, or
 called from inside its own package's entity files, where `Manager.Register`
 would not say what is being registered.
 
-Entities themselves need no name at all — they are anonymous literals inside
-their file, handed straight to a manager, and the file name says which one it is.
+An entity's name in code is the exported variable its file binds —
+`scene.Alley`, `dialog.Keypad`, `speaker.TapeSupport` — and it is the name the
+file carries too: `scene.alley.go` declares `Alley`, and its helper type is
+`alley`. The `Name` field is a different thing, the key a save file uses, and
+nobody but the engine reads it.
 
 Exported names are the authoring vocabulary — what a content file spells out:
-the constants in `inc/constants.go`, each package's
+the entity variables, the state keys in `inc/constants.go`, each package's
 `<Category>Manager` and entity type, the colour tokens, the tape lookups
-(`tape.Of`, `tape.Dialog`) and `tape.Speakers`, the system
-(`system.System` and its methods `Do`, `Game`, `Attach`, …), the Armilla
-(`armilla.Slot2`, `armilla.Insert`, `armilla.StripIfEmpty`), the action
-constructors (`System.Paused`, `System.SetMode`) and the one HUD condition a
-content file has to name, `widget.WhenPlaying`. A tape's line is `inkwell.Say`
-like anyone else's — the tape voice is on the `Speaker` the manager derives,
-not on a second spelling of Say.
+(`tape.Of`, `tape.DialogOf`), the system (`system.System` and its methods
+`Do`, `Game`, `Attach`, …), the Armilla (`armilla.Slot2`, `armilla.Insert`,
+`armilla.StripIfEmpty`), the action constructors (`System.Paused`,
+`System.SetMode`) and the one HUD condition a content file has to name,
+`widget.WhenPlaying`. A tape's line is `inkwell.Say` like anyone else's — the
+tape voice is the `Speaker` in `speaker/`, not a second spelling of Say.
 
 Everything else stays unexported, and now the compiler holds the line: the HUD
 widgets (`hudFrame`, `slots`, …), the conditions `whenCutscene` and `whenDebug`,
@@ -706,9 +792,9 @@ display: `ScreenWidth`, `ScreenHeight`.
 The layering is the import graph, so the compiler keeps it:
 
 ```
-inc ← theme ← system ← armilla ← widget ← tape ← main
- ↑      ↑        ↑                  ↑      ↑
-util    └── content ────────────────┴──────┘
+inc ← theme ← system ← armilla ← widget ← main
+ ↑      ↑        ↑                  ↑
+util    └── character, speaker ← item ← script ← dialog ← tape ← scene ← background ← stage
 ```
 
 `inc` imports nothing and everything imports it, and `util` sits beside it on
@@ -716,29 +802,31 @@ the same footing — standard library only, no game in it. `system` knows nothin
 about the HUD or the content; both build on it, never the other way round — and
 an arrow pointing back is now an import cycle, not a review comment.
 
-Three edges inside the arrow are worth knowing, and they all point from a
-thing to what it is made of or derived from. `tape → widget`: the tape slots
-are a cassette thing that registers a widget, so the cassette sits above the
-HUD rather than below it — this is the arrow that used to run the other way.
-`stage → widget`: a screen registers the menu or card that draws it, for the
-same reason. And `background → scene`: an asset is derived from the deck, so
-the deriving package imports the source.
+The content row is a strict order because a reference is an import, and it
+reads as *what is made of what*: an item is looked at by a character, a script
+hands out items, a dialog runs scripts, a card carries an item and plays a
+dialog, a scene holds all of them, a background is derived from the scenes, a
+stage frames the lot. `tape → widget` and `stage → widget` point the same way:
+a cassette and a screen each register the widget that draws them. And the HUD
+names no stage back — `widget.WhenPlaying` reads `inkwell.OnWorld()` — which is
+the one place the strictness had to be paid for.
 
 `main` is at the very top, and it is the only place that names every package at
-once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other six
-are `inc/content/`, and no arrow leaves `system` for `content` any more.
+once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other
+nine are `inc/content/`, and no arrow leaves `system` for `content`.
 
 ## Adding a scene
 
-1. One constant in `inc/constants.go`: `Scene<Name>`
-2. `inc/content/scene/scene.<name>.go` — a `var _ = SceneManager.Register(Scene{…})`
-   with its `Title` and every `Label` written in both languages
-3. A 640×380 PNG at `assets/bg/<name>.png`
+1. `inc/content/scene/scene.<name>.go`, three declarations: `type <name> struct{}`,
+   `var <Name> = SceneManager.Register(&Scene{…})` with its `Title` and every
+   `Label` written in both languages, and
+   `func (<name>) Scene() *inkwell.Scene { return <Name> }`
+2. A 640×380 PNG at `assets/bg/<name>.png`
 
-Nothing else moves. There is no list to update, and nothing names the picture:
-a scene that says nothing about its `Background` takes an asset named after
-itself, and `background.manager.go` registers one per registered scene. The PNG
-file name is the pairing.
+Nothing else moves. There is no constant and no list to update; another scene
+reaches this one as `To: <name>{}`, and nothing names the picture:
+`background.manager.go` registers one asset per registered scene and writes it
+into the scene. The PNG file name is the pairing.
 
 ## The engine next door
 

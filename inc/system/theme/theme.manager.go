@@ -6,4 +6,4 @@ import (
 
 type Theme = inkwell.Theme
 
-var ThemeManager = inkwell.NewManager[Theme]()
+var ThemeManager = inkwell.NewManager[*Theme]()

@@ -3,7 +3,7 @@ package script
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
+	"realworld/inc/content/character"
 )
 
 var exitLook = inkwell.Text{
@@ -17,9 +17,9 @@ var exitTake = inkwell.Text{
 }
 
 func ExitLook(exit inkwell.Exit) inkwell.Action {
-	return inkwell.Say(inc.Paul, inkwell.Format(exitLook, exit.Label))
+	return inkwell.Say(character.Paul, inkwell.Format(exitLook, exit.Label))
 }
 
 func ExitTake(inkwell.Exit) inkwell.Action {
-	return inkwell.Say(inc.Paul, exitTake)
+	return inkwell.Say(character.Paul, exitTake)
 }

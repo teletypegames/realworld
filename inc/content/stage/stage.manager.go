@@ -4,13 +4,12 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"realworld/inc"
 	"realworld/inc/system/widget"
 )
 
 type Stage = inkwell.Stage
 
-var StageManager = inkwell.NewManager[Stage]()
+var StageManager = inkwell.NewManager[*Stage]()
 
 func window(width, height float64) inkwell.Rectangle {
 	return inkwell.Rect(
@@ -57,15 +56,15 @@ func slotValue(info inkwell.SlotInfo) inkwell.Text {
 func backRow() inkwell.MenuItem {
 	return inkwell.MenuItem{
 		Label: back,
-		Do:    inkwell.GoToStage(inc.StageMainMenu),
+		Do:    inkwell.GoToStage(MainMenu),
 	}
 }
 
-func escapeToMenu(name string, stage string) *inkwell.KeyBinding {
+func escapeToMenu(name string, stage *Stage) *inkwell.KeyBinding {
 	return &inkwell.KeyBinding{
 		Name: name,
 		When: inkwell.OnStage(stage),
 		Key:  ebiten.KeyEscape,
-		Do:   inkwell.GoToStage(inc.StageMainMenu),
+		Do:   inkwell.GoToStage(MainMenu),
 	}
 }

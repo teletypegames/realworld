@@ -4,20 +4,25 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/dialog"
+	"realworld/inc/content/item"
+	"realworld/inc/content/script"
+	"realworld/inc/content/speaker"
 	"realworld/inc/system"
 )
 
 type securityRoom struct{}
 
-var _ = SceneManager.Register(Scene{
-	Name: inc.SceneSecurityRoom,
+var SecurityRoom = SceneManager.Register(&Scene{
+	Name: "security_room",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "OBSERVATION ROOM — INSIDE THE STRUCTURE"},
 		{Lang: "hu", Text: "MEGFIGYELŐSZOBA — A SZERKEZET BELSEJÉBEN"},
 	},
 	Exits: []inkwell.Exit{
 		{
-			To: inc.SceneBridgeFoot,
+			To: bridgeFoot{},
 			Label: inkwell.Text{
 				{Lang: "en", Text: "back down"},
 				{Lang: "hu", Text: "vissza le"},
@@ -25,14 +30,14 @@ var _ = SceneManager.Register(Scene{
 			Side: inkwell.ExitNear,
 		},
 		{
-			To: inc.SceneSecretLab,
+			To: secretLab{},
 			Label: inkwell.Text{
 				{Lang: "en", Text: "the chamber door"},
 				{Lang: "hu", Text: "a kamra ajtaja"},
 			},
 			Side:  inkwell.ExitBack,
 			Needs: inc.FlagACPDistracted,
-			Blocked: inkwell.Say(inc.SecurityACP, inkwell.Text{
+			Blocked: inkwell.Say(character.SecurityACP, inkwell.Text{
 				{Lang: "en", Text: "ACCESS DENIED."},
 				{Lang: "hu", Text: "HOZZÁFÉRÉS MEGTAGADVA."},
 			}),
@@ -42,7 +47,7 @@ var _ = SceneManager.Register(Scene{
 		{
 			Name: "found",
 			When: inkwell.Not(inkwell.Flag(inc.FlagNormanFound)),
-			Do:   inkwell.RunScript(inc.ScriptNormanFound),
+			Do:   inkwell.RunScript(script.NormanFound),
 			Once: true,
 		},
 	},
@@ -65,15 +70,15 @@ func (securityRoom) glassWall() inkwell.Hotspot {
 			{Lang: "hu", Text: "tükörüveg"},
 		},
 		Area: inkwell.Rect(40, 40, 300, 150),
-		OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+		OnLook: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "Norman. In a chair, cables running out of a helmet. A monitor behind him, playing something."},
 			{Lang: "hu", Text: "Norman. Egy székben, kábelek futnak ki egy sisakból. Mögötte egy monitor, valami megy rajta."},
 		}),
-		OnUse: inkwell.Say(inc.Paul, inkwell.Text{
+		OnUse: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "It's a wall that happens to be glass. It doesn't open."},
 			{Lang: "hu", Text: "Egy fal, ami történetesen üveg. Nem nyílik."},
 		}),
-		OnTalk: inkwell.Say(inc.Dex, inkwell.Text{
+		OnTalk: inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "He can't hear you. He can't hear anything on this side."},
 			{Lang: "hu", Text: "Nem hall téged. Semmit nem hall ezen az oldalon."},
 		}),
@@ -88,11 +93,11 @@ func (securityRoom) monitors() inkwell.Hotspot {
 			{Lang: "hu", Text: "monitorfal"},
 		},
 		Area: inkwell.Rect(360, 40, 250, 110),
-		OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+		OnLook: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "The same sleeping man from six angles. One camera is pointed at the monitor behind him."},
 			{Lang: "hu", Text: "Ugyanaz az alvó ember hat szögből. Egy kamera a mögötte lévő monitort nézi."},
 		}),
-		OnUse: inkwell.Say(inc.Dex, inkwell.Text{
+		OnUse: inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "Look, don't touch. Somebody is very interested in every twitch he makes."},
 			{Lang: "hu", Text: "Nézd, ne fogd. Valakit nagyon érdekel minden rándulása."},
 		}),
@@ -101,11 +106,11 @@ func (securityRoom) monitors() inkwell.Hotspot {
 
 func (securityRoom) terminal() inkwell.Hotspot {
 	refused := inkwell.Seq(
-		inkwell.Say(inc.SecurityACP, inkwell.Text{
+		inkwell.Say(character.SecurityACP, inkwell.Text{
 			{Lang: "en", Text: "ACCESS DENIED. THE SIMULATION MAY NOT BE INTERRUPTED."},
 			{Lang: "hu", Text: "HOZZÁFÉRÉS MEGTAGADVA. A SZIMULÁCIÓ NEM SZAKÍTHATÓ MEG."},
 		}),
-		inkwell.Say(inc.SecurityACP, inkwell.Text{
+		inkwell.Say(character.SecurityACP, inkwell.Text{
 			{Lang: "en", Text: "NO TAPE MAY BE CARRIED IN. STANDING ORDER OF THE OPERATOR."},
 			{Lang: "hu", Text: "KAZETTA NEM VIHETŐ BE. AZ OPERÁTOR ÁLLANDÓ UTASÍTÁSA."},
 		}),
@@ -117,24 +122,26 @@ func (securityRoom) terminal() inkwell.Hotspot {
 			{Lang: "hu", Text: "biztonsági terminál"},
 		},
 		Area: inkwell.Rect(420, 160, 150, 90),
-		OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+		OnLook: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "Green phosphor. One line, repeating: ACCESS DENIED. There's an ACP behind it, and it's listening."},
 			{Lang: "hu", Text: "Zöld foszfor. Egy sor, ismétlődik: HOZZÁFÉRÉS MEGTAGADVA. Egy ACP van mögötte, és figyel."},
 		}),
-		OnTalk: system.System.Paused(inkwell.RunDialog(inc.DialogSecurityACP)),
+		OnTalk: system.System.Paused(inkwell.RunDialog(dialog.SecurityACP)),
 		OnUse: inkwell.If(inkwell.Flag(inc.FlagACPDistracted),
-			inkwell.Say(inc.Paul, inkwell.Text{
+			inkwell.Say(character.Paul, inkwell.Text{
 				{Lang: "en", Text: "Door release is unlocked. It's still on hold with Raj."},
 				{Lang: "hu", Text: "Az ajtónyitó szabad. Még mindig várakoztatja Raj."},
 			}),
-			inkwell.If(inkwell.VarEq(inc.VarSlot2, inc.ItemSupportTape),
-				inkwell.RunScript(inc.ScriptACPDistracted),
+			inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
+				inkwell.RunScript(script.ACPDistracted),
 				refused,
 			),
 		),
-		OnUseWithAny: inkwell.Say(inc.SecurityACP, inkwell.Text{
+		OnUseWithAny: inkwell.Say(character.SecurityACP, inkwell.Text{
 			{Lang: "en", Text: "FOREIGN OBJECT. ACCESS DENIED."},
 			{Lang: "hu", Text: "IDEGEN TÁRGY. HOZZÁFÉRÉS MEGTAGADVA."},
 		}),
 	}
 }
+
+func (securityRoom) Scene() *inkwell.Scene { return SecurityRoom }

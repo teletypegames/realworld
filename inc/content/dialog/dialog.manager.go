@@ -6,4 +6,4 @@ import (
 
 type Dialog = inkwell.Dialog
 
-var DialogManager = inkwell.NewManager[Dialog]()
+var DialogManager = inkwell.NewManager[*Dialog]()

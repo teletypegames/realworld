@@ -14,8 +14,9 @@ import (
 	"realworld/inc/content/item"
 	"realworld/inc/content/scene"
 	"realworld/inc/content/script"
+	"realworld/inc/content/speaker"
 	"realworld/inc/content/stage"
-	"realworld/inc/content/tape"
+	_ "realworld/inc/content/tape"
 	"realworld/inc/system"
 	"realworld/inc/system/theme"
 	"realworld/inc/system/widget"
@@ -62,25 +63,25 @@ func parseOptions() options {
 	}
 }
 
-func (chosen options) startStage() string {
+func (chosen options) startStage() *stage.Stage {
 	if chosen.startScene != "" || chosen.finale {
-		return inc.StageGame
+		return stage.Game
 	}
-	return inc.StageSplashStudio
+	return stage.SplashStudio
 }
 
-func (chosen options) scene() string {
+func (chosen options) scene() *scene.Scene {
 	if chosen.startScene == "" {
-		return inc.ScenePaulShop
+		return scene.PaulShop
 	}
-	return chosen.startScene
+	return scene.SceneManager.MustGet(chosen.startScene)
 }
 
-func (chosen options) finaleScript() string {
+func (chosen options) finaleScript() *script.Script {
 	if !chosen.finale {
-		return ""
+		return nil
 	}
-	return inc.ScriptFinale
+	return script.Finale
 }
 
 func (chosen options) flags() []string {
@@ -101,12 +102,12 @@ func (chosen options) game() *inkwell.Game {
 
 		StartStage:   chosen.startStage(),
 		StartScene:   chosen.scene(),
-		StartScript:  inc.ScriptOpening,
+		StartScript:  script.Opening,
 		FinaleScript: chosen.finaleScript(),
-		StartTheme:   inc.RealWorld,
+		StartTheme:   theme.RealWorld,
 		Flags:        chosen.flags(),
 
-		Player:      inc.Paul,
+		Player:      character.Paul,
 		WalkOnClick: true,
 		Walkboxes:   scene.Floor,
 		ExitLook:    script.ExitLook,
@@ -119,7 +120,7 @@ func (chosen options) game() *inkwell.Game {
 		ItemManager:      item.ItemManager,
 		SceneManager:     scene.SceneManager,
 		ScriptManager:    script.ScriptManager,
-		SpeakerManager:   tape.Speakers,
+		SpeakerManager:   speaker.SpeakerManager,
 		StageManager:     stage.StageManager,
 		ThemeManager:     theme.ThemeManager,
 		WidgetManager:    widget.WidgetManager,

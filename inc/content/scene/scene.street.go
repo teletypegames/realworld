@@ -4,12 +4,15 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/script"
+	"realworld/inc/content/speaker"
 )
 
 type street struct{}
 
-var _ = SceneManager.Register(Scene{
-	Name: inc.SceneStreet,
+var Street = SceneManager.Register(&Scene{
+	Name: "street",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "STREET"},
 		{Lang: "hu", Text: "UTCA"},
@@ -21,7 +24,7 @@ var _ = SceneManager.Register(Scene{
 		{
 			Name: "glitch",
 			When: inkwell.Not(inkwell.VarEq(inc.VarDecay, nil)),
-			Do:   inkwell.RunScript(inc.ScriptStreetGlitch),
+			Do:   inkwell.RunScript(script.StreetGlitch),
 		},
 	},
 	Hotspots: street{}.hotspots(),
@@ -43,7 +46,7 @@ func (street) ticker() inkwell.Hotspot {
 			{Lang: "hu", Text: "hírszalag"},
 		},
 		Area: inkwell.Rect(180, 30, 300, 40),
-		OnLook: inkwell.Reply(inc.Paul, func(state *inkwell.State) inkwell.Text {
+		OnLook: inkwell.Reply(character.Paul, func(state *inkwell.State) inkwell.Text {
 			switch state.Var(inc.VarDecay) {
 			case inc.DecayNormanFound:
 				return inkwell.Text{
@@ -61,7 +64,7 @@ func (street) ticker() inkwell.Hotspot {
 				{Lang: "hu", Text: "Időjárás, sport, licencamnesztia a BVK-tól. Egy közönséges kedd."},
 			}
 		}),
-		OnUse: inkwell.Say(inc.Paul, inkwell.Text{
+		OnUse: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "It's four storeys up. I read it, I don't operate it."},
 			{Lang: "hu", Text: "Négy emelet magasan van. Olvasom, nem kezelem."},
 		}),
@@ -76,7 +79,7 @@ func (street) streetlight() inkwell.Hotspot {
 			{Lang: "hu", Text: "pislákoló utcalámpa"},
 		},
 		Area: inkwell.Rect(520, 30, 40, 200),
-		OnLook: inkwell.Reply(inc.Paul, func(state *inkwell.State) inkwell.Text {
+		OnLook: inkwell.Reply(character.Paul, func(state *inkwell.State) inkwell.Text {
 			if state.Var(inc.VarDecay) == nil {
 				return inkwell.Text{
 					{Lang: "en", Text: "On in daylight. The city has never fixed a lamp in my lifetime."},
@@ -88,7 +91,7 @@ func (street) streetlight() inkwell.Hotspot {
 				{Lang: "hu", Text: "Mintázatban pislog. Hosszú, rövid, rövid. Megint. Ugyanaz a mintázat."},
 			}
 		}),
-		OnUse: inkwell.Say(inc.Dex, inkwell.Text{
+		OnUse: inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "Don't climb it. Whatever is talking through the grid, it isn't talking to you."},
 			{Lang: "hu", Text: "Ne mássz fel rá. Ami a hálózaton keresztül beszél, az nem hozzád beszél."},
 		}),
@@ -103,13 +106,15 @@ func (street) busStop() inkwell.Hotspot {
 			{Lang: "hu", Text: "buszmegálló"},
 		},
 		Area: inkwell.Rect(40, 110, 120, 130),
-		OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+		OnLook: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "A timetable and a BBS terminal with the screen kicked in. Somebody didn't like what it said."},
 			{Lang: "hu", Text: "Egy menetrend és egy BBS-terminál berúgott képernyővel. Valakinek nem tetszett, amit írt."},
 		}),
-		OnUse: inkwell.Say(inc.Paul, inkwell.Text{
+		OnUse: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "I'm not waiting for a bus. I've had my bus."},
 			{Lang: "hu", Text: "Nem várok buszra. Buszból megvolt a mai."},
 		}),
 	}
 }
+
+func (street) Scene() *inkwell.Scene { return Street }

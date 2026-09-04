@@ -4,12 +4,10 @@ import (
 	"strings"
 
 	inkwell "git.teletypegames.org/engines/inkwell"
-
-	"realworld/inc"
 )
 
 var exitToSelector = inkwell.Exit{
-	To: inc.SceneSelector,
+	To: selector{},
 	Label: inkwell.Text{
 		{Lang: "en", Text: "the rest of the city"},
 		{Lang: "hu", Text: "a város többi része"},
@@ -19,8 +17,8 @@ var exitToSelector = inkwell.Exit{
 
 type selector struct{}
 
-var _ = SceneManager.Register(Scene{
-	Name: inc.SceneSelector,
+var Selector = SceneManager.Register(&Scene{
+	Name: "selector",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SAN FRANCISCO"},
 		{Lang: "hu", Text: "SAN FRANCISCO"},
@@ -38,7 +36,7 @@ func (selector) fromGraph(game *inkwell.Game) []inkwell.Exit {
 			continue
 		}
 		exits = append(exits, inkwell.Exit{
-			To:    entity.Name,
+			To:    entity,
 			Label: pins.label(entity.Title),
 			Area:  pins.area(len(exits)),
 		})
@@ -46,9 +44,9 @@ func (selector) fromGraph(game *inkwell.Game) []inkwell.Exit {
 	return exits
 }
 
-func (selector) leadsTo(scene Scene) bool {
+func (selector) leadsTo(scene *Scene) bool {
 	for _, exit := range scene.Exits {
-		if exit.To == inc.SceneSelector {
+		if _, toSelector := exit.To.(selector); toSelector {
 			return true
 		}
 	}
@@ -76,3 +74,5 @@ func (selector) label(title inkwell.Text) inkwell.Text {
 		return name
 	})
 }
+
+func (selector) Scene() *inkwell.Scene { return Selector }

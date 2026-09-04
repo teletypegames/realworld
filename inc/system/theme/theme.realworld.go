@@ -1,7 +1,6 @@
 package theme
 
 import (
-	"realworld/inc"
 	"realworld/inc/util"
 )
 
@@ -17,8 +16,8 @@ var (
 	sceneBackground = util.RGB(0x241F18)
 )
 
-var _ = ThemeManager.Register(Theme{
-	Name:                    inc.RealWorld,
+var RealWorld = ThemeManager.Register(&Theme{
+	Name:                    "realworld-93",
 	PanelBG:                 black,
 	StatusText:              Ink,
 	FlashText:               Amber,

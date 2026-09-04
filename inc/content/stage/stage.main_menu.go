@@ -3,12 +3,11 @@ package stage
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
 	"realworld/inc/system/widget"
 )
 
-var _ = StageManager.Register(Stage{
-	Name: inc.StageMainMenu,
+var MainMenu = StageManager.Register(&Stage{
+	Name: "main_menu",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "REAL WORLD"},
 		{Lang: "hu", Text: "REAL WORLD"},
@@ -17,7 +16,7 @@ var _ = StageManager.Register(Stage{
 
 var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	Name:   "main_menu",
-	When:   inkwell.OnStage(inc.StageMainMenu),
+	When:   inkwell.OnStage(MainMenu),
 	Sticky: true,
 	Bounds: window(240, 200),
 	Root: inkwell.MenuItem{
@@ -33,7 +32,7 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 				},
 				Do: inkwell.Seq(
 					inkwell.Restart(),
-					inkwell.GoToStage(inc.StageGame),
+					inkwell.GoToStage(Game),
 				),
 			},
 			{
@@ -42,14 +41,14 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 					{Lang: "hu", Text: "Folytatás"},
 				},
 				Enabled: inkwell.Started(),
-				Do:      inkwell.GoToStage(inc.StageGame),
+				Do:      inkwell.GoToStage(Game),
 			},
 			{
 				Label: inkwell.Text{
 					{Lang: "en", Text: "Load"},
 					{Lang: "hu", Text: "Betöltés"},
 				},
-				Do: inkwell.GoToStage(inc.StageLoad),
+				Do: inkwell.GoToStage(Load),
 			},
 			{
 				Label: inkwell.Text{
@@ -57,21 +56,21 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 					{Lang: "hu", Text: "Mentés"},
 				},
 				Enabled: inkwell.Started(),
-				Do:      inkwell.GoToStage(inc.StageSave),
+				Do:      inkwell.GoToStage(Save),
 			},
 			{
 				Label: inkwell.Text{
 					{Lang: "en", Text: "Settings"},
 					{Lang: "hu", Text: "Beállítások"},
 				},
-				Do: inkwell.GoToStage(inc.StageSettings),
+				Do: inkwell.GoToStage(Settings),
 			},
 			{
 				Label: inkwell.Text{
 					{Lang: "en", Text: "Credits"},
 					{Lang: "hu", Text: "Készítők"},
 				},
-				Do: inkwell.GoToStage(inc.StageCredits),
+				Do: inkwell.GoToStage(Credits),
 			},
 			{
 				Label: inkwell.Text{

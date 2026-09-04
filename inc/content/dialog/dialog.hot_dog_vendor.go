@@ -4,15 +4,18 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/item"
+	"realworld/inc/content/speaker"
 )
 
-var _ = DialogManager.Register(Dialog{
-	Name:  inc.DialogHotDogVendor,
+var HotDogVendor = DialogManager.Register(&Dialog{
+	Name:  "hot_dog_vendor",
 	Start: "root",
 	Nodes: []inkwell.DialogNode{{
 		Name: "root",
 		Lines: []inkwell.DialogLine{{
-			Speaker: inc.HotDogVendor,
+			Speaker: character.HotDogVendor,
 			Text: inkwell.Text{
 				{Lang: "en", Text: "What'll it be? Onions are extra, opinions are free."},
 				{Lang: "hu", Text: "Mi legyen? A hagyma felár, a vélemény ingyen van."},
@@ -25,19 +28,19 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Ismeri az embert, akié ez a kártya?"},
 				},
 				Show: inkwell.Given{
-					Item:    inc.ItemNormanWallet,
+					Item:    item.NormanWallet,
 					NotFlag: inc.FlagWorkplaceKnown,
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.HotDogVendor, inkwell.Text{
+					inkwell.Say(character.HotDogVendor, inkwell.Text{
 						{Lang: "en", Text: "Eight stamps? That's Norman. Every day at six, one with everything, never says a word to anybody but his wrist."},
 						{Lang: "hu", Text: "Nyolc pecsét? Az Norman. Minden nap hatkor, egy mindennel, senkihez egy szót se, csak a csuklójához."},
 					}),
-					inkwell.Say(inc.HotDogVendor, inkwell.Text{
+					inkwell.Say(character.HotDogVendor, inkwell.Text{
 						{Lang: "en", Text: "Haven't seen him in weeks. He works up the hill, the residential complex with the lift that never works. Tower B."},
 						{Lang: "hu", Text: "Hetek óta nem láttam. Fent dolgozik a dombon, a lakókomplexumban, amelyikben sosem működik a lift. B torony."},
 					}),
-					inkwell.Say(inc.Paul, inkwell.Text{
+					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "Tower B. Thanks."},
 						{Lang: "hu", Text: "B torony. Köszönöm."},
 					}),
@@ -52,10 +55,10 @@ var _ = DialogManager.Register(Dialog{
 				},
 				Show: inkwell.Given{
 					Flag:    inc.FlagWorkplaceKnown,
-					NotItem: inc.ItemHotDogOrder,
+					NotItem: item.HotDogOrder,
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.HotDogVendor, inkwell.Text{
+					inkwell.Say(character.HotDogVendor, inkwell.Text{
 						{Lang: "en", Text: "Tower B lunch run? Sure. Got their staff cards? It's half price on the cards, and I don't carry the tray up without."},
 						{Lang: "hu", Text: "B torony, ebédfutár? Mehet. Vannak a dolgozói kártyáik? Kártyával féláron van, és anélkül nem cipelem fel a tálcát."},
 					}),
@@ -69,11 +72,11 @@ var _ = DialogManager.Register(Dialog{
 				},
 				Once: true,
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.HotDogVendor, inkwell.Text{
+					inkwell.Say(character.HotDogVendor, inkwell.Text{
 						{Lang: "en", Text: "Him? Used to work up the hill too. They let him go, and something let go of him. Harmless. Buys a coffee, talks to the air."},
 						{Lang: "hu", Text: "Ő? Régen ő is fent dolgozott a dombon. Elengedték, és őt is elengedte valami. Ártalmatlan. Vesz egy kávét, beszél a levegőhöz."},
 					}),
-					inkwell.Say(inc.Dex, inkwell.Text{
+					inkwell.Say(speaker.Dex, inkwell.Text{
 						{Lang: "en", Text: "So do you, technically."},
 						{Lang: "hu", Text: "Te is, technikailag."},
 					}),
@@ -97,15 +100,15 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Itt vannak a kártyáik."},
 				},
 				Show: inkwell.Given{
-					Item: inc.ItemOfficeCards,
+					Item: item.OfficeCards,
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.HotDogVendor, inkwell.Text{
+					inkwell.Say(character.HotDogVendor, inkwell.Text{
 						{Lang: "en", Text: "Six with everything, on the cards. Tray's yours. Tell them the mustard is the good kind."},
 						{Lang: "hu", Text: "Hat mindennel, kártyára. A tálca a tiéd. Mondd meg nekik, hogy a mustár a jobbik fajta."},
 					}),
-					inkwell.Give(inc.ItemHotDogOrder),
-					inkwell.Say(inc.Dex, inkwell.Text{
+					inkwell.Give(item.HotDogOrder),
+					inkwell.Say(speaker.Dex, inkwell.Text{
 						{Lang: "en", Text: "You are now a delivery boy. This is the most honest job you've had all week."},
 						{Lang: "hu", Text: "Mostantól kifutófiú vagy. Ez a legtisztességesebb munkád a héten."},
 					}),
@@ -118,10 +121,10 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Nincsenek nálam a kártyáik."},
 				},
 				Show: inkwell.Given{
-					NotItem: inc.ItemOfficeCards,
+					NotItem: item.OfficeCards,
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.HotDogVendor, inkwell.Text{
+					inkwell.Say(character.HotDogVendor, inkwell.Text{
 						{Lang: "en", Text: "Then come back when you do. They leave them lying about on their desks, it's not hard."},
 						{Lang: "hu", Text: "Akkor gyere vissza, ha lesznek. Ott hagyják az asztalukon szanaszét, nem nagy ügy."},
 					}),

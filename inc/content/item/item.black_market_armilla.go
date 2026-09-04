@@ -3,32 +3,33 @@ package item
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/speaker"
 )
 
-var _ = ItemManager.Register(Item{
-	Name: inc.ItemBlackArmilla,
+var BlackArmilla = ItemManager.Register(&Item{
+	Name: "black_market_armilla",
 	Description: inkwell.Text{
 		{Lang: "en", Text: "black-market Armilla"},
 		{Lang: "hu", Text: "feketepiaci Armilla"},
 	},
 	OnUseSelf: inkwell.Seq(
-		inkwell.Say(inc.Paul, inkwell.Text{
+		inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "Jailbroken. Pushes ads, but it was cheap."},
 			{Lang: "hu", Text: "Feltört. Reklámokat tol, de olcsó volt."},
 		}),
-		inkwell.Say(inc.Dex, inkwell.Text{
+		inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "Two slots, and both of them lie about the temperature. Don't trade me in for it."},
 			{Lang: "hu", Text: "Két foglalat, és mindkettő hazudik a hőmérsékletről. Ne cserélj be érte."},
 		}),
 	),
-	OnUseWith: map[string]inkwell.Action{
-		inc.ItemNoodleLetter: inkwell.Seq(
-			inkwell.Say(inc.Paul, inkwell.Text{
+	OnUseWith: map[*inkwell.Item]inkwell.Action{
+		NoodleLetter: inkwell.Seq(
+			inkwell.Say(character.Paul, inkwell.Text{
 				{Lang: "en", Text: "A letter and a bracelet. Brilliant."},
 				{Lang: "hu", Text: "Egy levél és egy karperec. Zseniális."},
 			}),
-			inkwell.Say(inc.Dex, inkwell.Text{
+			inkwell.Say(speaker.Dex, inkwell.Text{
 				{Lang: "en", Text: "Nothing. Which is what I'd charge for it."},
 				{Lang: "hu", Text: "Semmi. Ennyit is kérnék érte."},
 			}),

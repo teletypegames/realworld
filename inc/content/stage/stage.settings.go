@@ -3,14 +3,14 @@ package stage
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
+	"realworld/inc/system/theme"
 	"realworld/inc/system/widget"
 )
 
 type settingsScreen struct{}
 
-var _ = StageManager.Register(Stage{
-	Name: inc.StageSettings,
+var Settings = StageManager.Register(&Stage{
+	Name: "settings",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SETTINGS"},
 		{Lang: "hu", Text: "BEÁLLÍTÁSOK"},
@@ -19,7 +19,7 @@ var _ = StageManager.Register(Stage{
 
 var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	Name:   "settings_menu",
-	When:   inkwell.OnStage(inc.StageSettings),
+	When:   inkwell.OnStage(Settings),
 	Sticky: true,
 	Bounds: window(320, 140),
 	Root: inkwell.MenuItem{
@@ -31,7 +31,7 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	},
 })
 
-var _ = widget.WidgetManager.Register(escapeToMenu("settings_escape", inc.StageSettings))
+var _ = widget.WidgetManager.Register(escapeToMenu("settings_escape", Settings))
 
 func (settings settingsScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 	return []inkwell.MenuItem{
@@ -49,7 +49,7 @@ func (settings settingsScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 				{Lang: "en", Text: "Theme"},
 				{Lang: "hu", Text: "Téma"},
 			},
-			Value:    inkwell.FixedValue(themeNames[context.Game.Theme().Name]),
+			Value:    inkwell.FixedValue(themeNames[context.Game.Theme()]),
 			Do:       inkwell.UseTheme(settings.otherTheme(context)),
 			KeepOpen: true,
 		},
@@ -64,11 +64,11 @@ func (settingsScreen) otherLanguage() string {
 	return "hu"
 }
 
-func (settingsScreen) otherTheme(context *inkwell.Ctx) string {
-	if context.Game.Theme().Name == inc.NokiaPunk {
-		return inc.RealWorld
+func (settingsScreen) otherTheme(context *inkwell.Ctx) *theme.Theme {
+	if context.Game.Theme() == theme.NokiaPunk {
+		return theme.RealWorld
 	}
-	return inc.NokiaPunk
+	return theme.NokiaPunk
 }
 
 var languageNames = map[string]inkwell.Text{
@@ -82,12 +82,12 @@ var languageNames = map[string]inkwell.Text{
 	},
 }
 
-var themeNames = map[string]inkwell.Text{
-	inc.RealWorld: {
+var themeNames = map[*theme.Theme]inkwell.Text{
+	theme.RealWorld: {
 		{Lang: "en", Text: "Real World '93"},
 		{Lang: "hu", Text: "Real World '93"},
 	},
-	inc.NokiaPunk: {
+	theme.NokiaPunk: {
 		{Lang: "en", Text: "Nokia-punk"},
 		{Lang: "hu", Text: "Nokia-punk"},
 	},

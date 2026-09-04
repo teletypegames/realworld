@@ -3,21 +3,23 @@ package scene
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/dialog"
+	"realworld/inc/content/speaker"
 	"realworld/inc/system"
 )
 
 type interrogationRoom struct{}
 
-var _ = SceneManager.Register(Scene{
-	Name: inc.SceneInterrogationRoom,
+var InterrogationRoom = SceneManager.Register(&Scene{
+	Name: "interrogation_room",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SFPD — INTERVIEW ROOM"},
 		{Lang: "hu", Text: "SFPD — KIHALLGATÓSZOBA"},
 	},
 	Exits: []inkwell.Exit{
 		{
-			To: inc.ScenePoliceStation,
+			To: policeStation{},
 			Label: inkwell.Text{
 				{Lang: "en", Text: "back to the front desk"},
 				{Lang: "hu", Text: "vissza a recepcióhoz"},
@@ -27,21 +29,21 @@ var _ = SceneManager.Register(Scene{
 	},
 	Actors: []inkwell.SceneActor{
 		{
-			CharacterName: inc.Paul,
+			Character: character.Paul,
 			At: inkwell.Point{
 				X: 140,
 				Y: 240,
 			},
 		},
 		{
-			CharacterName: inc.Vasquez,
+			Character: character.Vasquez,
 			At: inkwell.Point{
 				X: 300,
 				Y: 236,
 			},
 		},
 		{
-			CharacterName: inc.Noodle,
+			Character: character.Noodle,
 			At: inkwell.Point{
 				X: 500,
 				Y: 200,
@@ -68,16 +70,16 @@ func (interrogationRoom) vasquez() inkwell.Hotspot {
 			{Lang: "hu", Text: "Vasquez nyomozó"},
 		},
 		Area: inkwell.Rect(276, 156, 48, 84),
-		OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+		OnLook: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "Red hair cut short on one side, gold earrings, brown blazer. Not in uniform. She was waiting for me."},
 			{Lang: "hu", Text: "Vörös haj, egyik oldalon rövidre vágva, arany fülbevaló, barna blézer. Nem egyenruhás. Engem várt."},
 		}),
-		OnTalk: system.System.Paused(inkwell.RunDialog(inc.DialogVasquez)),
-		OnUse: inkwell.Say(inc.Vasquez, inkwell.Text{
+		OnTalk: system.System.Paused(inkwell.RunDialog(dialog.Vasquez)),
+		OnUse: inkwell.Say(character.Vasquez, inkwell.Text{
 			{Lang: "en", Text: "Sit down, Paul."},
 			{Lang: "hu", Text: "Üljön le, Paul."},
 		}),
-		OnUseWithAny: inkwell.Say(inc.Vasquez, inkwell.Text{
+		OnUseWithAny: inkwell.Say(character.Vasquez, inkwell.Text{
 			{Lang: "en", Text: "Whatever that is, I don't want it. Yet."},
 			{Lang: "hu", Text: "Akármi is az, nem kérem. Még."},
 		}),
@@ -93,21 +95,21 @@ func (interrogationRoom) glassWall() inkwell.Hotspot {
 		},
 		Area: inkwell.Rect(440, 100, 150, 120),
 		OnLook: inkwell.Seq(
-			inkwell.Say(inc.Paul, inkwell.Text{
+			inkwell.Say(character.Paul, inkwell.Text{
 				{Lang: "en", Text: "Noodle. Fatter than I remember, monocle, a cigar behind his ear. Eating chips in a police station."},
 				{Lang: "hu", Text: "Noodle. Kövérebb, mint ahogy emlékszem, monokli, szivar a füle mögött. Chipset eszik egy rendőrségen."},
 			}),
-			inkwell.Say(inc.Dex, inkwell.Text{
+			inkwell.Say(speaker.Dex, inkwell.Text{
 				{Lang: "en", Text: "Twenty years and he still dresses like a man who lost a bet."},
 				{Lang: "hu", Text: "Húsz év, és még mindig úgy öltözik, mint aki elvesztett egy fogadást."},
 			}),
 		),
-		OnTalk: system.System.Paused(inkwell.RunDialog(inc.DialogNoodleGlass)),
-		OnUse: inkwell.Say(inc.Paul, inkwell.Text{
+		OnTalk: system.System.Paused(inkwell.RunDialog(dialog.NoodleGlass)),
+		OnUse: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "Thick glass. A slit at the bottom for words to get through, barely."},
 			{Lang: "hu", Text: "Vastag üveg. Egy rés alul, amin épphogy átjutnak a szavak."},
 		}),
-		OnTake: inkwell.Say(inc.Paul, inkwell.Text{
+		OnTake: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "I'd take him if I could."},
 			{Lang: "hu", Text: "Elvinném, ha tudnám."},
 		}),
@@ -122,11 +124,11 @@ func (interrogationRoom) mirror() inkwell.Hotspot {
 			{Lang: "hu", Text: "detektívtükör"},
 		},
 		Area: inkwell.Rect(40, 60, 150, 100),
-		OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+		OnLook: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "Somebody is behind that. Somebody always is."},
 			{Lang: "hu", Text: "Valaki áll mögötte. Mindig áll mögötte valaki."},
 		}),
-		OnUse: inkwell.Say(inc.Dex, inkwell.Text{
+		OnUse: inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "Don't wave. It's not that kind of mirror."},
 			{Lang: "hu", Text: "Ne integess. Ez nem az a fajta tükör."},
 		}),
@@ -141,17 +143,19 @@ func (interrogationRoom) table() inkwell.Hotspot {
 			{Lang: "hu", Text: "asztal a magnóval"},
 		},
 		Area: inkwell.Rect(220, 190, 130, 40),
-		OnLook: inkwell.Say(inc.Paul, inkwell.Text{
+		OnLook: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "Steel table, a tape recorder, two cups. Neither of them for me."},
 			{Lang: "hu", Text: "Acélasztal, egy magnó, két pohár. Egyik sem nekem."},
 		}),
-		OnUse: inkwell.Say(inc.Vasquez, inkwell.Text{
+		OnUse: inkwell.Say(character.Vasquez, inkwell.Text{
 			{Lang: "en", Text: "It's running. It's always running."},
 			{Lang: "hu", Text: "Megy. Mindig megy."},
 		}),
-		OnTake: inkwell.Say(inc.Paul, inkwell.Text{
+		OnTake: inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "Stealing the recorder from an interview room. Even I have limits."},
 			{Lang: "hu", Text: "Ellopni a magnót egy kihallgatószobából. Még nekem is vannak határaim."},
 		}),
 	}
 }
+
+func (interrogationRoom) Scene() *inkwell.Scene { return InterrogationRoom }

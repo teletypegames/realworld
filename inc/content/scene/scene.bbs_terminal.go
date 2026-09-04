@@ -2,12 +2,12 @@ package scene
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
-
-	"realworld/inc"
 )
 
-var _ = SceneManager.Register(Scene{
-	Name: inc.SceneBBSTerminal,
+type bbsTerminal struct{}
+
+var BBSTerminal = SceneManager.Register(&Scene{
+	Name: "bbs_terminal",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "TERMINAL — BBS ACCESS POINT"},
 		{Lang: "hu", Text: "TERMINÁL — BBS HOZZÁFÉRÉSI PONT"},
@@ -22,3 +22,5 @@ var _ = SceneManager.Register(Scene{
 		},
 	},
 })
+
+func (bbsTerminal) Scene() *inkwell.Scene { return BBSTerminal }

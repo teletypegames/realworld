@@ -8,11 +8,11 @@ import (
 
 type Background = inkwell.Asset
 
-var BackgroundManager = inkwell.NewManager[Background]()
+var BackgroundManager = inkwell.NewManager[*Background]()
 
 func init() {
-	scene.SceneManager.Each(func(entity scene.Scene) {
-		BackgroundManager.Register(Background{
+	scene.SceneManager.Each(func(entity *scene.Scene) {
+		entity.Background = BackgroundManager.Register(&Background{
 			Name: entity.Name,
 			Path: "assets/bg/" + entity.Name + ".png",
 			Kind: inkwell.AssetImage,

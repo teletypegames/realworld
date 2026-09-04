@@ -3,7 +3,8 @@ package script
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/speaker"
 	"realworld/inc/system"
 )
 
@@ -59,14 +60,14 @@ var fail = useWithFail{
 	},
 }
 
-func UseWithFail(item string, hotspot *inkwell.Hotspot) inkwell.Action {
+func UseWithFail(held *inkwell.Item, hotspot *inkwell.Hotspot) inkwell.Action {
 	state := system.System.Game().State
-	key := "fail." + item + "." + hotspot.Name
+	key := "fail." + held.Name + "." + hotspot.Name
 	state.NoteTalked(key)
 	count := state.Talked(key)
 
 	return inkwell.Seq(
-		inkwell.Say(inc.Paul, fail.paul.At(count)),
-		inkwell.Say(inc.Dex, fail.dex.At(count)),
+		inkwell.Say(character.Paul, fail.paul.At(count)),
+		inkwell.Say(speaker.Dex, fail.dex.At(count)),
 	)
 }

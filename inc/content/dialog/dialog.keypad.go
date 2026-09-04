@@ -4,12 +4,14 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/speaker"
 )
 
 type keypad struct{}
 
-var _ = DialogManager.Register(Dialog{
-	Name:  inc.DialogKeypad,
+var Keypad = DialogManager.Register(&Dialog{
+	Name:  "keypad",
 	Start: "root",
 	Nodes: keypad{}.nodes(),
 })
@@ -38,7 +40,7 @@ func (pad keypad) root() inkwell.DialogNode {
 	return inkwell.DialogNode{
 		Name: "root",
 		Lines: []inkwell.DialogLine{{
-			Speaker: inc.Dex,
+			Speaker: speaker.Dex,
 			Text: inkwell.Text{
 				{Lang: "en", Text: "Four digits. Two and seven are worn. First two?"},
 				{Lang: "hu", Text: "Négy számjegy. A kettes és a hetes kopott. Az első kettő?"},
@@ -60,7 +62,7 @@ func (pad keypad) second(first string) inkwell.DialogNode {
 	return inkwell.DialogNode{
 		Name: "first_" + first,
 		Lines: []inkwell.DialogLine{{
-			Speaker: inc.Dex,
+			Speaker: speaker.Dex,
 			Text: inkwell.Text{
 				{Lang: "en", Text: "Last two."},
 				{Lang: "hu", Text: "Az utolsó kettő."},
@@ -73,11 +75,11 @@ func (pad keypad) second(first string) inkwell.DialogNode {
 func (keypad) attempt(code string) []inkwell.Action {
 	if code == keypadCode {
 		return []inkwell.Action{
-			inkwell.Say(inc.Paul, inkwell.Text{
+			inkwell.Say(character.Paul, inkwell.Text{
 				{Lang: "en", Text: "Click."},
 				{Lang: "hu", Text: "Katt."},
 			}),
-			inkwell.Say(inc.Dex, inkwell.Text{
+			inkwell.Say(speaker.Dex, inkwell.Text{
 				{Lang: "en", Text: "Well. Somebody knew that."},
 				{Lang: "hu", Text: "Nos. Ezt valaki tudta."},
 			}),
@@ -86,11 +88,11 @@ func (keypad) attempt(code string) []inkwell.Action {
 		}
 	}
 	return []inkwell.Action{
-		inkwell.Say(inc.Paul, inkwell.Text{
+		inkwell.Say(character.Paul, inkwell.Text{
 			{Lang: "en", Text: "Nothing."},
 			{Lang: "hu", Text: "Semmi."},
 		}),
-		inkwell.Say(inc.Dex, inkwell.Text{
+		inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "Fifteen to go. Or one, if you'd ask the man who set it."},
 			{Lang: "hu", Text: "Még tizenöt. Vagy egy, ha megkérdeznéd azt, aki beállította."},
 		}),

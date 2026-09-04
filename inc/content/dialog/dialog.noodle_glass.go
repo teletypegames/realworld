@@ -4,15 +4,17 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/speaker"
 )
 
-var _ = DialogManager.Register(Dialog{
-	Name:  inc.DialogNoodleGlass,
+var NoodleGlass = DialogManager.Register(&Dialog{
+	Name:  "noodle_glass",
 	Start: "root",
 	Nodes: []inkwell.DialogNode{{
 		Name: "root",
 		Lines: []inkwell.DialogLine{{
-			Speaker: inc.Noodle,
+			Speaker: character.Noodle,
 			Text: inkwell.Text{
 				{Lang: "en", Text: "Paul. You came. You actually came."},
 				{Lang: "hu", Text: "Paul. Eljöttél. Tényleg eljöttél."},
@@ -28,11 +30,11 @@ var _ = DialogManager.Register(Dialog{
 					NotFlag: inc.FlagVasquezDeal,
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.Vasquez, inkwell.Text{
+					inkwell.Say(character.Vasquez, inkwell.Text{
 						{Lang: "en", Text: "Not yet."},
 						{Lang: "hu", Text: "Még nem."},
 					}),
-					inkwell.Say(inc.Paul, inkwell.Text{
+					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "She hasn't finished with me."},
 						{Lang: "hu", Text: "Még nem végzett velem."},
 					}),
@@ -50,11 +52,11 @@ var _ = DialogManager.Register(Dialog{
 				Once: true,
 				Actions: []inkwell.Action{
 					inkwell.SetFlag(inc.FlagNoodleSeen),
-					inkwell.Say(inc.Noodle, inkwell.Text{
+					inkwell.Say(character.Noodle, inkwell.Text{
 						{Lang: "en", Text: "Nothing I couldn't talk my way out of. Usually. They're going to empty my place, Paul. Every shelf."},
 						{Lang: "hu", Text: "Semmi olyat, amiből ne beszélném ki magam. Általában. Ki fogják pakolni a helyemet, Paul. Minden polcot."},
 					}),
-					inkwell.Say(inc.Noodle, inkwell.Text{
+					inkwell.Say(character.Noodle, inkwell.Text{
 						{Lang: "en", Text: "What I left you isn't what they think it is. It isn't what I thought it was either."},
 						{Lang: "hu", Text: "Amit neked hagytam, az nem az, aminek hiszik. Nem is az, aminek én hittem."},
 					}),
@@ -72,15 +74,15 @@ var _ = DialogManager.Register(Dialog{
 				Once: true,
 				Actions: []inkwell.Action{
 					inkwell.SetFlag(inc.FlagNoodleSeen),
-					inkwell.Say(inc.Noodle, inkwell.Text{
+					inkwell.Say(character.Noodle, inkwell.Text{
 						{Lang: "en", Text: "Norman… Norman handed me something to look at. I looked."},
 						{Lang: "hu", Text: "Norman… Norman a kezembe adott valamit, hogy nézzem meg. Megnéztem."},
 					}),
-					inkwell.Say(inc.Noodle, inkwell.Text{
+					inkwell.Say(character.Noodle, inkwell.Text{
 						{Lang: "en", Text: "I should not have."},
 						{Lang: "hu", Text: "Nem kellett volna."},
 					}),
-					inkwell.Say(inc.Dex, inkwell.Text{
+					inkwell.Say(speaker.Dex, inkwell.Text{
 						{Lang: "en", Text: "He hesitated. Noodle never hesitates. He lies faster than that."},
 						{Lang: "hu", Text: "Habozott. Noodle soha nem habozik. Gyorsabban hazudik ennél."},
 					}),
@@ -98,19 +100,19 @@ var _ = DialogManager.Register(Dialog{
 				Once: true,
 				Actions: []inkwell.Action{
 					inkwell.SetFlag(inc.FlagNoodleSeen),
-					inkwell.Say(inc.Noodle, inkwell.Text{
+					inkwell.Say(character.Noodle, inkwell.Text{
 						{Lang: "en", Text: "Give her something bigger than me. She wants bigger. You'll find bigger, Paul, you've got the thing."},
 						{Lang: "hu", Text: "Adj neki valamit, ami nagyobb nálam. Nagyobbat akar. Találsz nagyobbat, Paul, nálad van az a dolog."},
 					}),
-					inkwell.Say(inc.Noodle, inkwell.Text{
+					inkwell.Say(character.Noodle, inkwell.Text{
 						{Lang: "en", Text: "Get me out, and I tell you everything. All of it. There's a room you haven't seen."},
 						{Lang: "hu", Text: "Hozz ki, és mindent elmondok. Az egészet. Van egy szoba, amit még nem láttál."},
 					}),
-					inkwell.Say(inc.Paul, inkwell.Text{
+					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "What room?"},
 						{Lang: "hu", Text: "Milyen szoba?"},
 					}),
-					inkwell.Say(inc.Noodle, inkwell.Text{
+					inkwell.Say(character.Noodle, inkwell.Text{
 						{Lang: "en", Text: "Not here. Not through glass."},
 						{Lang: "hu", Text: "Nem itt. Nem üvegen át."},
 					}),
@@ -123,7 +125,7 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Tarts ki."},
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.Noodle, inkwell.Text{
+					inkwell.Say(character.Noodle, inkwell.Text{
 						{Lang: "en", Text: "They have chips. I'll live."},
 						{Lang: "hu", Text: "Van chipsük. Túlélem."},
 					}),

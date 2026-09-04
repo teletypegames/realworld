@@ -4,15 +4,19 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/item"
+	"realworld/inc/content/script"
+	"realworld/inc/content/speaker"
 )
 
-var _ = DialogManager.Register(Dialog{
-	Name:  inc.DialogShopkeeper,
+var Shopkeeper = DialogManager.Register(&Dialog{
+	Name:  "shopkeeper",
 	Start: "root",
 	Nodes: []inkwell.DialogNode{{
 		Name: "root",
 		Lines: []inkwell.DialogLine{{
-			Speaker: inc.Shopkeeper,
+			Speaker: character.Shopkeeper,
 			Text: inkwell.Text{
 				{Lang: "en", Text: "Welcome, welcome! Everything authentic. Everything good price. What you looking for?"},
 				{Lang: "hu", Text: "Üdv, üdv! Minden eredeti. Minden jó ár. Mit keres?"},
@@ -25,24 +29,24 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Mi az a Személyes Kazetta a polcon?"},
 				},
 				Show: inkwell.Given{
-					NotItem: inc.ItemSupportTape,
+					NotItem: item.SupportTape,
 				},
 				Once: true,
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.Shopkeeper, inkwell.Text{
+					inkwell.Say(character.Shopkeeper, inkwell.Text{
 						{Lang: "en", Text: "Ah! Very useful. Tech support tape. Answers everything. Any question, any device. Twenty dollar."},
 						{Lang: "hu", Text: "Á! Nagyon hasznos. Ügyfélszolgálati kazetta. Mindenre válaszol. Bármi kérdés, bármi eszköz. Húsz dollár."},
 					}),
-					inkwell.Say(inc.Dex, inkwell.Text{
+					inkwell.Say(speaker.Dex, inkwell.Text{
 						{Lang: "en", Text: "“Answers everything” is what you say about a thing that answers nothing. Don't."},
 						{Lang: "hu", Text: "„Mindenre válaszol” — ezt arról mondják, ami semmire nem. Ne."},
 					}),
-					inkwell.Say(inc.Paul, inkwell.Text{
+					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "Twenty. Fine."},
 						{Lang: "hu", Text: "Húsz. Jó."},
 					}),
-					inkwell.Give(inc.ItemSupportTape),
-					inkwell.Say(inc.Shopkeeper, inkwell.Text{
+					inkwell.Give(item.SupportTape),
+					inkwell.Say(character.Shopkeeper, inkwell.Text{
 						{Lang: "en", Text: "Very good choice. No refund."},
 						{Lang: "hu", Text: "Nagyon jó választás. Visszaváltás nincs."},
 					}),
@@ -55,24 +59,24 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "És az a… valami mellette?"},
 				},
 				Show: inkwell.Given{
-					NotItem: inc.ItemTrinket,
+					NotItem: item.Trinket,
 				},
 				Once: true,
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.Shopkeeper, inkwell.Text{
+					inkwell.Say(character.Shopkeeper, inkwell.Text{
 						{Lang: "en", Text: "Very rare. Very old. From the mountains. Five dollar, because I like you."},
 						{Lang: "hu", Text: "Nagyon ritka. Nagyon régi. A hegyekből. Öt dollár, mert kedvelem."},
 					}),
-					inkwell.Say(inc.Paul, inkwell.Text{
+					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "What does it do?"},
 						{Lang: "hu", Text: "Mire jó?"},
 					}),
-					inkwell.Say(inc.Shopkeeper, inkwell.Text{
+					inkwell.Say(character.Shopkeeper, inkwell.Text{
 						{Lang: "en", Text: "Sir, for five dollar, it does what you need."},
 						{Lang: "hu", Text: "Uram, öt dollárért arra jó, amire kell."},
 					}),
-					inkwell.Give(inc.ItemTrinket),
-					inkwell.Say(inc.Dex, inkwell.Text{
+					inkwell.Give(item.Trinket),
+					inkwell.Say(speaker.Dex, inkwell.Text{
 						{Lang: "en", Text: "You bought it. You actually bought it. I'm going to remember this longer than you will."},
 						{Lang: "hu", Text: "Megvetted. Tényleg megvetted. Erre tovább fogok emlékezni, mint te."},
 					}),
@@ -88,11 +92,11 @@ var _ = DialogManager.Register(Dialog{
 					NotFlag: inc.FlagClubEntry,
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.Shopkeeper, inkwell.Text{
+					inkwell.Say(character.Shopkeeper, inkwell.Text{
 						{Lang: "en", Text: "Club? No club. Just a shop. You want a sun, I have sun. Charms, two dollar."},
 						{Lang: "hu", Text: "Klub? Nincs klub. Csak bolt. Nap kell? Van napom. Amulett, két dollár."},
 					}),
-					inkwell.Say(inc.Dex, inkwell.Text{
+					inkwell.Say(speaker.Dex, inkwell.Text{
 						{Lang: "en", Text: "He answered a little too fast, and he sold you something on the way out of it."},
 						{Lang: "hu", Text: "Kicsit túl gyorsan válaszolt, és közben még el is adott valamit."},
 					}),
@@ -109,11 +113,11 @@ var _ = DialogManager.Register(Dialog{
 					NotFlag: inc.FlagClubEntry,
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.Shopkeeper, inkwell.Text{
+					inkwell.Say(character.Shopkeeper, inkwell.Text{
 						{Lang: "en", Text: "…Ah. You are here for the club. Why you don't say so. This way please, this way."},
 						{Lang: "hu", Text: "…Á. A klubba jött. Miért nem ezzel kezdte. Erre tessék, erre."},
 					}),
-					inkwell.RunScript(inc.ScriptClubAdmission),
+					inkwell.RunScript(script.ClubAdmission),
 					inkwell.EndDialog(),
 				},
 			},
@@ -123,7 +127,7 @@ var _ = DialogManager.Register(Dialog{
 					{Lang: "hu", Text: "Csak nézelődök."},
 				},
 				Actions: []inkwell.Action{
-					inkwell.Say(inc.Shopkeeper, inkwell.Text{
+					inkwell.Say(character.Shopkeeper, inkwell.Text{
 						{Lang: "en", Text: "Looking is free. Touching is buying."},
 						{Lang: "hu", Text: "Nézni ingyen van. Hozzányúlni vásárlás."},
 					}),

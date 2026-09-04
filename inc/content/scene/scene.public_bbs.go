@@ -2,12 +2,12 @@ package scene
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
-
-	"realworld/inc"
 )
 
-var _ = SceneManager.Register(Scene{
-	Name: inc.ScenePublicBBS,
+type publicBBS struct{}
+
+var PublicBBS = SceneManager.Register(&Scene{
+	Name: "public_bbs",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "PUBLIC BBS TERMINAL"},
 		{Lang: "hu", Text: "NYILVÁNOS BBS TERMINÁL"},
@@ -16,3 +16,5 @@ var _ = SceneManager.Register(Scene{
 		exitToSelector,
 	},
 })
+
+func (publicBBS) Scene() *inkwell.Scene { return PublicBBS }

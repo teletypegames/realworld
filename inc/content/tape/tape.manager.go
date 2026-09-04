@@ -1,51 +1,40 @@
 package tape
 
 import (
-	"image/color"
-
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
+	"realworld/inc/content/dialog"
+	"realworld/inc/content/item"
+	"realworld/inc/content/speaker"
 )
 
 type Tape struct {
 	Name     string
-	Item     string
-	Label    inkwell.Text
-	Color    color.Color
-	Dialog   string
+	Item     *item.Item
+	Speaker  *speaker.Speaker
+	Dialog   *dialog.Dialog
 	OnInsert inkwell.Action
 }
 
-var TapeManager = inkwell.NewManager[Tape]()
-
-var Speakers = inkwell.NewManager[inkwell.Speaker]()
+var TapeManager = inkwell.NewManager[*Tape]()
 
 func (tape Tape) GetName() string { return tape.Name }
 
-func init() {
-	TapeManager.Each(func(tape Tape) {
-		Speakers.Register(inkwell.Speaker{
-			Name:  tape.Name,
-			Label: tape.Label,
-			Voice: inkwell.VoiceLog,
-			Color: tape.Color,
-		})
-	})
-}
-
-func Of(item string) (Tape, bool) {
+func Of(loaded *item.Item) (*Tape, bool) {
+	if loaded == nil {
+		return nil, false
+	}
 	for _, candidate := range TapeManager.All() {
-		if candidate.Item != "" && candidate.Item == item {
+		if candidate.Item == loaded {
 			return candidate, true
 		}
 	}
-	return Tape{}, false
+	return nil, false
 }
 
-func Dialog(item string) string {
-	if loaded, found := Of(item); found && loaded.Dialog != "" {
-		return loaded.Dialog
+func DialogOf(loaded *item.Item) *dialog.Dialog {
+	if card, found := Of(loaded); found && card.Dialog != nil {
+		return card.Dialog
 	}
-	return inc.DialogDex
+	return dialog.Dex
 }

@@ -3,12 +3,11 @@ package stage
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
 	"realworld/inc/system/widget"
 )
 
-var _ = StageManager.Register(Stage{
-	Name: inc.StageCredits,
+var Credits = StageManager.Register(&Stage{
+	Name: "credits",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "CREDITS"},
 		{Lang: "hu", Text: "KÉSZÍTŐK"},
@@ -17,7 +16,7 @@ var _ = StageManager.Register(Stage{
 
 var _ = widget.WidgetManager.Register(&inkwell.TextCard{
 	Name:     "credits",
-	When:     inkwell.OnStage(inc.StageCredits),
+	When:     inkwell.OnStage(Credits),
 	Align:    inkwell.AlignCenter,
 	Backdrop: true,
 	Lines: []inkwell.Text{
@@ -48,4 +47,4 @@ var _ = widget.WidgetManager.Register(&inkwell.TextCard{
 	},
 })
 
-var _ = widget.WidgetManager.Register(escapeToMenu("credits_escape", inc.StageCredits))
+var _ = widget.WidgetManager.Register(escapeToMenu("credits_escape", Credits))

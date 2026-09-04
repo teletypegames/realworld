@@ -12,17 +12,23 @@ var stripReading = inkwell.Text{
 	{Lang: "hu", Text: "2. FOGL: OLVAS"},
 }
 
-func Slot2() string {
-	if value, isText := system.System.Game().State.Var(inc.VarSlot2).(string); isText {
-		return value
+func Slot2() *inkwell.Item {
+	game := system.System.Game()
+	name, isText := game.State.Var(inc.VarSlot2).(string)
+	if !isText {
+		return nil
 	}
-	return ""
+	loaded, found := game.ItemManager.Get(name)
+	if !found {
+		return nil
+	}
+	return loaded
 }
 
-func Insert(item string) inkwell.Action {
+func Insert(cassette *inkwell.Item) inkwell.Action {
 	return inkwell.Seq(
-		inkwell.SetVar(inc.VarSlot2, item),
-		inkwell.TakeAway(item),
+		inkwell.SetVar(inc.VarSlot2, cassette.Name),
+		inkwell.TakeAway(cassette),
 		inkwell.SetVar(inc.VarArmillaStrip, stripReading),
 	)
 }

@@ -4,16 +4,18 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/speaker"
 )
 
-var _ = DialogManager.Register(Dialog{
-	Name:  inc.DialogReceptionist,
+var Receptionist = DialogManager.Register(&Dialog{
+	Name:  "receptionist",
 	Start: "root",
 	Nodes: []inkwell.DialogNode{
 		{
 			Name: "root",
 			Lines: []inkwell.DialogLine{{
-				Speaker: inc.Receptionist,
+				Speaker: character.Receptionist,
 				Text: inkwell.Text{
 					{Lang: "en", Text: "Yes."},
 					{Lang: "hu", Text: "Igen."},
@@ -29,7 +31,7 @@ var _ = DialogManager.Register(Dialog{
 						NotFlag: inc.FlagReceptionPassed,
 					},
 					Actions: []inkwell.Action{
-						inkwell.Say(inc.Receptionist, inkwell.Text{
+						inkwell.Say(character.Receptionist, inkwell.Text{
 							{Lang: "en", Text: "Everybody is somebody's friend."},
 							{Lang: "hu", Text: "Mindenki valakinek a barátja."},
 						}),
@@ -45,7 +47,7 @@ var _ = DialogManager.Register(Dialog{
 						NotFlag: inc.FlagReceptionPassed,
 					},
 					Actions: []inkwell.Action{
-						inkwell.Say(inc.Receptionist, inkwell.Text{
+						inkwell.Say(character.Receptionist, inkwell.Text{
 							{Lang: "en", Text: "Detective Vasquez is handling that. She is not seeing anybody."},
 							{Lang: "hu", Text: "Azt Vasquez nyomozó viszi. Nem fogad senkit."},
 						}),
@@ -61,11 +63,11 @@ var _ = DialogManager.Register(Dialog{
 						NotFlag: inc.FlagReceptionPassed,
 					},
 					Actions: []inkwell.Action{
-						inkwell.Say(inc.Receptionist, inkwell.Text{
+						inkwell.Say(character.Receptionist, inkwell.Text{
 							{Lang: "en", Text: "Are you."},
 							{Lang: "hu", Text: "Valóban."},
 						}),
-						inkwell.Say(inc.Paul, inkwell.Text{
+						inkwell.Say(character.Paul, inkwell.Text{
 							{Lang: "en", Text: "She's looking at the actual lawyer on the bench. Right."},
 							{Lang: "hu", Text: "Az igazi ügyvédet nézi a padon. Értem."},
 						}),
@@ -81,7 +83,7 @@ var _ = DialogManager.Register(Dialog{
 						Flag: inc.FlagReceptionPassed,
 					},
 					Actions: []inkwell.Action{
-						inkwell.Say(inc.Receptionist, inkwell.Text{
+						inkwell.Say(character.Receptionist, inkwell.Text{
 							{Lang: "en", Text: "Through the door, sir."},
 							{Lang: "hu", Text: "Az ajtón át, uram."},
 						}),
@@ -100,7 +102,7 @@ var _ = DialogManager.Register(Dialog{
 		{
 			Name: "deflected",
 			Lines: []inkwell.DialogLine{{
-				Speaker: inc.Receptionist,
+				Speaker: character.Receptionist,
 				Text: inkwell.Text{
 					{Lang: "en", Text: "Anything else."},
 					{Lang: "hu", Text: "Még valami."},
@@ -123,20 +125,20 @@ var _ = DialogManager.Register(Dialog{
 						NotFlag: inc.FlagReceptionPassed,
 					},
 					Actions: []inkwell.Action{
-						inkwell.Say(inc.Receptionist, inkwell.Text{
+						inkwell.Say(character.Receptionist, inkwell.Text{
 							{Lang: "en", Text: "…"},
 							{Lang: "hu", Text: "…"},
 						}),
-						inkwell.Say(inc.Paul, inkwell.Text{
+						inkwell.Say(character.Paul, inkwell.Text{
 							{Lang: "en", Text: "She picks up the phone. Says two words. Listens for a lot longer."},
 							{Lang: "hu", Text: "Felveszi a telefont. Két szót mond. Sokkal tovább hallgat."},
 						}),
-						inkwell.Say(inc.Receptionist, inkwell.Text{
+						inkwell.Say(character.Receptionist, inkwell.Text{
 							{Lang: "en", Text: "She says go through."},
 							{Lang: "hu", Text: "Azt mondja, menjen be."},
 						}),
 						inkwell.SetFlag(inc.FlagReceptionPassed),
-						inkwell.Say(inc.Dex, inkwell.Text{
+						inkwell.Say(speaker.Dex, inkwell.Text{
 							{Lang: "en", Text: "There was no list, Paul. There is one now."},
 							{Lang: "hu", Text: "Nem volt lista, Paul. Most már van."},
 						}),

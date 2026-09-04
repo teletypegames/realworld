@@ -4,12 +4,11 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"realworld/inc"
 	"realworld/inc/system/widget"
 )
 
-var _ = StageManager.Register(Stage{
-	Name:  inc.StageGame,
+var Game = StageManager.Register(&Stage{
+	Name:  "game",
 	World: true,
 	Title: inkwell.Text{
 		{Lang: "en", Text: "REAL WORLD"},
@@ -19,8 +18,8 @@ var _ = StageManager.Register(Stage{
 
 var _ = widget.WidgetManager.Register(&inkwell.KeyBinding{
 	Name:         "pause",
-	When:         inkwell.OnStage(inc.StageGame),
+	When:         inkwell.OnStage(Game),
 	Key:          ebiten.KeyEscape,
-	Do:           inkwell.GoToStage(inc.StageMainMenu),
+	Do:           inkwell.GoToStage(MainMenu),
 	DuringScript: true,
 })

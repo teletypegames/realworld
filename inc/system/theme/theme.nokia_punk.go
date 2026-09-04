@@ -1,7 +1,6 @@
 package theme
 
 import (
-	"realworld/inc"
 	"realworld/inc/util"
 )
 
@@ -11,8 +10,8 @@ var (
 	nokiaPunkBlack = util.RGB(0x030603)
 )
 
-var _ = ThemeManager.Register(Theme{
-	Name:                    inc.NokiaPunk,
+var NokiaPunk = ThemeManager.Register(&Theme{
+	Name:                    "nokia-punk",
 	PanelBG:                 nokiaPunkBlack,
 	StatusText:              Green,
 	FlashText:               util.RGB(0xD8F06A),

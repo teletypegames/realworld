@@ -1,18 +1,12 @@
 package tape
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
-	"realworld/inc"
-	"realworld/inc/system/theme"
+	"realworld/inc/content/dialog"
+	"realworld/inc/content/speaker"
 )
 
-var _ = TapeManager.Register(Tape{
-	Name: inc.Dex,
-	Label: inkwell.Text{
-		{Lang: "en", Text: "DEX"},
-		{Lang: "hu", Text: "DEX"},
-	},
-	Color:  theme.Amber,
-	Dialog: inc.DialogDex,
+var Dex = TapeManager.Register(&Tape{
+	Name:    "dex",
+	Speaker: speaker.Dex,
+	Dialog:  dialog.Dex,
 })

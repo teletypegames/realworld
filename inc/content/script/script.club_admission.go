@@ -4,17 +4,19 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/character"
+	"realworld/inc/content/speaker"
 )
 
-var _ = ScriptManager.Register(Script{
-	Name: inc.ScriptClubAdmission,
+var ClubAdmission = ScriptManager.Register(&Script{
+	Name: "club_admission",
 	Actions: inkwell.Seq(
-		inkwell.Say(inc.Shopkeeper, inkwell.Text{
+		inkwell.Say(character.Shopkeeper, inkwell.Text{
 			{Lang: "en", Text: "Behind the curtain. Down the step. Knock twice, or don't, nobody there to hear it."},
 			{Lang: "hu", Text: "A függöny mögött. Le a lépcsőn. Kopogjon kétszer, vagy ne, nincs ott senki, aki hallaná."},
 		}),
 		inkwell.SetFlag(inc.FlagClubEntry),
-		inkwell.Say(inc.Dex, inkwell.Text{
+		inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "A shop with a back room is never just a shop. Write that down somewhere I can't see it."},
 			{Lang: "hu", Text: "Egy bolt hátsó szobával sosem csak egy bolt. Írd fel valahová, ahol nem látom."},
 		}),

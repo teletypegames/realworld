@@ -2,12 +2,12 @@ package scene
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
-
-	"realworld/inc"
 )
 
-var _ = SceneManager.Register(Scene{
-	Name: inc.SceneSamizdatPress,
+type samizdatPress struct{}
+
+var SamizdatPress = SceneManager.Register(&Scene{
+	Name: "samizdat_press",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SAMIZDAT PRINTING HOUSE"},
 		{Lang: "hu", Text: "SZAMIZDAT NYOMDA"},
@@ -16,3 +16,5 @@ var _ = SceneManager.Register(Scene{
 		exitToSelector,
 	},
 })
+
+func (samizdatPress) Scene() *inkwell.Scene { return SamizdatPress }

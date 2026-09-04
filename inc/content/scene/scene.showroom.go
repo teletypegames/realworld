@@ -2,12 +2,12 @@ package scene
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
-
-	"realworld/inc"
 )
 
-var _ = SceneManager.Register(Scene{
-	Name: inc.SceneShowroom,
+type showroom struct{}
+
+var Showroom = SceneManager.Register(&Scene{
+	Name: "showroom",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "NEUMATRONIC SHOWROOM"},
 		{Lang: "hu", Text: "NEUMATRONIC BEMUTATÓTEREM"},
@@ -16,3 +16,5 @@ var _ = SceneManager.Register(Scene{
 		exitToSelector,
 	},
 })
+
+func (showroom) Scene() *inkwell.Scene { return Showroom }

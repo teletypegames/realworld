@@ -3,24 +3,23 @@ package stage
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
 	"realworld/inc/system/widget"
 )
 
-var _ = StageManager.Register(Stage{
-	Name: inc.StageSplashTitle,
+var SplashTitle = StageManager.Register(&Stage{
+	Name: "splash_title",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "REAL WORLD"},
 		{Lang: "hu", Text: "REAL WORLD"},
 	},
 	Transition: splashTransition,
 	Hold:       splashHold,
-	Next:       inc.StageMainMenu,
+	Next:       MainMenu,
 })
 
 var _ = widget.WidgetManager.Register(&inkwell.TextCard{
 	Name:     "splash_title",
-	When:     inkwell.OnStage(inc.StageSplashTitle),
+	When:     inkwell.OnStage(SplashTitle),
 	Align:    inkwell.AlignCenter,
 	Backdrop: true,
 	Lines: []inkwell.Text{

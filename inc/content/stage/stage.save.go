@@ -9,8 +9,8 @@ import (
 
 type saveScreen struct{}
 
-var _ = StageManager.Register(Stage{
-	Name: inc.StageSave,
+var Save = StageManager.Register(&Stage{
+	Name: "save",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SAVE"},
 		{Lang: "hu", Text: "MENTÉS"},
@@ -19,7 +19,7 @@ var _ = StageManager.Register(Stage{
 
 var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	Name:   "save_menu",
-	When:   inkwell.OnStage(inc.StageSave),
+	When:   inkwell.OnStage(Save),
 	Sticky: true,
 	Bounds: window(360, 180),
 	Root: inkwell.MenuItem{
@@ -31,7 +31,7 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	},
 })
 
-var _ = widget.WidgetManager.Register(escapeToMenu("save_escape", inc.StageSave))
+var _ = widget.WidgetManager.Register(escapeToMenu("save_escape", Save))
 
 func (saveScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 	var rows []inkwell.MenuItem
@@ -41,7 +41,7 @@ func (saveScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 			Value: inkwell.FixedValue(slotValue(info)),
 			Do: inkwell.Seq(
 				inkwell.SaveSlot(info.Slot),
-				inkwell.GoToStage(inc.StageMainMenu),
+				inkwell.GoToStage(MainMenu),
 			),
 		})
 	}

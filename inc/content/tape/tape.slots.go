@@ -5,7 +5,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 
-	"realworld/inc"
+	"realworld/inc/content/dialog"
+	"realworld/inc/content/item"
+	"realworld/inc/content/script"
+	"realworld/inc/content/speaker"
 	"realworld/inc/system"
 	"realworld/inc/system/armilla"
 	"realworld/inc/system/widget"
@@ -43,32 +46,32 @@ func (slots *slotPanel) hotspots(game *inkwell.Game) []inkwell.Hotspot {
 }
 
 func (slotPanel) dex(game *inkwell.Game, area inkwell.Rectangle) inkwell.Hotspot {
-	remark := inkwell.Say(inc.Dex, inkwell.Text{
+	remark := inkwell.Say(speaker.Dex, inkwell.Text{
 		{Lang: "en", Text: "Me. Four kilobytes of a dead man. Be grateful."},
 		{Lang: "hu", Text: "Én. Egy halott ember négy kilobájtja. Légy hálás."},
 	})
 	return inkwell.Hotspot{
 		Name:   "slot1",
-		Label:  game.SpeakerLabel(inc.Dex),
+		Label:  speaker.Dex.DisplayName(),
 		Area:   area,
 		OnLook: remark,
 		OnUse:  remark,
 		OnTake: remark,
-		OnTalk: system.System.Paused(inkwell.RunDialog(inc.DialogDex)),
-		OnUseWithAny: inkwell.Say(inc.Dex, inkwell.Text{
+		OnTalk: system.System.Paused(inkwell.RunDialog(dialog.Dex)),
+		OnUseWithAny: inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "The first slot is mine. I'm not moving."},
 			{Lang: "hu", Text: "Az első foglalat az enyém. Nem megyek sehová."},
 		}),
 	}
 }
 
-func (slots *slotPanel) cassette(game *inkwell.Game, area inkwell.Rectangle, loaded string) inkwell.Hotspot {
-	notATape := inkwell.Say(inc.Dex, inkwell.Text{
+func (slots *slotPanel) cassette(game *inkwell.Game, area inkwell.Rectangle, loaded *item.Item) inkwell.Hotspot {
+	notATape := inkwell.Say(speaker.Dex, inkwell.Text{
 		{Lang: "en", Text: "That isn't a tape, Paul. That's an object. There is a difference."},
 		{Lang: "hu", Text: "Az nem kazetta, Paul. Az egy tárgy. Van különbség."},
 	})
-	if loaded == "" {
-		empty := inkwell.Say(inc.Dex, inkwell.Text{
+	if loaded == nil {
+		empty := inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "The second slot is empty. That's the rarer state."},
 			{Lang: "hu", Text: "A második foglalat üres. Ez a ritkább állapot."},
 		})
@@ -79,7 +82,7 @@ func (slots *slotPanel) cassette(game *inkwell.Game, area inkwell.Rectangle, loa
 			OnLook: empty,
 			OnUse:  empty,
 			OnTake: empty,
-			OnTalk: inkwell.Say(inc.Dex, inkwell.Text{
+			OnTalk: inkwell.Say(speaker.Dex, inkwell.Text{
 				{Lang: "en", Text: "Empty. Nobody to talk to."},
 				{Lang: "hu", Text: "Üres. Nincs kivel beszélni."},
 			}),
@@ -87,32 +90,32 @@ func (slots *slotPanel) cassette(game *inkwell.Game, area inkwell.Rectangle, loa
 			OnUseWithAny: notATape,
 		}
 	}
-	careful := inkwell.Say(inc.Dex, inkwell.Text{
+	careful := inkwell.Say(speaker.Dex, inkwell.Text{
 		{Lang: "en", Text: "That is the second slot. Be careful what you let in."},
 		{Lang: "hu", Text: "Az a második foglalat. Vigyázz, mit engedsz be."},
 	})
 	return inkwell.Hotspot{
 		Name:         "slot2",
-		Label:        game.ItemLabel(loaded),
+		Label:        loaded.Description,
 		Area:         area,
 		OnLook:       careful,
 		OnUse:        careful,
 		OnTake:       careful,
-		OnTalk:       system.System.Paused(inkwell.RunDialog(Dialog(loaded))),
+		OnTalk:       system.System.Paused(inkwell.RunDialog(DialogOf(loaded))),
 		OnUseWith:    slots.insertions(),
 		OnUseWithAny: notATape,
 	}
 }
 
-func (slotPanel) insertions() map[string]inkwell.Action {
-	pairs := make(map[string]inkwell.Action)
+func (slotPanel) insertions() map[*inkwell.Item]inkwell.Action {
+	pairs := make(map[*inkwell.Item]inkwell.Action)
 	for _, candidate := range TapeManager.All() {
-		if candidate.Item == "" {
+		if candidate.Item == nil {
 			continue
 		}
 		pairs[candidate.Item] = inkwell.Seq(
 			armilla.Insert(candidate.Item),
-			inkwell.RunScript(inc.ScriptTapeInsert),
+			inkwell.RunScript(script.TapeInsert),
 			candidate.OnInsert,
 		)
 	}
@@ -122,9 +125,9 @@ func (slotPanel) insertions() map[string]inkwell.Action {
 func (slots *slotPanel) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
 	game := context.Game
 	first, second := slots.areas()
-	slots.paint(destination, game, first, slot1Label, game.SpeakerLabel(inc.Dex), true)
-	if loaded := armilla.Slot2(); loaded != "" {
-		slots.paint(destination, game, second, slot2Label, game.ItemLabel(loaded), true)
+	slots.paint(destination, game, first, slot1Label, speaker.Dex.DisplayName(), true)
+	if loaded := armilla.Slot2(); loaded != nil {
+		slots.paint(destination, game, second, slot2Label, loaded.Description, true)
 		return
 	}
 	slots.paint(destination, game, second, slot2Label, slotEmpty, false)

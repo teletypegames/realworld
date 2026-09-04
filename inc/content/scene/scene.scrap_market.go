@@ -2,12 +2,12 @@ package scene
 
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
-
-	"realworld/inc"
 )
 
-var _ = SceneManager.Register(Scene{
-	Name: inc.SceneScrapMarket,
+type scrapMarket struct{}
+
+var ScrapMarket = SceneManager.Register(&Scene{
+	Name: "scrap_market",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SCRAP MARKET"},
 		{Lang: "hu", Text: "ÓCSKAPIAC"},
@@ -16,3 +16,5 @@ var _ = SceneManager.Register(Scene{
 		exitToSelector,
 	},
 })
+
+func (scrapMarket) Scene() *inkwell.Scene { return ScrapMarket }

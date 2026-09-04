@@ -6,4 +6,4 @@ import (
 
 type Character = inkwell.Character
 
-var CharacterManager = inkwell.NewManager[Character]()
+var CharacterManager = inkwell.NewManager[*Character]()
