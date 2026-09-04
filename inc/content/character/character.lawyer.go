@@ -1,14 +1,12 @@
 package character
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/system/theme"
 )
 
 var Lawyer = CharacterManager.Register(&Character{
 	Name: "lawyer",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "lawyer"},
 		{Lang: "hu", Text: "ügyvéd"},
 	},

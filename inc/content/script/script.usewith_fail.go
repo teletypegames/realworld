@@ -9,13 +9,13 @@ import (
 )
 
 type useWithFail struct {
-	paul inkwell.Ladder
-	dex  inkwell.Ladder
+	paul Ladder
+	dex  Ladder
 }
 
 var fail = useWithFail{
-	paul: inkwell.Ladder{
-		Rungs: []inkwell.Text{
+	paul: Ladder{
+		Rungs: []Text{
 			{
 				{Lang: "en", Text: "No. That's not going to work."},
 				{Lang: "hu", Text: "Nem. Ez így nem fog menni."},
@@ -34,8 +34,8 @@ var fail = useWithFail{
 			},
 		},
 	},
-	dex: inkwell.Ladder{
-		Rungs: []inkwell.Text{
+	dex: Ladder{
+		Rungs: []Text{
 			{
 				{Lang: "en", Text: "No. Not like that."},
 				{Lang: "hu", Text: "Nem. Nem így."},
@@ -53,21 +53,21 @@ var fail = useWithFail{
 				{Lang: "hu", Text: "Csináld még párszor, hátha a fizika meggondolja magát."},
 			},
 		},
-		Last: inkwell.Text{
+		Last: Text{
 			{Lang: "en", Text: "Paul. Leave it. Look again at what you're carrying — that's where it is."},
 			{Lang: "hu", Text: "Paul. Hagyd. Nézd meg még egyszer, mi van nálad — ott lesz."},
 		},
 	},
 }
 
-func UseWithFail(held *inkwell.Item, hotspot *inkwell.Hotspot) inkwell.Action {
+func UseWithFail(held *inkwell.Item, hotspot *inkwell.Hotspot) Action {
 	state := system.System.Game().State
 	key := "fail." + held.Name + "." + hotspot.Name
 	state.NoteTalked(key)
 	count := state.Talked(key)
 
 	return inkwell.Seq(
-		inkwell.Say(character.Paul, fail.paul.At(count)),
-		inkwell.Say(speaker.Dex, fail.dex.At(count)),
+		character.Paul.Say(fail.paul.At(count)),
+		speaker.Dex.Say(fail.dex.At(count)),
 	)
 }

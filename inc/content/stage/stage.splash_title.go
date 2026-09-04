@@ -8,7 +8,7 @@ import (
 
 var SplashTitle = StageManager.Register(&Stage{
 	Name: "splash_title",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "REAL WORLD"},
 		{Lang: "hu", Text: "REAL WORLD"},
 	},
@@ -22,7 +22,7 @@ var _ = widget.WidgetManager.Register(&inkwell.TextCard{
 	When:     inkwell.OnStage(SplashTitle),
 	Align:    inkwell.AlignCenter,
 	Backdrop: true,
-	Lines: []inkwell.Text{
+	Lines: []Text{
 		{
 			{Lang: "en", Text: "Real World"},
 			{Lang: "hu", Text: "Real World"},

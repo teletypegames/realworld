@@ -8,7 +8,7 @@ import (
 
 var SecurityACP = CharacterManager.Register(&Character{
 	Name: "security_acp",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "SECURITY ACP"},
 		{Lang: "hu", Text: "BIZTONSÁGI ACP"},
 	},

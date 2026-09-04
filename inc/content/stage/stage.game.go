@@ -10,7 +10,7 @@ import (
 var Game = StageManager.Register(&Stage{
 	Name:  "game",
 	World: true,
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "REAL WORLD"},
 		{Lang: "hu", Text: "REAL WORLD"},
 	},

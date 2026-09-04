@@ -8,7 +8,7 @@ import (
 
 var SplashStudio = StageManager.Register(&Stage{
 	Name: "splash_studio",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "TELETYPE GAMES"},
 		{Lang: "hu", Text: "TELETYPE GAMES"},
 	},

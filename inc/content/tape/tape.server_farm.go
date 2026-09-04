@@ -14,11 +14,11 @@ var ServerFarm = TapeManager.Register(&Tape{
 	Speaker: speaker.TapeServerFarm,
 	Dialog:  dialog.ServerFarmTape,
 	OnInsert: inkwell.Seq(
-		inkwell.Say(speaker.TapeServerFarm, inkwell.Text{
+		speaker.TapeServerFarm.Say(Text{
 			{Lang: "en", Text: "CREDENTIAL LOADED. DOOR GROUP: DATACENTER-WEST."},
 			{Lang: "hu", Text: "HITELESÍTŐ BETÖLTVE. AJTÓCSOPORT: ADATKÖZPONT-NYUGAT."},
 		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
+		speaker.Dex.Say(Text{
 			{Lang: "en", Text: "No personality at all. I'm almost jealous."},
 			{Lang: "hu", Text: "Semmi személyiség. Majdnem irigylem."},
 		}),

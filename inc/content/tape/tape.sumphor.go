@@ -14,11 +14,11 @@ var Sumphor = TapeManager.Register(&Tape{
 	Speaker: speaker.TapeSumphor,
 	Dialog:  dialog.SumphorTape,
 	OnInsert: inkwell.Seq(
-		inkwell.Say(speaker.TapeSumphor, inkwell.Text{
+		speaker.TapeSumphor.Say(Text{
 			{Lang: "en", Text: "Desk four. Second floor. Coffee at ten. Who is this?"},
 			{Lang: "hu", Text: "Négyes asztal. Második emelet. Kávé tízkor. Ki vagy te?"},
 		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
+		speaker.Dex.Say(Text{
 			{Lang: "en", Text: "It knows the building better than it knows its own owner. That's a kind of damage."},
 			{Lang: "hu", Text: "Az épületet jobban ismeri, mint a saját gazdáját. Ez is egyfajta sérülés."},
 		}),

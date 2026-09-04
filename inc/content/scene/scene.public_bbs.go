@@ -1,12 +1,10 @@
 package scene
 
-import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-)
+import ()
 
 var PublicBBS = SceneManager.Register(&Scene{
 	Name: "public_bbs",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "PUBLIC BBS TERMINAL"},
 		{Lang: "hu", Text: "NYILVÁNOS BBS TERMINÁL"},
 	},

@@ -9,7 +9,7 @@ import (
 
 var Load = StageManager.Register(&Stage{
 	Name: "load",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "LOAD"},
 		{Lang: "hu", Text: "BETÖLTÉS"},
 	},
@@ -20,8 +20,8 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	When:   inkwell.OnStage(Load),
 	Sticky: true,
 	Bounds: window(360, 180),
-	Root: inkwell.MenuItem{
-		Label: inkwell.Text{
+	Root: MenuItem{
+		Label: Text{
 			{Lang: "en", Text: "LOAD"},
 			{Lang: "hu", Text: "BETÖLTÉS"},
 		},
@@ -31,10 +31,10 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 
 var _ = widget.WidgetManager.Register(escapeToMenu("load_escape", Load))
 
-func loadExpand(context *inkwell.Ctx) []inkwell.MenuItem {
-	var rows []inkwell.MenuItem
+func loadExpand(context *inkwell.Ctx) []MenuItem {
+	var rows []MenuItem
 	for _, info := range context.Game.Slots(inc.SaveSlots) {
-		rows = append(rows, inkwell.MenuItem{
+		rows = append(rows, MenuItem{
 			Label:   inkwell.Format(slotName, info.Slot),
 			Value:   inkwell.FixedValue(slotValue(info)),
 			Enabled: fixed(info.Exists),

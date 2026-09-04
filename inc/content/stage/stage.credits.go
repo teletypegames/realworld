@@ -8,7 +8,7 @@ import (
 
 var Credits = StageManager.Register(&Stage{
 	Name: "credits",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "CREDITS"},
 		{Lang: "hu", Text: "KÉSZÍTŐK"},
 	},
@@ -19,7 +19,7 @@ var _ = widget.WidgetManager.Register(&inkwell.TextCard{
 	When:     inkwell.OnStage(Credits),
 	Align:    inkwell.AlignCenter,
 	Backdrop: true,
-	Lines: []inkwell.Text{
+	Lines: []Text{
 		{
 			{Lang: "en", Text: "REAL WORLD"},
 			{Lang: "hu", Text: "REAL WORLD"},

@@ -1,12 +1,10 @@
 package scene
 
-import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-)
+import ()
 
 var SamizdatPress = SceneManager.Register(&Scene{
 	Name: "samizdat_press",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "SAMIZDAT PRINTING HOUSE"},
 		{Lang: "hu", Text: "SZAMIZDAT NYOMDA"},
 	},

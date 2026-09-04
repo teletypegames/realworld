@@ -1,12 +1,10 @@
 package scene
 
-import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-)
+import ()
 
 var Showroom = SceneManager.Register(&Scene{
 	Name: "showroom",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "NEUMATRONIC SHOWROOM"},
 		{Lang: "hu", Text: "NEUMATRONIC BEMUTATÓTEREM"},
 	},

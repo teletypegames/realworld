@@ -1,14 +1,12 @@
 package character
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/system/theme"
 )
 
 var ThinFigure = CharacterManager.Register(&Character{
 	Name: "thin_figure",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "thin figure"},
 		{Lang: "hu", Text: "vékony alak"},
 	},

@@ -1,14 +1,12 @@
 package character
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/system/theme"
 )
 
 var FatCop = CharacterManager.Register(&Character{
 	Name: "fat_cop",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "fat cop"},
 		{Lang: "hu", Text: "kövér rendőr"},
 	},

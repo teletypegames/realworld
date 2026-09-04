@@ -14,11 +14,11 @@ var Support = TapeManager.Register(&Tape{
 	Speaker: speaker.TapeSupport,
 	Dialog:  dialog.SupportTape,
 	OnInsert: inkwell.Seq(
-		inkwell.Say(speaker.TapeSupport, inkwell.Text{
+		speaker.TapeSupport.Say(Text{
 			{Lang: "en", Text: "Thank you for calling. My name is Raj. Have you tried turning it off and on again?"},
 			{Lang: "hu", Text: "Köszönjük a hívását. A nevem Raj. Próbálta már ki- és bekapcsolni?"},
 		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
+		speaker.Dex.Say(Text{
 			{Lang: "en", Text: "Paul. Take it out. Take it out now."},
 			{Lang: "hu", Text: "Paul. Vedd ki. Most vedd ki."},
 		}),

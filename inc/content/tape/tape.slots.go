@@ -34,16 +34,16 @@ func init() {
 	widget.WidgetManager.Register(panel)
 }
 
-func (slots *slotPanel) hotspots(game *inkwell.Game) []inkwell.Hotspot {
-	dexRemark := inkwell.Say(speaker.Dex, inkwell.Text{
+func (slots *slotPanel) hotspots(game *inkwell.Game) []Hotspot {
+	dexRemark := speaker.Dex.Say(Text{
 		{Lang: "en", Text: "Me. Four kilobytes of a dead man. Be grateful."},
 		{Lang: "hu", Text: "Én. Egy halott ember négy kilobájtja. Légy hálás."},
 	})
-	notATape := inkwell.Say(speaker.Dex, inkwell.Text{
+	notATape := speaker.Dex.Say(Text{
 		{Lang: "en", Text: "That isn't a tape, Paul. That's an object. There is a difference."},
 		{Lang: "hu", Text: "Az nem kazetta, Paul. Az egy tárgy. Van különbség."},
 	})
-	insertions := make(map[*inkwell.Item]inkwell.Action)
+	insertions := make(map[*inkwell.Item]Action)
 	for _, candidate := range TapeManager.All() {
 		if candidate.Item == nil {
 			continue
@@ -54,7 +54,7 @@ func (slots *slotPanel) hotspots(game *inkwell.Game) []inkwell.Hotspot {
 			candidate.OnInsert,
 		)
 	}
-	dex := inkwell.Hotspot{
+	dex := Hotspot{
 		Name:   "slot1",
 		Label:  speaker.Dex.DisplayName(),
 		Area:   slots.first,
@@ -62,18 +62,18 @@ func (slots *slotPanel) hotspots(game *inkwell.Game) []inkwell.Hotspot {
 		OnUse:  dexRemark,
 		OnTake: dexRemark,
 		OnTalk: system.System.Paused(inkwell.RunDialog(Dex.Dialog)),
-		OnUseWithAny: inkwell.Say(speaker.Dex, inkwell.Text{
+		OnUseWithAny: speaker.Dex.Say(Text{
 			{Lang: "en", Text: "The first slot is mine. I'm not moving."},
 			{Lang: "hu", Text: "Az első foglalat az enyém. Nem megyek sehová."},
 		}),
 	}
 	loaded := armilla.Slot2()
 	if loaded == nil {
-		empty := inkwell.Say(speaker.Dex, inkwell.Text{
+		empty := speaker.Dex.Say(Text{
 			{Lang: "en", Text: "The second slot is empty. That's the rarer state."},
 			{Lang: "hu", Text: "A második foglalat üres. Ez a ritkább állapot."},
 		})
-		return []inkwell.Hotspot{
+		return []Hotspot{
 			dex,
 			{
 				Name:   "slot2",
@@ -82,7 +82,7 @@ func (slots *slotPanel) hotspots(game *inkwell.Game) []inkwell.Hotspot {
 				OnLook: empty,
 				OnUse:  empty,
 				OnTake: empty,
-				OnTalk: inkwell.Say(speaker.Dex, inkwell.Text{
+				OnTalk: speaker.Dex.Say(Text{
 					{Lang: "en", Text: "Empty. Nobody to talk to."},
 					{Lang: "hu", Text: "Üres. Nincs kivel beszélni."},
 				}),
@@ -91,11 +91,11 @@ func (slots *slotPanel) hotspots(game *inkwell.Game) []inkwell.Hotspot {
 			},
 		}
 	}
-	careful := inkwell.Say(speaker.Dex, inkwell.Text{
+	careful := speaker.Dex.Say(Text{
 		{Lang: "en", Text: "That is the second slot. Be careful what you let in."},
 		{Lang: "hu", Text: "Az a második foglalat. Vigyázz, mit engedsz be."},
 	})
-	return []inkwell.Hotspot{
+	return []Hotspot{
 		dex,
 		{
 			Name:         "slot2",
@@ -114,7 +114,7 @@ func (slots *slotPanel) hotspots(game *inkwell.Game) []inkwell.Hotspot {
 func (slots *slotPanel) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
 	game := context.Game
 	theme := game.Theme()
-	paint := func(area inkwell.Rectangle, label, body inkwell.Text, filled bool) {
+	paint := func(area inkwell.Rectangle, label, body Text, filled bool) {
 		background, border, textColor := theme.InventorySlotBG, theme.ChatLogSystem, theme.ChatLogSystem
 		if filled {
 			background, border, textColor = theme.PanelBG, theme.CharacterPanelBorder, theme.ChatLogResponse
@@ -138,19 +138,19 @@ func (slots *slotPanel) Draw(destination *ebiten.Image, context *inkwell.UICtx) 
 }
 
 var (
-	slot1Label = inkwell.Text{
+	slot1Label = Text{
 		{Lang: "en", Text: "SLOT 1"},
 		{Lang: "hu", Text: "1. FOGLALAT"},
 	}
-	slot2Label = inkwell.Text{
+	slot2Label = Text{
 		{Lang: "en", Text: "SLOT 2"},
 		{Lang: "hu", Text: "2. FOGLALAT"},
 	}
-	slotEmpty = inkwell.Text{
+	slotEmpty = Text{
 		{Lang: "en", Text: "empty"},
 		{Lang: "hu", Text: "üres"},
 	}
-	slotEmptyLabel = inkwell.Text{
+	slotEmptyLabel = Text{
 		{Lang: "en", Text: "empty tape slot"},
 		{Lang: "hu", Text: "üres kazettafoglalat"},
 	}

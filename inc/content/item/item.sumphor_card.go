@@ -9,16 +9,16 @@ import (
 
 var SumphorCard = ItemManager.Register(&Item{
 	Name: "sumphor_card",
-	Description: inkwell.Text{
+	Description: Text{
 		{Lang: "en", Text: "Sumphor's access card"},
 		{Lang: "hu", Text: "Sumphor belépőkártyája"},
 	},
 	OnUseSelf: inkwell.Seq(
-		inkwell.Say(character.Paul, inkwell.Text{
+		character.Paul.Say(Text{
 			{Lang: "en", Text: "Staff card, Tower B. The photo is of a man who still slept at night."},
 			{Lang: "hu", Text: "Dolgozói kártya, B torony. A fényképen egy ember, aki még aludt éjszakánként."},
 		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
+		speaker.Dex.Say(Text{
 			{Lang: "en", Text: "Four-one-nine-one. Don't make me repeat it at the lift."},
 			{Lang: "hu", Text: "Négy-egy-kilenc-egy. Ne kelljen a liftnél megismételnem."},
 		}),

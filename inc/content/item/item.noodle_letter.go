@@ -9,16 +9,16 @@ import (
 
 var NoodleLetter = ItemManager.Register(&Item{
 	Name: "noodle_letter",
-	Description: inkwell.Text{
+	Description: Text{
 		{Lang: "en", Text: "Noodle's letter"},
 		{Lang: "hu", Text: "Noodle levele"},
 	},
 	OnUseSelf: inkwell.Seq(
-		inkwell.Say(character.Paul, inkwell.Text{
+		character.Paul.Say(Text{
 			{Lang: "en", Text: "“Come out, Paul. Not a phone conversation.” That's all it says."},
 			{Lang: "hu", Text: "„Gyere ki, Paul. Ez nem telefontéma.” Ennyi áll benne."},
 		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
+		speaker.Dex.Say(Text{
 			{Lang: "en", Text: "And now you're here. And he isn't."},
 			{Lang: "hu", Text: "És most itt vagy. Ő meg nincs."},
 		}),

@@ -1,14 +1,12 @@
 package character
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/system/theme"
 )
 
 var Secretary = CharacterManager.Register(&Character{
 	Name: "secretary",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "secretary"},
 		{Lang: "hu", Text: "titkár"},
 	},

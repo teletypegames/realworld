@@ -189,7 +189,7 @@ The game is written twice, in place. Every string the player reads is an
 it in — and it stays in the file that owns the thing it names:
 
 ```go
-OnLook: inkwell.Say(character.Paul, inkwell.Text{
+OnLook: character.Paul.Say(Text{
 	{Lang: "en", Text: "Keypad. Four digits, worn keys."},
 	{Lang: "hu", Text: "Billentyűzet. Négy számjegy, kopott gombok."},
 }),
@@ -475,8 +475,8 @@ Tapes are the one entity type this game invents. `Tape` holds the voice it
 speaks with, the cassette that carries it and the dialog it plays, one file
 each — what a tape *sounds* like stays on the `Speaker`, as its `Label`,
 `Color` and `Voice`, because that is a fact about a voice.
-A tape's line is `inkwell.Say` like anybody else's; the engine sends it to the
-log instead of a speech bubble because the character says so.
+A tape's line is `speaker.TapeSupport.Say(…)` like anybody else's; the engine
+sends it to the log instead of a speech bubble because the voice says so.
 
 So adding an entity is adding a file, and there is no second list to keep in
 step. The price is that registration order is file-name order: the debug

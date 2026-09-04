@@ -8,7 +8,7 @@ import (
 
 var MainMenu = StageManager.Register(&Stage{
 	Name: "main_menu",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "REAL WORLD"},
 		{Lang: "hu", Text: "REAL WORLD"},
 	},
@@ -19,14 +19,14 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	When:   inkwell.OnStage(MainMenu),
 	Sticky: true,
 	Bounds: window(240, 200),
-	Root: inkwell.MenuItem{
-		Label: inkwell.Text{
+	Root: MenuItem{
+		Label: Text{
 			{Lang: "en", Text: "REAL WORLD"},
 			{Lang: "hu", Text: "REAL WORLD"},
 		},
-		Items: []inkwell.MenuItem{
+		Items: []MenuItem{
 			{
-				Label: inkwell.Text{
+				Label: Text{
 					{Lang: "en", Text: "New Game"},
 					{Lang: "hu", Text: "Új játék"},
 				},
@@ -36,7 +36,7 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 				),
 			},
 			{
-				Label: inkwell.Text{
+				Label: Text{
 					{Lang: "en", Text: "Resume"},
 					{Lang: "hu", Text: "Folytatás"},
 				},
@@ -44,14 +44,14 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 				Do:      inkwell.GoToStage(Game),
 			},
 			{
-				Label: inkwell.Text{
+				Label: Text{
 					{Lang: "en", Text: "Load"},
 					{Lang: "hu", Text: "Betöltés"},
 				},
 				Do: inkwell.GoToStage(Load),
 			},
 			{
-				Label: inkwell.Text{
+				Label: Text{
 					{Lang: "en", Text: "Save"},
 					{Lang: "hu", Text: "Mentés"},
 				},
@@ -59,21 +59,21 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 				Do:      inkwell.GoToStage(Save),
 			},
 			{
-				Label: inkwell.Text{
+				Label: Text{
 					{Lang: "en", Text: "Settings"},
 					{Lang: "hu", Text: "Beállítások"},
 				},
 				Do: inkwell.GoToStage(Settings),
 			},
 			{
-				Label: inkwell.Text{
+				Label: Text{
 					{Lang: "en", Text: "Credits"},
 					{Lang: "hu", Text: "Készítők"},
 				},
 				Do: inkwell.GoToStage(Credits),
 			},
 			{
-				Label: inkwell.Text{
+				Label: Text{
 					{Lang: "en", Text: "Exit"},
 					{Lang: "hu", Text: "Kilépés"},
 				},

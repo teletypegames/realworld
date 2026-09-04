@@ -1,12 +1,10 @@
 package scene
 
-import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-)
+import ()
 
 var ScrapMarket = SceneManager.Register(&Scene{
 	Name: "scrap_market",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "SCRAP MARKET"},
 		{Lang: "hu", Text: "ÓCSKAPIAC"},
 	},

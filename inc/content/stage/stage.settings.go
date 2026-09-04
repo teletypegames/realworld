@@ -9,7 +9,7 @@ import (
 
 var Settings = StageManager.Register(&Stage{
 	Name: "settings",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "SETTINGS"},
 		{Lang: "hu", Text: "BEÁLLÍTÁSOK"},
 	},
@@ -20,8 +20,8 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 	When:   inkwell.OnStage(Settings),
 	Sticky: true,
 	Bounds: window(320, 140),
-	Root: inkwell.MenuItem{
-		Label: inkwell.Text{
+	Root: MenuItem{
+		Label: Text{
 			{Lang: "en", Text: "SETTINGS"},
 			{Lang: "hu", Text: "BEÁLLÍTÁSOK"},
 		},
@@ -31,7 +31,7 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 
 var _ = widget.WidgetManager.Register(escapeToMenu("settings_escape", Settings))
 
-func settingsExpand(context *inkwell.Ctx) []inkwell.MenuItem {
+func settingsExpand(context *inkwell.Ctx) []MenuItem {
 	otherLanguage := "hu"
 	if inkwell.Lang == "hu" {
 		otherLanguage = "en"
@@ -40,9 +40,9 @@ func settingsExpand(context *inkwell.Ctx) []inkwell.MenuItem {
 	if context.Game.Theme() == theme.NokiaPunk {
 		otherTheme = theme.RealWorld
 	}
-	return []inkwell.MenuItem{
+	return []MenuItem{
 		{
-			Label: inkwell.Text{
+			Label: Text{
 				{Lang: "en", Text: "Language"},
 				{Lang: "hu", Text: "Nyelv"},
 			},
@@ -51,7 +51,7 @@ func settingsExpand(context *inkwell.Ctx) []inkwell.MenuItem {
 			KeepOpen: true,
 		},
 		{
-			Label: inkwell.Text{
+			Label: Text{
 				{Lang: "en", Text: "Theme"},
 				{Lang: "hu", Text: "Téma"},
 			},
@@ -63,7 +63,7 @@ func settingsExpand(context *inkwell.Ctx) []inkwell.MenuItem {
 	}
 }
 
-var languageNames = map[string]inkwell.Text{
+var languageNames = map[string]Text{
 	"en": {
 		{Lang: "en", Text: "English"},
 		{Lang: "hu", Text: "angol"},
@@ -74,7 +74,7 @@ var languageNames = map[string]inkwell.Text{
 	},
 }
 
-var themeNames = map[*theme.Theme]inkwell.Text{
+var themeNames = map[*theme.Theme]Text{
 	theme.RealWorld: {
 		{Lang: "en", Text: "Real World '93"},
 		{Lang: "hu", Text: "Real World '93"},

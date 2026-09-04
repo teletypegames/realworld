@@ -8,7 +8,7 @@ import (
 
 var TapeMystery = SpeakerManager.Register(&Speaker{
 	Name: "tape_mystery",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "UNKNOWN TAPE"},
 		{Lang: "hu", Text: "ISMERETLEN KAZETTA"},
 	},

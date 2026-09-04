@@ -8,7 +8,7 @@ import (
 
 var TapeServerFarm = SpeakerManager.Register(&Speaker{
 	Name: "tape_server_farm",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "ACCESS TAPE"},
 		{Lang: "hu", Text: "BELÉPŐKAZETTA"},
 	},

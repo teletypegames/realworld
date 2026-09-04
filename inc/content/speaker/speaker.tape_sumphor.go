@@ -8,7 +8,7 @@ import (
 
 var TapeSumphor = SpeakerManager.Register(&Speaker{
 	Name: "tape_sumphor",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "SUMPHOR'S TAPE"},
 		{Lang: "hu", Text: "SUMPHOR KAZETTÁJA"},
 	},

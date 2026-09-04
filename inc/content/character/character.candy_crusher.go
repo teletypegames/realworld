@@ -1,14 +1,12 @@
 package character
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/system/theme"
 )
 
 var CandyCrusher = CharacterManager.Register(&Character{
 	Name: "candy_crusher",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "man with the handheld"},
 		{Lang: "hu", Text: "kézikonzolos fickó"},
 	},

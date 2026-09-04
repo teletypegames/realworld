@@ -1,14 +1,12 @@
 package character
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/system/theme"
 )
 
 var Receptionist = CharacterManager.Register(&Character{
 	Name: "receptionist",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "receptionist"},
 		{Lang: "hu", Text: "recepciós"},
 	},

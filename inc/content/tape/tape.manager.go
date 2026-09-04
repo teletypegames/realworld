@@ -8,12 +8,18 @@ import (
 	"realworld/inc/content/speaker"
 )
 
+type (
+	Text    = inkwell.Text
+	Action  = inkwell.Action
+	Hotspot = inkwell.Hotspot
+)
+
 type Tape struct {
 	Name     string
 	Item     *item.Item
 	Speaker  *speaker.Speaker
 	Dialog   *dialog.Dialog
-	OnInsert inkwell.Action
+	OnInsert Action
 }
 
 var TapeManager = inkwell.NewManager[*Tape]()

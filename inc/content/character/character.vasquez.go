@@ -1,14 +1,12 @@
 package character
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/system/theme"
 )
 
 var Vasquez = CharacterManager.Register(&Character{
 	Name: "vasquez",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "Det. Vasquez"},
 		{Lang: "hu", Text: "Vasquez nyomozó"},
 	},

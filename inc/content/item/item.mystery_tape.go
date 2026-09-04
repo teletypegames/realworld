@@ -9,16 +9,16 @@ import (
 
 var MysteryTape = ItemManager.Register(&Item{
 	Name: "mystery_tape",
-	Description: inkwell.Text{
+	Description: Text{
 		{Lang: "en", Text: "unmarked Personal Tape"},
 		{Lang: "hu", Text: "jelöletlen Személyes Kazetta"},
 	},
 	OnUseSelf: inkwell.Seq(
-		inkwell.Say(character.Paul, inkwell.Text{
+		character.Paul.Say(Text{
 			{Lang: "en", Text: "Password-locked. Of course."},
 			{Lang: "hu", Text: "Jelszóval zárva. Persze."},
 		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
+		speaker.Dex.Say(Text{
 			{Lang: "en", Text: "Put it in the second slot if you care that much. I did warn you."},
 			{Lang: "hu", Text: "Tedd a második foglalatba, ha ennyire érdekel. Én szóltam."},
 		}),

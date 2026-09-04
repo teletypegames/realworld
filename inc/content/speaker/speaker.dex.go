@@ -8,7 +8,7 @@ import (
 
 var Dex = SpeakerManager.Register(&Speaker{
 	Name: "dex",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "DEX"},
 		{Lang: "hu", Text: "DEX"},
 	},

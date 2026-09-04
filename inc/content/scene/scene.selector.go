@@ -6,9 +6,9 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-var exitToSelector = inkwell.Exit{
+var exitToSelector = Exit{
 	To: Selector,
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "the rest of the city"},
 		{Lang: "hu", Text: "a város többi része"},
 	},
@@ -17,16 +17,16 @@ var exitToSelector = inkwell.Exit{
 
 var Selector = SceneManager.Register(&Scene{
 	Name: "selector",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "SAN FRANCISCO"},
 		{Lang: "hu", Text: "SAN FRANCISCO"},
 	},
-	Actors:    []inkwell.SceneActor{},
-	Walkboxes: []inkwell.Polygon{},
+	Actors:    []SceneActor{},
+	Walkboxes: []Polygon{},
 	Derived:   selectorDerived,
 })
 
-func selectorDerived(game *inkwell.Game, self *Scene) []inkwell.Exit {
+func selectorDerived(game *inkwell.Game, self *Scene) []Exit {
 	leadsHere := func(scene *Scene) bool {
 		for _, exit := range scene.Exits {
 			if exit.To == self {
@@ -39,18 +39,18 @@ func selectorDerived(game *inkwell.Game, self *Scene) []inkwell.Exit {
 		column, row := index%pinColumns, index/pinColumns
 		return inkwell.Rect(pinX+float64(column)*pinGapX, pinY+float64(row)*pinGapY, pinWidth, pinHeight)
 	}
-	shortTitle := func(title inkwell.Text) inkwell.Text {
+	shortTitle := func(title Text) Text {
 		return title.Map(func(title string) string {
 			name, _, _ := strings.Cut(title, " — ")
 			return name
 		})
 	}
-	var exits []inkwell.Exit
+	var exits []Exit
 	for _, entity := range game.SceneManager.All() {
 		if !leadsHere(entity) {
 			continue
 		}
-		exits = append(exits, inkwell.Exit{
+		exits = append(exits, Exit{
 			To:    entity,
 			Label: shortTitle(entity.Title),
 			Area:  pin(len(exits)),

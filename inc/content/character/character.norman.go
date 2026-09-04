@@ -1,14 +1,12 @@
 package character
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/system/theme"
 )
 
 var Norman = CharacterManager.Register(&Character{
 	Name: "norman",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "Norman"},
 		{Lang: "hu", Text: "Norman"},
 	},

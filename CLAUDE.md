@@ -50,7 +50,7 @@ carrying English first and every other language the game speaks after it, in
 the same file, at the same place:
 
 ```go
-OnLook: inkwell.Say(character.Paul, inkwell.Text{
+OnLook: character.Paul.Say(Text{
 	{Lang: "en", Text: "Keypad. Four digits, worn keys."},
 	{Lang: "hu", Text: "Billentyűzet. Négy számjegy, kopott gombok."},
 }),
@@ -94,7 +94,7 @@ stay on **one** line, so the translations of a string stack into a table and
 the eye can run down a single column to compare them.
 
 ```go
-Title: inkwell.Text{
+Title: Text{
 	{Lang: "en", Text: "ALLEY — BEHIND NOODLE'S HOUSE"},
 	{Lang: "hu", Text: "SIKÁTOR — NOODLE HÁZA MÖGÖTT"},
 },
@@ -213,10 +213,25 @@ keeps the prefix, because a manager is read far from its package and a bare
 // inc/content/character/character.manager.go
 package character
 
-type Character = inkwell.Character
+type (
+	Character = inkwell.Character
+	Text      = inkwell.Text
+	Point     = inkwell.Point
+)
 
 var CharacterManager = inkwell.NewManager[*Character]()
 ```
+
+The manager file also aliases the engine types the package writes as
+**literals** — `Text` everywhere, `Hotspot`, `Exit`, `Trigger`, `SceneActor`,
+`Point` in `scene`, `DialogNode`, `DialogLine`, `DialogChoice`, `Given` in
+`dialog`, `MenuItem` in `stage` — so a content file says `Text{…}` and
+`Hotspot{…}` rather than `inkwell.Text{…}` on every line. Only literal types
+are aliased, never functions: `inkwell.Seq`, `inkwell.If`, `inkwell.Rect` keep
+their qualifier, because a call reads fine with one and a literal drowns in
+them. A line is spoken by its speaker, `character.Paul.Say(…)`,
+`speaker.Dex.Say(…)`, which is `inkwell.Say` with the first argument moved in
+front of the verb, where a script puts it.
 
 Every manager holds **pointers**, `Manager[*Character]` and never
 `Manager[Character]`, so the variable an entity file binds and the entry the
@@ -772,8 +787,9 @@ the entity variables, the state keys in `inc/constants.go`, each package's
 `Do`, `Game`, `Attach`, …), the Armilla (`armilla.Slot2`, `armilla.Insert`,
 `armilla.StripIfEmpty`), the action constructors (`System.Paused`,
 `System.SetMode`) and the one HUD condition a content file has to name,
-`widget.WhenPlaying`. A tape's line is `inkwell.Say` like anyone else's — the
-tape voice is the `Speaker` in `speaker/`, not a second spelling of Say.
+`widget.WhenPlaying`. A tape's line is `speaker.TapeSupport.Say(…)` like
+anyone else's — the tape voice is the `Speaker` in `speaker/`, and `Say` is
+the engine's one `Say` on every talker, not a second spelling of it.
 
 Everything else stays unexported, and now the compiler holds the line: the HUD
 widgets (`hudFrame`, `slots`, …), the conditions `whenCutscene` and `whenDebug`,

@@ -10,23 +10,23 @@ import (
 var OfficerOnGuard = DialogManager.Register(&Dialog{
 	Name:  "officer_on_guard",
 	Start: "root",
-	Nodes: []inkwell.DialogNode{{
+	Nodes: []DialogNode{{
 		Name: "root",
-		Lines: []inkwell.DialogLine{{
+		Lines: []DialogLine{{
 			Speaker: character.OfficerOnGuard,
-			Text: inkwell.Text{
+			Text: Text{
 				{Lang: "en", Text: "Sir. This is a sealed address."},
 				{Lang: "hu", Text: "Uram. Ez lezárt helyszín."},
 			},
 		}},
-		Choices: []inkwell.DialogChoice{
+		Choices: []DialogChoice{
 			{
-				Text: inkwell.Text{
+				Text: Text{
 					{Lang: "en", Text: "What happened here?"},
 					{Lang: "hu", Text: "Mi történt itt?"},
 				},
-				Actions: []inkwell.Action{
-					inkwell.Say(character.OfficerOnGuard, inkwell.Text{
+				Actions: []Action{
+					character.OfficerOnGuard.Say(Text{
 						{Lang: "en", Text: "Police matter."},
 						{Lang: "hu", Text: "Rendőrségi ügy."},
 					}),
@@ -34,28 +34,28 @@ var OfficerOnGuard = DialogManager.Register(&Dialog{
 				},
 			},
 			{
-				Text: inkwell.Text{
+				Text: Text{
 					{Lang: "en", Text: "Where's the man who lives here?"},
 					{Lang: "hu", Text: "Hol van, aki itt lakik?"},
 				},
-				Actions: []inkwell.Action{
-					inkwell.Say(character.OfficerOnGuard, inkwell.Text{
+				Actions: []Action{
+					character.OfficerOnGuard.Say(Text{
 						{Lang: "en", Text: "One moment."},
 						{Lang: "hu", Text: "Egy pillanat."},
 					}),
-					inkwell.Say(character.Paul, inkwell.Text{
+					character.Paul.Say(Text{
 						{Lang: "en", Text: "He's getting a notebook out."},
 						{Lang: "hu", Text: "Füzetet vesz elő."},
 					}),
-					inkwell.Say(character.OfficerOnGuard, inkwell.Text{
+					character.OfficerOnGuard.Say(Text{
 						{Lang: "en", Text: "Would you like to give your details and state your connection to this address, sir?"},
 						{Lang: "hu", Text: "Kívánja megadni az adatait, és közölni, mi köze ehhez a címhez, uram?"},
 					}),
-					inkwell.Say(character.Paul, inkwell.Text{
+					character.Paul.Say(Text{
 						{Lang: "en", Text: "…No. No, I would not."},
 						{Lang: "hu", Text: "…Nem. Nem kívánom."},
 					}),
-					inkwell.Say(speaker.Dex, inkwell.Text{
+					speaker.Dex.Say(Text{
 						{Lang: "en", Text: "Wise. Nothing in that notebook ever got anybody out of anything."},
 						{Lang: "hu", Text: "Bölcs. Abból a füzetből még senki nem került ki semmiből."},
 					}),
@@ -63,20 +63,20 @@ var OfficerOnGuard = DialogManager.Register(&Dialog{
 				},
 			},
 			{
-				Text: inkwell.Text{
+				Text: Text{
 					{Lang: "en", Text: "Long shift?"},
 					{Lang: "hu", Text: "Hosszú a műszak?"},
 				},
-				Actions: []inkwell.Action{
-					inkwell.Say(character.OfficerOnGuard, inkwell.Text{
+				Actions: []Action{
+					character.OfficerOnGuard.Say(Text{
 						{Lang: "en", Text: "Since six. Nobody relieves you on a seal. Nobody brings you anything either."},
 						{Lang: "hu", Text: "Hat óta. Pecsételésnél nem vált le senki. Hozni se hoz senki semmit."},
 					}),
-					inkwell.Say(character.OfficerOnGuard, inkwell.Text{
+					character.OfficerOnGuard.Say(Text{
 						{Lang: "en", Text: "And don't eat in front of me, please. I'm standing here all day and I'm starving."},
 						{Lang: "hu", Text: "És kérem, ne egyen itt előttem. Egész nap szobrozok, és éhen halok."},
 					}),
-					inkwell.Say(speaker.Dex, inkwell.Text{
+					speaker.Dex.Say(Text{
 						{Lang: "en", Text: "Paul. You heard the man."},
 						{Lang: "hu", Text: "Paul. Hallottad az embert."},
 					}),
@@ -84,12 +84,12 @@ var OfficerOnGuard = DialogManager.Register(&Dialog{
 				},
 			},
 			{
-				Text: inkwell.Text{
+				Text: Text{
 					{Lang: "en", Text: "I'll go."},
 					{Lang: "hu", Text: "Megyek."},
 				},
-				Actions: []inkwell.Action{
-					inkwell.Say(character.OfficerOnGuard, inkwell.Text{
+				Actions: []Action{
+					character.OfficerOnGuard.Say(Text{
 						{Lang: "en", Text: "Do that, sir."},
 						{Lang: "hu", Text: "Tegye azt, uram."},
 					}),

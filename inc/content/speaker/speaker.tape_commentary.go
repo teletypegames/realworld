@@ -8,7 +8,7 @@ import (
 
 var TapeCommentary = SpeakerManager.Register(&Speaker{
 	Name: "tape_commentary",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "DEV COMMENTARY"},
 		{Lang: "hu", Text: "FEJLESZTŐI KOMMENTÁR"},
 	},

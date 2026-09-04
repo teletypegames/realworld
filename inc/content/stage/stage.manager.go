@@ -7,7 +7,11 @@ import (
 	"realworld/inc/system/widget"
 )
 
-type Stage = inkwell.Stage
+type (
+	Stage    = inkwell.Stage
+	Text     = inkwell.Text
+	MenuItem = inkwell.MenuItem
+)
 
 var StageManager = inkwell.NewManager[*Stage]()
 
@@ -24,7 +28,7 @@ var splashTransition = inkwell.Fade(0.5)
 
 const splashHold = 2.0
 
-var back = inkwell.Text{
+var back = Text{
 	{Lang: "en", Text: "Back"},
 	{Lang: "hu", Text: "Vissza"},
 }
@@ -33,28 +37,28 @@ type fixed bool
 
 func (value fixed) Eval(*inkwell.Ctx) bool { return bool(value) }
 
-var slotName = inkwell.Text{
+var slotName = Text{
 	{Lang: "en", Text: "Slot %d"},
 	{Lang: "hu", Text: "%d. hely"},
 }
 
-var slotEmpty = inkwell.Text{
+var slotEmpty = Text{
 	{Lang: "en", Text: "empty"},
 	{Lang: "hu", Text: "üres"},
 }
 
-func slotValue(info inkwell.SlotInfo) inkwell.Text {
+func slotValue(info inkwell.SlotInfo) Text {
 	if !info.Exists {
 		return slotEmpty
 	}
-	return inkwell.Text{
+	return Text{
 		{Lang: "en", Text: info.SavedAt.Format("2006-01-02 15:04")},
 		{Lang: "hu", Text: info.SavedAt.Format("2006-01-02 15:04")},
 	}
 }
 
-func backRow() inkwell.MenuItem {
-	return inkwell.MenuItem{
+func backRow() MenuItem {
+	return MenuItem{
 		Label: back,
 		Do:    inkwell.GoToStage(MainMenu),
 	}

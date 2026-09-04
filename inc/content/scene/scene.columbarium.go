@@ -1,12 +1,10 @@
 package scene
 
-import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-)
+import ()
 
 var Columbarium = SceneManager.Register(&Scene{
 	Name: "columbarium",
-	Title: inkwell.Text{
+	Title: Text{
 		{Lang: "en", Text: "COLUMBARIUM — DEX'S MEMORIAL"},
 		{Lang: "hu", Text: "KOLUMBÁRIUM — DEX EMLÉKHELYE"},
 	},

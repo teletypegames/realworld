@@ -8,7 +8,7 @@ import (
 
 var TapeSupport = SpeakerManager.Register(&Speaker{
 	Name: "tape_support",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "TECH SUPPORT"},
 		{Lang: "hu", Text: "ÜGYFÉLSZOLGÁLAT"},
 	},

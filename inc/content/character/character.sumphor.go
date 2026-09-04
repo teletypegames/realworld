@@ -1,14 +1,12 @@
 package character
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/system/theme"
 )
 
 var Sumphor = CharacterManager.Register(&Character{
 	Name: "sumphor",
-	Label: inkwell.Text{
+	Label: Text{
 		{Lang: "en", Text: "Sumphor"},
 		{Lang: "hu", Text: "Sumphor"},
 	},

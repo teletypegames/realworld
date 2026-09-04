@@ -18,29 +18,29 @@ var keypadPairs = []string{"22", "27", "72", "77"}
 
 const keypadCode = "2772"
 
-func keypadNodes() []inkwell.DialogNode {
-	label := func(pair string) inkwell.Text {
+func keypadNodes() []DialogNode {
+	label := func(pair string) Text {
 		spaced := string(pair[0]) + " " + string(pair[1])
-		return inkwell.Text{
+		return Text{
 			{Lang: "en", Text: spaced},
 			{Lang: "hu", Text: spaced},
 		}
 	}
-	stepAway := inkwell.DialogChoice{
-		Text: inkwell.Text{
+	stepAway := DialogChoice{
+		Text: Text{
 			{Lang: "en", Text: "Step away."},
 			{Lang: "hu", Text: "Hátralépni."},
 		},
-		Actions: []inkwell.Action{inkwell.EndDialog()},
+		Actions: []Action{inkwell.EndDialog()},
 	}
-	attempt := func(code string) []inkwell.Action {
+	attempt := func(code string) []Action {
 		if code == keypadCode {
-			return []inkwell.Action{
-				inkwell.Say(character.Paul, inkwell.Text{
+			return []Action{
+				character.Paul.Say(Text{
 					{Lang: "en", Text: "Click."},
 					{Lang: "hu", Text: "Katt."},
 				}),
-				inkwell.Say(speaker.Dex, inkwell.Text{
+				speaker.Dex.Say(Text{
 					{Lang: "en", Text: "Well. Somebody knew that."},
 					{Lang: "hu", Text: "Nos. Ezt valaki tudta."},
 				}),
@@ -48,30 +48,30 @@ func keypadNodes() []inkwell.DialogNode {
 				inkwell.EndDialog(),
 			}
 		}
-		return []inkwell.Action{
-			inkwell.Say(character.Paul, inkwell.Text{
+		return []Action{
+			character.Paul.Say(Text{
 				{Lang: "en", Text: "Nothing."},
 				{Lang: "hu", Text: "Semmi."},
 			}),
-			inkwell.Say(speaker.Dex, inkwell.Text{
+			speaker.Dex.Say(Text{
 				{Lang: "en", Text: "Fifteen to go. Or one, if you'd ask the man who set it."},
 				{Lang: "hu", Text: "Még tizenöt. Vagy egy, ha megkérdeznéd azt, aki beállította."},
 			}),
 			inkwell.GotoNode("root"),
 		}
 	}
-	first := []inkwell.DialogChoice{}
+	first := []DialogChoice{}
 	for _, pair := range keypadPairs {
-		first = append(first, inkwell.DialogChoice{
+		first = append(first, DialogChoice{
 			Text:    label(pair),
-			Actions: []inkwell.Action{inkwell.GotoNode("first_" + pair)},
+			Actions: []Action{inkwell.GotoNode("first_" + pair)},
 		})
 	}
-	nodes := []inkwell.DialogNode{{
+	nodes := []DialogNode{{
 		Name: "root",
-		Lines: []inkwell.DialogLine{{
+		Lines: []DialogLine{{
 			Speaker: speaker.Dex,
-			Text: inkwell.Text{
+			Text: Text{
 				{Lang: "en", Text: "Four digits. Two and seven are worn. First two?"},
 				{Lang: "hu", Text: "Négy számjegy. A kettes és a hetes kopott. Az első kettő?"},
 			},
@@ -79,18 +79,18 @@ func keypadNodes() []inkwell.DialogNode {
 		Choices: append(first, stepAway),
 	}}
 	for _, firstPair := range keypadPairs {
-		second := []inkwell.DialogChoice{}
+		second := []DialogChoice{}
 		for _, secondPair := range keypadPairs {
-			second = append(second, inkwell.DialogChoice{
+			second = append(second, DialogChoice{
 				Text:    label(secondPair),
 				Actions: attempt(firstPair + secondPair),
 			})
 		}
-		nodes = append(nodes, inkwell.DialogNode{
+		nodes = append(nodes, DialogNode{
 			Name: "first_" + firstPair,
-			Lines: []inkwell.DialogLine{{
+			Lines: []DialogLine{{
 				Speaker: speaker.Dex,
-				Text: inkwell.Text{
+				Text: Text{
 					{Lang: "en", Text: "Last two."},
 					{Lang: "hu", Text: "Az utolsó kettő."},
 				},
