@@ -62,14 +62,11 @@ func parseOptions() options {
 	}
 }
 
-// startStage is the main menu, unless the run named a scene or asked for the
-// finale — both of those are somebody wanting to look at the game, not at its
-// front door.
 func (chosen options) startStage() string {
 	if chosen.startScene != "" || chosen.finale {
 		return inc.StageGame
 	}
-	return inc.StageMainMenu
+	return inc.StageSplashStudio
 }
 
 func (chosen options) scene() string {

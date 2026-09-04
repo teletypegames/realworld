@@ -150,12 +150,14 @@ const (
 )
 
 const (
-	StageGame     = "game"
-	StageMainMenu = "main_menu"
-	StageLoad     = "load"
-	StageSave     = "save"
-	StageSettings = "settings"
-	StageCredits  = "credits"
+	StageGame         = "game"
+	StageSplashStudio = "splash_studio"
+	StageSplashTitle  = "splash_title"
+	StageMainMenu     = "main_menu"
+	StageLoad         = "load"
+	StageSave         = "save"
+	StageSettings     = "settings"
+	StageCredits      = "credits"
 )
 
 const (

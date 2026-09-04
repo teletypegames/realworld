@@ -23,7 +23,7 @@ go run .
 ```
 
 ```bash
-go run .                   # the main menu
+go run .                   # the two splash cards, then the main menu
 go run . -lang hu          # the same game in Hungarian
 go run . -finale           # the finale — try the Nokia-punk theme switch
 go run . -scene alley      # straight into the alley (beat 3), no main menu
@@ -400,8 +400,26 @@ the first thing a player sees without the alley running behind it.
 
 Each stage file is a whole screen: the `Stage` literal and the widget that
 draws it, in one file — a `Sticky` `inkwell.Menu` for the four menu
-screens, an `inkwell.TextCard` for the credits. Sticky because a menu with
-nothing behind it must not be closable. The HUD needed one line to follow all
+screens, an `inkwell.TextCard` for the credits and for the two splash cards.
+Sticky because a menu with nothing behind it must not be closable.
+
+The splash cards are what the game opens on: `inc.StageSplashStudio`, the
+Teletype Games logo, and `inc.StageSplashTitle`, "Real World" centred, each
+two seconds, each fading to the next. None of that is code in this
+repository: a `Stage` says `Hold: 2` and `Next`, and the fade is its
+`Transition`, `inkwell.Fade(0.5)`. The logo is the Stage's `Background`, a
+picture the engine stretches over the whole window, so
+`assets/stage/splash_studio.png` is already 640×380: the logo scaled to
+150 px tall on a black canvas, the logo's own background — and the colour
+the `Fade` goes through, so the card leaves without a visible edge. The stage
+file registers that one asset itself, the way `tape.slots.go` registers a
+widget — `background.manager.go` derives an asset per *scene*, and a stage
+is not one. The two numbers are `splashHold` and
+`splashTransition` in `stage.manager.go`, shared so that the two cards move
+at one pace. A `Transition` belongs to the Stage that *leaves* through it,
+which is what keeps the menu and its sub-screens cutting: neither names one.
+`-scene` and `-finale` skip the cards along with the menu, because both mean
+somebody wants to look at the game. The HUD needed one line to follow all
 of this: `WhenPlaying` is `And(OnStage(inc.StageGame), Not(inCutscene))`, and
 because *not being in a cutscene* is the default, a fresh `State` after a New
 Game is already a playing one.

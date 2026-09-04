@@ -21,6 +21,10 @@ func window(width, height float64) inkwell.Rectangle {
 	)
 }
 
+var splashTransition = inkwell.Fade(0.5)
+
+const splashHold = 2.0
+
 var back = inkwell.Text{
 	{Lang: "en", Text: "Back"},
 	{Lang: "hu", Text: "Vissza"},

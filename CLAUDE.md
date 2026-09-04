@@ -149,7 +149,7 @@ inc/system/theme/theme.nokia_punk.go     nokia-punk
 
 inc/content/stage/stage.manager.go       the Stage alias, its Manager, the shared rows
 inc/content/stage/stage.game.go          the world, and the key that leaves it
-inc/content/stage/stage.*.go             one screen per file: menu, load, save, …
+inc/content/stage/stage.*.go             one screen per file: splash cards, menu, load, save, …
 inc/content/scene/scene.manager.go       the Scene alias, its Manager, the floor
 inc/content/scene/scene.selector.go      the map screen: pins derived from the graph
 inc/content/scene/scene.*.go             one file per scene
@@ -564,9 +564,17 @@ which is what lets a menu row say the whole of what it means at once:
 Do: inkwell.Seq(inkwell.Restart(), inkwell.GoToStage(inc.StageGame)),
 ```
 
+The front door is two splash cards before the menu, `stage.splash_studio.go`
+— the Teletype Games logo, a 640×380 `Background` the file registers as an
+asset itself — and `stage.splash_title.go`, and each is a `Stage` that says
+how long it shows and where it goes: `Hold: 2`, `Next`, and a `Transition` of
+`inkwell.Fade(0.5)` it leaves through. A `Transition` is the leaving Stage's,
+so the menu and its sub-screens, which name none, keep cutting. The two
+numbers are shared in `stage.manager.go`.
+
 `-scene` and `-finale` skip the front door: both mean somebody wants to look
-at the game, not at its main menu, so `options.startStage` answers
-`inc.StageGame` for either.
+at the game, not at its splash cards or main menu, so `options.startStage`
+answers `inc.StageGame` for either.
 
 ## The system
 
