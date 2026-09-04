@@ -9,37 +9,13 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type bridgeFoot struct{}
-
-var _ place = bridgeFoot{}
-
 var BridgeFoot = SceneManager.Register(&Scene{
 	Name: "bridge_foot",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "GOLDEN GATE — THE FOOT OF THE BRIDGE"},
 		{Lang: "hu", Text: "GOLDEN GATE — A HÍD LÁBA"},
 	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
-		{
-			To: securityRoom{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "up into the structure"},
-				{Lang: "hu", Text: "fel a szerkezetbe"},
-			},
-			Side:  inkwell.ExitBack,
-			Needs: inc.FlagBridgeOpen,
-			Blocked: inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "Steel door, no handle. It opens for a card, not for me."},
-				{Lang: "hu", Text: "Acélajtó, kilincs nélkül. Kártyának nyílik, nem nekem."},
-			}),
-		},
-	},
-	Hotspots: bridgeFoot{}.hotspots(),
-})
-
-func (bridgeFoot) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "service_door",
 			Label: inkwell.Text{
@@ -112,7 +88,22 @@ func (bridgeFoot) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Nem úszom oda."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (bridgeFoot) Scene() *inkwell.Scene { return BridgeFoot }
+var _ = BridgeFoot.Leads(
+	exitToSelector,
+	inkwell.Exit{
+		To: SecurityRoom,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "up into the structure"},
+			{Lang: "hu", Text: "fel a szerkezetbe"},
+		},
+		Side:  inkwell.ExitBack,
+		Needs: inc.FlagBridgeOpen,
+		Blocked: inkwell.Say(character.Paul, inkwell.Text{
+			{Lang: "en", Text: "Steel door, no handle. It opens for a card, not for me."},
+			{Lang: "hu", Text: "Acélajtó, kilincs nélkül. Kártyának nyílik, nem nekem."},
+		}),
+	},
+)

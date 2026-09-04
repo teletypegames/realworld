@@ -8,19 +8,17 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type keypad struct{}
-
 var Keypad = DialogManager.Register(&Dialog{
 	Name:  "keypad",
 	Start: "root",
-	Nodes: keypad{}.nodes(),
+	Nodes: keypadNodes(),
 })
 
 var keypadPairs = []string{"22", "27", "72", "77"}
 
 const keypadCode = "2772"
 
-func (keypad) nodes() []inkwell.DialogNode {
+func keypadNodes() []inkwell.DialogNode {
 	label := func(pair string) inkwell.Text {
 		spaced := string(pair[0]) + " " + string(pair[1])
 		return inkwell.Text{

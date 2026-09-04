@@ -11,45 +11,16 @@ import (
 	"realworld/inc/system"
 )
 
-type noodleHouse struct{}
-
-var _ place = noodleHouse{}
+var noodleHouseGone = inkwell.Say(character.Paul, inkwell.Text{
+	{Lang: "en", Text: "He's gone. Took the tape with him, left the smell of the donuts."},
+	{Lang: "hu", Text: "Elment. A szalagot vitte, a fánkszagot hagyta."},
+})
 
 var NoodleHouse = SceneManager.Register(&Scene{
 	Name: "noodle_house",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "NOODLE'S HOUSE — SEALED"},
 		{Lang: "hu", Text: "NOODLE HÁZA — LEPECSÉTELVE"},
-	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
-		{
-			To: alley{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the alley behind the house"},
-				{Lang: "hu", Text: "a sikátor a ház mögött"},
-			},
-			Side: inkwell.ExitRight,
-		},
-		{
-			To: noodleOffice{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "Noodle's front door"},
-				{Lang: "hu", Text: "Noodle bejárati ajtaja"},
-			},
-			Side:  inkwell.ExitBack,
-			Needs: inc.FlagNoodleReleased,
-			Blocked: inkwell.Seq(
-				inkwell.Say(character.OfficerOnGuard, inkwell.Text{
-					{Lang: "en", Text: "Sir. The tape is there for a reason."},
-					{Lang: "hu", Text: "Uram. A szalag okkal van ott."},
-				}),
-				inkwell.Say(character.Paul, inkwell.Text{
-					{Lang: "en", Text: "Sealed. And watched."},
-					{Lang: "hu", Text: "Lepecsételve. És figyelik."},
-				}),
-			),
-		},
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -67,15 +38,7 @@ var NoodleHouse = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Hotspots: noodleHouse{}.hotspots(),
-})
-
-func (noodleHouse) hotspots() []inkwell.Hotspot {
-	gone := inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "He's gone. Took the tape with him, left the smell of the donuts."},
-		{Lang: "hu", Text: "Elment. A szalagot vitte, a fánkszagot hagyta."},
-	})
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "officer",
 			Label: inkwell.Text{
@@ -84,21 +47,21 @@ func (noodleHouse) hotspots() []inkwell.Hotspot {
 			},
 			Area: inkwell.Rect(316, 156, 48, 84),
 			OnLook: inkwell.If(inkwell.Flag(inc.FlagNoodleReleased),
-				gone,
+				noodleHouseGone,
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "Arms crossed, feet apart, jaw like a shovel. He's been standing there since before the tape went up."},
 					{Lang: "hu", Text: "Karba tett kéz, terpesz, lapát-állkapocs. Azelőtt állt ide, hogy a szalag felkerült."},
 				}),
 			),
 			OnUse: inkwell.If(inkwell.Flag(inc.FlagNoodleReleased),
-				gone,
+				noodleHouseGone,
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "I'm not going to push a policeman."},
 					{Lang: "hu", Text: "Nem fogok meglökni egy rendőrt."},
 				}),
 			),
 			OnTalk: inkwell.If(inkwell.Flag(inc.FlagNoodleReleased),
-				gone,
+				noodleHouseGone,
 				system.System.Paused(inkwell.RunDialog(dialog.OfficerOnGuard)),
 			),
 			OnTake: inkwell.Say(speaker.Dex, inkwell.Text{
@@ -107,7 +70,7 @@ func (noodleHouse) hotspots() []inkwell.Hotspot {
 			}),
 			OnUseWith: map[*inkwell.Item]inkwell.Action{
 				item.BreakfastBox: inkwell.If(inkwell.Flag(inc.FlagNoodleReleased),
-					gone,
+					noodleHouseGone,
 					inkwell.If(inkwell.Flag(inc.FlagOfficerFed),
 						inkwell.Say(character.OfficerOnGuard, inkwell.Text{
 							{Lang: "en", Text: "I'm good, thanks. One's plenty on duty."},
@@ -137,7 +100,7 @@ func (noodleHouse) hotspots() []inkwell.Hotspot {
 				),
 			},
 			OnUseWithAny: inkwell.If(inkwell.Flag(inc.FlagNoodleReleased),
-				gone,
+				noodleHouseGone,
 				inkwell.Say(character.OfficerOnGuard, inkwell.Text{
 					{Lang: "en", Text: "Put that away, sir."},
 					{Lang: "hu", Text: "Tegye el, uram."},
@@ -236,7 +199,36 @@ func (noodleHouse) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Nem török be ablakot egy rendőr előtt. Se mögött."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (noodleHouse) Scene() *inkwell.Scene { return NoodleHouse }
+var _ = NoodleHouse.Leads(
+	exitToSelector,
+	inkwell.Exit{
+		To: Alley,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the alley behind the house"},
+			{Lang: "hu", Text: "a sikátor a ház mögött"},
+		},
+		Side: inkwell.ExitRight,
+	},
+	inkwell.Exit{
+		To: NoodleOffice,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "Noodle's front door"},
+			{Lang: "hu", Text: "Noodle bejárati ajtaja"},
+		},
+		Side:  inkwell.ExitBack,
+		Needs: inc.FlagNoodleReleased,
+		Blocked: inkwell.Seq(
+			inkwell.Say(character.OfficerOnGuard, inkwell.Text{
+				{Lang: "en", Text: "Sir. The tape is there for a reason."},
+				{Lang: "hu", Text: "Uram. A szalag okkal van ott."},
+			}),
+			inkwell.Say(character.Paul, inkwell.Text{
+				{Lang: "en", Text: "Sealed. And watched."},
+				{Lang: "hu", Text: "Lepecsételve. És figyelik."},
+			}),
+		),
+	},
+)

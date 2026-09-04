@@ -9,9 +9,29 @@ import (
 	"realworld/inc/content/script"
 )
 
-type workplaceLobby struct{}
+var workplaceLobbyNeedCode = inkwell.Say(character.Paul, inkwell.Text{
+	{Lang: "en", Text: "Dead panel. It wants a floor code and a card, and it wants both."},
+	{Lang: "hu", Text: "Halott panel. Emeletkódot és kártyát kér, és mindkettőt akarja."},
+})
 
-var _ place = workplaceLobby{}
+var workplaceLobbyToActive = inkwell.Seq(
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "Norman's code, Norman's card. Up we go."},
+		{Lang: "hu", Text: "Norman kódja, Norman kártyája. Fel is megyünk."},
+	}),
+	inkwell.GoTo(ActiveOffice),
+)
+
+var workplaceLobbyToAbandoned = inkwell.If(inkwell.Flag(inc.FlagSumphorCard),
+	inkwell.Seq(
+		inkwell.Say(character.Paul, inkwell.Text{
+			{Lang: "en", Text: "Sumphor's card, four-one-nine-one. The lift goes somewhere it isn't supposed to."},
+			{Lang: "hu", Text: "Sumphor kártyája, négy-egy-kilenc-egy. A lift oda megy, ahová nem kéne."},
+		}),
+		inkwell.GoTo(AbandonedOffice),
+	),
+	workplaceLobbyNeedCode,
+)
 
 var WorkplaceLobby = SceneManager.Register(&Scene{
 	Name: "workplace_lobby",
@@ -19,38 +39,10 @@ var WorkplaceLobby = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "TOWER B — LOBBY"},
 		{Lang: "hu", Text: "B TORONY — ELŐTÉR"},
 	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
-	},
 	OnEnter: inkwell.If(inkwell.Not(inkwell.Flag(inc.FlagNoodleReleased)),
 		inkwell.RunScript(script.NoodleReleased),
 	),
-	Hotspots: workplaceLobby{}.hotspots(),
-})
-
-func (workplaceLobby) hotspots() []inkwell.Hotspot {
-	needCode := inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "Dead panel. It wants a floor code and a card, and it wants both."},
-		{Lang: "hu", Text: "Halott panel. Emeletkódot és kártyát kér, és mindkettőt akarja."},
-	})
-	toActive := inkwell.Seq(
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Norman's code, Norman's card. Up we go."},
-			{Lang: "hu", Text: "Norman kódja, Norman kártyája. Fel is megyünk."},
-		}),
-		inkwell.GoTo(activeOffice{}),
-	)
-	toAbandoned := inkwell.If(inkwell.Flag(inc.FlagSumphorCard),
-		inkwell.Seq(
-			inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "Sumphor's card, four-one-nine-one. The lift goes somewhere it isn't supposed to."},
-				{Lang: "hu", Text: "Sumphor kártyája, négy-egy-kilenc-egy. A lift oda megy, ahová nem kéne."},
-			}),
-			inkwell.GoTo(abandonedOffice{}),
-		),
-		needCode,
-	)
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "lift",
 			Label: inkwell.Text{
@@ -63,13 +55,13 @@ func (workplaceLobby) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Számbillentyűzet és kártyaolvasó. Emeletgomb sehol. Oda mész, ahová szabad."},
 			}),
 			OnUse: inkwell.If(inkwell.And(inkwell.Flag(inc.FlagLiftCode), inkwell.HasItem(item.NormanWallet)),
-				toActive,
-				needCode,
+				workplaceLobbyToActive,
+				workplaceLobbyNeedCode,
 			),
 			OnUseWith: map[*inkwell.Item]inkwell.Action{
-				item.SumphorCard: toAbandoned,
+				item.SumphorCard: workplaceLobbyToAbandoned,
 				item.NormanWallet: inkwell.If(inkwell.Flag(inc.FlagLiftCode),
-					toActive,
+					workplaceLobbyToActive,
 					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "The card's fine. I still don't have his floor code."},
 						{Lang: "hu", Text: "A kártya jó. Csak az emeletkódja nincs meg."},
@@ -109,7 +101,9 @@ func (workplaceLobby) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Műanyag. Mégis letörölgetve. Valaki még úgy tesz, mintha ide emberek érkeznének."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (workplaceLobby) Scene() *inkwell.Scene { return WorkplaceLobby }
+var _ = WorkplaceLobby.Leads(
+	exitToSelector,
+)

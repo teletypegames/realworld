@@ -7,17 +7,13 @@ import (
 )
 
 var exitToSelector = inkwell.Exit{
-	To: selector{},
+	To: Selector,
 	Label: inkwell.Text{
 		{Lang: "en", Text: "the rest of the city"},
 		{Lang: "hu", Text: "a város többi része"},
 	},
 	Side: inkwell.ExitNear,
 }
-
-type selector struct{}
-
-var _ place = selector{}
 
 var Selector = SceneManager.Register(&Scene{
 	Name: "selector",
@@ -27,13 +23,13 @@ var Selector = SceneManager.Register(&Scene{
 	},
 	Actors:    []inkwell.SceneActor{},
 	Walkboxes: []inkwell.Polygon{},
-	Derived:   selector{}.derived,
+	Derived:   selectorDerived,
 })
 
-func (selector) derived(game *inkwell.Game) []inkwell.Exit {
+func selectorDerived(game *inkwell.Game, self *Scene) []inkwell.Exit {
 	leadsHere := func(scene *Scene) bool {
 		for _, exit := range scene.Exits {
-			if _, toSelector := exit.To.(selector); toSelector {
+			if exit.To == self {
 				return true
 			}
 		}
@@ -72,5 +68,3 @@ const (
 	pinGapX    = 156.0
 	pinGapY    = 38.0
 )
-
-func (selector) Scene() *inkwell.Scene { return Selector }

@@ -9,18 +9,11 @@ import (
 	"realworld/inc/system"
 )
 
-type hotDogStreet struct{}
-
-var _ place = hotDogStreet{}
-
 var HotDogStreet = SceneManager.Register(&Scene{
 	Name: "hot_dog_street",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "STREET FRONT — THE HOT DOG STAND"},
 		{Lang: "hu", Text: "UTCAFRONT — A HOTDOGOS"},
-	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -45,11 +38,7 @@ var HotDogStreet = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Hotspots: hotDogStreet{}.hotspots(),
-})
-
-func (hotDogStreet) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "vendor",
 			Label: inkwell.Text{
@@ -128,7 +117,9 @@ func (hotDogStreet) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Odacsavarozták. A mustár nincs, de azt sem viszem el."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (hotDogStreet) Scene() *inkwell.Scene { return HotDogStreet }
+var _ = HotDogStreet.Leads(
+	exitToSelector,
+)

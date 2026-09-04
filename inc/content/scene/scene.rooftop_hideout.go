@@ -9,9 +9,10 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type rooftopHideout struct{}
-
-var _ place = rooftopHideout{}
+var rooftopHideoutTaken = inkwell.Say(character.Paul, inkwell.Text{
+	{Lang: "en", Text: "Empty crate. The notes are with me."},
+	{Lang: "hu", Text: "Üres láda. A jegyzetek nálam vannak."},
+})
 
 var RooftopHideout = SceneManager.Register(&Scene{
 	Name: "rooftop_hideout",
@@ -19,33 +20,7 @@ var RooftopHideout = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "NORMAN'S ROOFTOP HIDEOUT"},
 		{Lang: "hu", Text: "NORMAN BÚVÓHELYE A TETŐN"},
 	},
-	Exits: []inkwell.Exit{
-		{
-			To: normanApartment{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back down into the flat"},
-				{Lang: "hu", Text: "vissza le a lakásba"},
-			},
-			Side: inkwell.ExitNear,
-		},
-		{
-			To: bbsTerminal{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the old terminal"},
-				{Lang: "hu", Text: "a régi terminál"},
-			},
-			Side: inkwell.ExitRight,
-		},
-	},
-	Hotspots: rooftopHideout{}.hotspots(),
-})
-
-func (rooftopHideout) hotspots() []inkwell.Hotspot {
-	taken := inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "Empty crate. The notes are with me."},
-		{Lang: "hu", Text: "Üres láda. A jegyzetek nálam vannak."},
-	})
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "crate",
 			Label: inkwell.Text{
@@ -54,14 +29,14 @@ func (rooftopHideout) hotspots() []inkwell.Hotspot {
 			},
 			Area: inkwell.Rect(120, 170, 80, 60),
 			OnLook: inkwell.If(inkwell.HasItem(item.NormanNotes),
-				taken,
+				rooftopHideoutTaken,
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "A fruit crate under a tarp. Notebooks, loose sheets, a pencil worn to the metal."},
 					{Lang: "hu", Text: "Gyümölcsösláda ponyva alatt. Füzetek, kitépett lapok, egy fémig kopott ceruza."},
 				}),
 			),
 			OnTake: inkwell.If(inkwell.HasItem(item.NormanNotes),
-				taken,
+				rooftopHideoutTaken,
 				inkwell.Seq(
 					inkwell.Give(item.NormanNotes),
 					inkwell.Say(character.Paul, inkwell.Text{
@@ -75,7 +50,7 @@ func (rooftopHideout) hotspots() []inkwell.Hotspot {
 				),
 			),
 			OnUse: inkwell.If(inkwell.HasItem(item.NormanNotes),
-				taken,
+				rooftopHideoutTaken,
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "I'll take the lot. It'll get rained on otherwise."},
 					{Lang: "hu", Text: "Elviszem az egészet. Különben eláztatja az eső."},
@@ -116,7 +91,24 @@ func (rooftopHideout) hotspots() []inkwell.Hotspot {
 				}),
 			),
 		},
-	}
-}
+	},
+})
 
-func (rooftopHideout) Scene() *inkwell.Scene { return RooftopHideout }
+var _ = RooftopHideout.Leads(
+	inkwell.Exit{
+		To: NormanApartment,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back down into the flat"},
+			{Lang: "hu", Text: "vissza le a lakásba"},
+		},
+		Side: inkwell.ExitNear,
+	},
+	inkwell.Exit{
+		To: BBSTerminal,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the old terminal"},
+			{Lang: "hu", Text: "a régi terminál"},
+		},
+		Side: inkwell.ExitRight,
+	},
+)

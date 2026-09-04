@@ -11,25 +11,11 @@ import (
 	"realworld/inc/system"
 )
 
-type bus struct{}
-
-var _ place = bus{}
-
 var Bus = SceneManager.Register(&Scene{
 	Name: "bus",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "BUS — AIRPORT TO THE CITY"},
 		{Lang: "hu", Text: "BUSZ — A REPTÉRRŐL A VÁROSBA"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: noodleHouse{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "get off at Noodle's street"},
-				{Lang: "hu", Text: "leszállni Noodle utcájánál"},
-			},
-			Side: inkwell.ExitRight,
-		},
 	},
 	Triggers: []inkwell.Trigger{
 		{
@@ -41,11 +27,7 @@ var Bus = SceneManager.Register(&Scene{
 			Once: true,
 		},
 	},
-	Hotspots: bus{}.hotspots(),
-})
-
-func (bus) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "window",
 			Label: inkwell.Text{
@@ -113,7 +95,16 @@ func (bus) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "A csuklómon van. Ennél felvettebb már nem lesz."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (bus) Scene() *inkwell.Scene { return Bus }
+var _ = Bus.Leads(
+	inkwell.Exit{
+		To: NoodleHouse,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "get off at Noodle's street"},
+			{Lang: "hu", Text: "leszállni Noodle utcájánál"},
+		},
+		Side: inkwell.ExitRight,
+	},
+)

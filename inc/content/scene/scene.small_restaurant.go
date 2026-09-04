@@ -7,39 +7,13 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type smallRestaurant struct{}
-
-var _ place = smallRestaurant{}
-
 var SmallRestaurant = SceneManager.Register(&Scene{
 	Name: "small_restaurant",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SMALL RESTAURANT — NEXT DOOR"},
 		{Lang: "hu", Text: "KIS ÉTTEREM — A SZOMSZÉDBAN"},
 	},
-	Exits: []inkwell.Exit{
-		{
-			To: trinketShop{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back to the trinket shop"},
-				{Lang: "hu", Text: "vissza a csecsebecseboltba"},
-			},
-			Side: inkwell.ExitLeft,
-		},
-		{
-			To: restaurantToilet{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the toilet at the back"},
-				{Lang: "hu", Text: "a hátsó mosdó"},
-			},
-			Side: inkwell.ExitBack,
-		},
-	},
-	Hotspots: smallRestaurant{}.hotspots(),
-})
-
-func (smallRestaurant) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "counter",
 			Label: inkwell.Text{
@@ -112,7 +86,24 @@ func (smallRestaurant) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Nem lopok el egy neonfeliratot."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (smallRestaurant) Scene() *inkwell.Scene { return SmallRestaurant }
+var _ = SmallRestaurant.Leads(
+	inkwell.Exit{
+		To: TrinketShop,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back to the trinket shop"},
+			{Lang: "hu", Text: "vissza a csecsebecseboltba"},
+		},
+		Side: inkwell.ExitLeft,
+	},
+	inkwell.Exit{
+		To: RestaurantToilet,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the toilet at the back"},
+			{Lang: "hu", Text: "a hátsó mosdó"},
+		},
+		Side: inkwell.ExitBack,
+	},
+)

@@ -10,25 +10,37 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type secretLab struct{}
+var secretLabNothingItWants = inkwell.If(inkwell.HasItem(item.MysteryTape),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "You're holding the tape. If you're going to do this, you do it deliberately: slot it, or push it in. Not by accident."},
+		{Lang: "hu", Text: "A kezedben a kazetta. Ha megteszed, szándékosan tedd: rakd a foglalatba, vagy told be. Ne véletlenül."},
+	}),
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "A tape slot on the front panel. I have nothing it wants."},
+		{Lang: "hu", Text: "Kazettafoglalat az előlapon. Nincs nálam semmi, amit akarna."},
+	}),
+)
 
-var _ place = secretLab{}
+var secretLabPlea = inkwell.Seq(
+	inkwell.Say(speaker.TapeMystery, inkwell.Text{
+		{Lang: "en", Text: "There. The machine that runs it. Put me in, Paul. It's the only way he wakes up."},
+		{Lang: "hu", Text: "Ott. A gép, ami futtatja. Tegyél be, Paul. Csak így ébred fel."},
+	}),
+	inkwell.Say(speaker.TapeMystery, inkwell.Text{
+		{Lang: "en", Text: "I carry what he knows. Once I'm inside, he can say it out loud, and the BVK is finished."},
+		{Lang: "hu", Text: "Én hordozom, amit ő tud. Ha bent vagyok, ki tudja mondani, és a BVK-nak vége."},
+	}),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "Paul. Think."},
+		{Lang: "hu", Text: "Paul. Gondolkozz."},
+	}),
+)
 
 var SecretLab = SceneManager.Register(&Scene{
 	Name: "secret_lab",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SECRET LAB — INSIDE THE GOLDEN GATE"},
 		{Lang: "hu", Text: "TITKOS LABOR — A GOLDEN GATE BELSEJÉBEN"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: securityRoom{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back to the observation room"},
-				{Lang: "hu", Text: "vissza a megfigyelőszobába"},
-			},
-			Side: inkwell.ExitNear,
-		},
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -46,49 +58,17 @@ var SecretLab = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Triggers: secretLab{}.triggers(),
-	Hotspots: secretLab{}.hotspots(),
-})
-
-func (secretLab) triggers() []inkwell.Trigger {
-	plea := inkwell.Seq(
-		inkwell.Say(speaker.TapeMystery, inkwell.Text{
-			{Lang: "en", Text: "There. The machine that runs it. Put me in, Paul. It's the only way he wakes up."},
-			{Lang: "hu", Text: "Ott. A gép, ami futtatja. Tegyél be, Paul. Csak így ébred fel."},
-		}),
-		inkwell.Say(speaker.TapeMystery, inkwell.Text{
-			{Lang: "en", Text: "I carry what he knows. Once I'm inside, he can say it out loud, and the BVK is finished."},
-			{Lang: "hu", Text: "Én hordozom, amit ő tud. Ha bent vagyok, ki tudja mondani, és a BVK-nak vége."},
-		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "Paul. Think."},
-			{Lang: "hu", Text: "Paul. Gondolkozz."},
-		}),
-	)
-	return []inkwell.Trigger{
+	Triggers: []inkwell.Trigger{
 		{
 			Name: "plea",
 			When: inkwell.Given{
 				Flag: inc.FlagTapeSpeaks,
 			},
-			Do:   plea,
+			Do:   secretLabPlea,
 			Once: true,
 		},
-	}
-}
-
-func (secretLab) hotspots() []inkwell.Hotspot {
-	nothingItWants := inkwell.If(inkwell.HasItem(item.MysteryTape),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "You're holding the tape. If you're going to do this, you do it deliberately: slot it, or push it in. Not by accident."},
-			{Lang: "hu", Text: "A kezedben a kazetta. Ha megteszed, szándékosan tedd: rakd a foglalatba, vagy told be. Ne véletlenül."},
-		}),
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "A tape slot on the front panel. I have nothing it wants."},
-			{Lang: "hu", Text: "Kazettafoglalat az előlapon. Nincs nálam semmi, amit akarna."},
-		}),
-	)
-	return []inkwell.Hotspot{
+	},
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "norman",
 			Label: inkwell.Text{
@@ -157,7 +137,7 @@ func (secretLab) hotspots() []inkwell.Hotspot {
 					inkwell.SetVar(inc.VarSlot2, ""),
 					inkwell.RunScript(script.Finale),
 				),
-				nothingItWants,
+				secretLabNothingItWants,
 			),
 			OnUseWith: map[*inkwell.Item]inkwell.Action{
 				item.MysteryTape: inkwell.Seq(
@@ -170,7 +150,16 @@ func (secretLab) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "A foglalat kazetta alakú. Az nem."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (secretLab) Scene() *inkwell.Scene { return SecretLab }
+var _ = SecretLab.Leads(
+	inkwell.Exit{
+		To: SecurityRoom,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back to the observation room"},
+			{Lang: "hu", Text: "vissza a megfigyelőszobába"},
+		},
+		Side: inkwell.ExitNear,
+	},
+)

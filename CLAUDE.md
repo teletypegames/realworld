@@ -324,25 +324,24 @@ gap in the engine but the price of the compiler holding the graph, and the
 answer is the one the layering always gave — the dialog sets a flag, and the
 scene's trigger does the moving.
 
-**Scenes name each other through their type.** Go forbids two package-level
-variables from referring to each other in their initialisers, and two scenes
-that lead to each other do exactly that, so `Exit.To` and `GoTo` take an
-`inkwell.SceneRef` rather than a `*Scene`. Every scene file already declares an
-empty type named after itself for its helpers; that type is the reference:
+**Exits come after the scene.** Go forbids two package-level variables from
+referring to each other in their initialisers, and two scenes that lead to
+each other do exactly that. So a scene file declares the scene first and its
+exits second, with `Leads`, which appends to `Exits` and hands the scene back:
 
 ```go
-type street struct{}
+var Alley = SceneManager.Register(&Scene{ … })
 
-var Street = SceneManager.Register(&Scene{ … })
-
-func (street) Scene() *inkwell.Scene { return Street }
+var _ = Alley.Leads(
+	inkwell.Exit{To: NoodleHouse, Side: inkwell.ExitLeft, …},
+)
 ```
 
-Another scene writes `To: street{}`, the engine asks it at run time, and the
-cycle is gone because a type is not a dependency. The selector's pins are
-derived exits, built after every variable exists, so they hold the `*Scene`
-itself; `leadsTo` recognises an exit to the map by asserting `exit.To` to
-`selector`.
+The second declaration depends on both scenes and neither scene depends on
+it, so `Exit.To` holds the `*Scene` itself and the graph may be as tangled as
+the city. The selector's pins are `Derived` exits, built at `Run` after every
+variable exists, and `Derived` is handed the scene itself so that "who leads
+to me" never names its own variable.
 
 **What stays a string.** `Name`, because a save file, a `State` var and the
 `-scene` flag have to find the entity again from outside the process — `main`
@@ -392,65 +391,42 @@ in its stage's `Background`, registered in place.
 
 Adding an entity is adding a file. Deleting one is deleting a file.
 
-### A file's helpers speak a closed vocabulary
+### A file has no type and no methods
 
-An entity file that is too long to read as one literal breaks a **field** out
-into a method — never a piece of a field, and never a helper with a name of
-its own. Twenty-four scene files share one `scene` namespace, so the method
-hangs off an empty type the file declares and names after itself, and the
-method takes the name of the field it fills:
+An entity file is the variable and the literal, and the variable **is** the
+entity: `Alley` is the `*Scene`, `Trinket` the `*Item`, `Keypad` the `*Dialog`.
+There is no empty type named after the file, no method hanging off it, and no
+helper with a name the next file will not have. The engine's own interfaces
+are the only methods in `inc/content/` — the tape slots' `Draw`, a `Tape`'s
+`GetName` — and those are the engine's words, not ours.
 
-```go
-type alley struct{}
+What a helper used to carry lives in one of three places:
 
-var _ place = alley{}
+- **A line two hotspots share** is a package-level variable before the
+  literal, named with the file's own name in front so twenty-four scene files
+  can share one namespace: `policeStreetNoticed`, `noodleHouseGone`,
+  `alleyLocked`.
+- **A piece that takes a parameter, or has to loop**, is a package-level
+  function named the same way, after the field it fills:
+  `selectorDerived`, `keypadNodes`, `loadExpand`.
+- **The exits** are the second declaration of the file, `var _ = Alley.Leads(…)`,
+  under **References are pointers**.
 
-var Alley = SceneManager.Register(&Scene{
-	…
-	Hotspots: alley{}.hotspots(),
-})
+Everything else stays in the literal, however long it gets. A scene file reads
+as its shared lines, then the scene, then where it leads; the reader never
+meets a name invented for that file alone, and clicking `Alley` anywhere in
+the game lands on the scene, not on a type standing in for it.
 
-func (alley) hotspots() []inkwell.Hotspot {
-	locked := inkwell.Say(character.Paul, …)
-	return []inkwell.Hotspot{
-		{Name: "hiding_place", …},
-		{Name: "back_door", OnUse: locked, …},
-	}
-}
-
-func (alley) Scene() *inkwell.Scene { return Alley }
-```
-
-The vocabulary is the entity's field names in lowerCamel and nothing else. A
-scene's type may carry `hotspots`, `exits`, `triggers`, `actors` and
-`derived`; a dialog's `nodes` and `choices`; a stage's menu `expand`, after
-`MenuItem.Expand`; a widget the engine's own `Draw`. The one word that is not
-a field is `Scene`, the method every scene type has, because it is what makes
-`alley{}` a reference another scene can write in an `Exit`, under **References
-are pointers**. `var _ place = alley{}` is the compiler holding the one word the
-files must share; the rest of the vocabulary it cannot forbid, so a
-`func (…)` in a content package that is not one of these is a review comment.
-
-What a helper used to be — one method per hotspot, `bin()`, `fireEscape()`,
-`tip()`, a name invented per file — is a **local** inside the field's method
-now. A line two hotspots share is a variable before the `return`; a piece that
-takes a parameter is a closure. The file reads top to bottom as the literal,
-then the one or two fields that were too long for it, and the reader never
-meets a name the previous file did not have.
-
-`alley{}` in the literal rather than a local is the same rule read from the
-other end: the type is the namespace, so naming an instance of it adds a word
-that says nothing. The receiver stays unnamed unless the body reads a field of
-it, which only the tape slots do — `slots.first`, a rectangle computed once
-in `init()` and kept on the struct rather than recomputed by a method.
-
-The rule stops where the package is already the namespace: `armilla.Slot2`,
+The one struct with methods in `inc/content/` is the tape slots' widget,
+because the engine asks a widget to `Draw` itself; its two rectangles are
+fields computed once in `init()`, not helpers recomputed per call. The rule
+stops where the package is already the namespace: `armilla.Slot2`,
 `armilla.Insert` and `tape.DialogOf` stay functions, because a receiver there
 would be an empty word. `system` is the other way round — the receiver is
 the whole point, so everything it offers is a method on `System`. `main` is
-the same as a content file: `options` carries the flags, and its methods are
-the `Game` fields they answer — `startStage`, `startScene`, `finaleScript`,
-`flags` — plus `game`, the literal itself.
+the same as a content file in spirit: `options` carries the flags, and its
+methods are the `Game` fields they answer — `startStage`, `startScene`,
+`finaleScript`, `flags` — plus `game`, the literal itself.
 
 Initialisation order is file-name order, so **registration order is
 alphabetical**. Nothing may depend on it — including the order the debug menu
@@ -838,14 +814,13 @@ nine are `inc/content/`, and no arrow leaves `system` for `content`.
 
 ## Adding a scene
 
-1. `inc/content/scene/scene.<name>.go`, three declarations: `type <name> struct{}`,
-   `var <Name> = SceneManager.Register(&Scene{…})` with its `Title` and every
-   `Label` written in both languages, and
-   `func (<name>) Scene() *inkwell.Scene { return <Name> }`
+1. `inc/content/scene/scene.<name>.go`: `var <Name> = SceneManager.Register(&Scene{…})`
+   with its `Title` and every `Label` written in both languages, and under it
+   `var _ = <Name>.Leads(…)` with its exits
 2. A 640×380 PNG at `assets/bg/<name>.png`
 
 Nothing else moves. There is no constant and no list to update; another scene
-reaches this one as `To: <name>{}`, and nothing names the picture:
+reaches this one as `To: <Name>`, and nothing names the picture:
 `background.manager.go` registers one asset per registered scene and writes it
 into the scene. The PNG file name is the pairing.
 

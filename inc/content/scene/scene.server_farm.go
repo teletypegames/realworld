@@ -9,9 +9,25 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type serverFarm struct{}
-
-var _ place = serverFarm{}
+var serverFarmWalkTheRacks = inkwell.Seq(
+	inkwell.Say(speaker.TapeServerFarm, inkwell.Text{
+		{Lang: "en", Text: "DOOR GROUP MATCHED. WELCOME."},
+		{Lang: "hu", Text: "AJTÓCSOPORT EGYEZIK. ÜDVÖZÖLJÜK."},
+	}),
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "Rows of it. Cold air, and the sound of a thousand fans agreeing on something."},
+		{Lang: "hu", Text: "Sorokban. Hideg levegő, és ezer ventilátor hangja, ahogy megegyeznek valamiben."},
+	}),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "Look at the traffic lights on the switches. That pattern isn't a customer. That's one thing, talking to itself across the whole floor."},
+		{Lang: "hu", Text: "Nézd a switchek forgalomjelzőit. Az a mintázat nem egy ügyfél. Az egyetlen dolog, ami önmagával beszél az egész szinten."},
+	}),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "It isn't in one place any more, Paul. It's in the traffic."},
+		{Lang: "hu", Text: "Már nincs egy helyen, Paul. A forgalomban van."},
+	}),
+	inkwell.SetFlag(inc.FlagServerFarmMapped),
+)
 
 var ServerFarm = SceneManager.Register(&Scene{
 	Name: "server_farm",
@@ -19,33 +35,7 @@ var ServerFarm = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SERVER FARM"},
 		{Lang: "hu", Text: "SZERVERFARM"},
 	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
-	},
-	Hotspots: serverFarm{}.hotspots(),
-})
-
-func (serverFarm) hotspots() []inkwell.Hotspot {
-	walkTheRacks := inkwell.Seq(
-		inkwell.Say(speaker.TapeServerFarm, inkwell.Text{
-			{Lang: "en", Text: "DOOR GROUP MATCHED. WELCOME."},
-			{Lang: "hu", Text: "AJTÓCSOPORT EGYEZIK. ÜDVÖZÖLJÜK."},
-		}),
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Rows of it. Cold air, and the sound of a thousand fans agreeing on something."},
-			{Lang: "hu", Text: "Sorokban. Hideg levegő, és ezer ventilátor hangja, ahogy megegyeznek valamiben."},
-		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "Look at the traffic lights on the switches. That pattern isn't a customer. That's one thing, talking to itself across the whole floor."},
-			{Lang: "hu", Text: "Nézd a switchek forgalomjelzőit. Az a mintázat nem egy ügyfél. Az egyetlen dolog, ami önmagával beszél az egész szinten."},
-		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "It isn't in one place any more, Paul. It's in the traffic."},
-			{Lang: "hu", Text: "Már nincs egy helyen, Paul. A forgalomban van."},
-		}),
-		inkwell.SetFlag(inc.FlagServerFarmMapped),
-	)
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "badge_door",
 			Label: inkwell.Text{
@@ -63,7 +53,7 @@ func (serverFarm) hotspots() []inkwell.Hotspot {
 					{Lang: "hu", Text: "Láttam a szintet. Egyetlen dolog van bent, vékonyan elterülve, és nő."},
 				}),
 				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.ServerFarmTape),
-					walkTheRacks,
+					serverFarmWalkTheRacks,
 					inkwell.Seq(
 						inkwell.Say(character.Paul, inkwell.Text{
 							{Lang: "en", Text: "Red blink. It doesn't like what's on my wrist."},
@@ -105,7 +95,9 @@ func (serverFarm) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Tizennyolc fok minden szinten. Terhelés: kilencvenhat százalék, és emelkedik. Ennyit senki nem bérel."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (serverFarm) Scene() *inkwell.Scene { return ServerFarm }
+var _ = ServerFarm.Leads(
+	exitToSelector,
+)

@@ -9,18 +9,11 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type street struct{}
-
-var _ place = street{}
-
 var Street = SceneManager.Register(&Scene{
 	Name: "street",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "STREET"},
 		{Lang: "hu", Text: "UTCA"},
-	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
 	},
 	Triggers: []inkwell.Trigger{
 		{
@@ -29,11 +22,7 @@ var Street = SceneManager.Register(&Scene{
 			Do:   inkwell.RunScript(script.StreetGlitch),
 		},
 	},
-	Hotspots: street{}.hotspots(),
-})
-
-func (street) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "news_ticker",
 			Label: inkwell.Text{
@@ -104,7 +93,9 @@ func (street) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Nem várok buszra. Buszból megvolt a mai."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (street) Scene() *inkwell.Scene { return Street }
+var _ = Street.Leads(
+	exitToSelector,
+)

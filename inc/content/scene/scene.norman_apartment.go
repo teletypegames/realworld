@@ -10,9 +10,15 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type normanApartment struct{}
+var normanApartmentSeen = inkwell.Say(character.Paul, inkwell.Text{
+	{Lang: "en", Text: "His Armilla. Slot one empty. Still here, and he isn't."},
+	{Lang: "hu", Text: "Az Armillája. Az egyes foglalat üres. Ez itt maradt, ő nem."},
+})
 
-var _ place = normanApartment{}
+var normanApartmentGone = inkwell.Say(character.Paul, inkwell.Text{
+	{Lang: "en", Text: "Just the jacket now. The wallet's on me."},
+	{Lang: "hu", Text: "Már csak a zakó. A tárca nálam van."},
+})
 
 var NormanApartment = SceneManager.Register(&Scene{
 	Name: "norman_apartment",
@@ -20,38 +26,7 @@ var NormanApartment = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "NORMAN'S APARTMENT"},
 		{Lang: "hu", Text: "NORMAN LAKÁSA"},
 	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
-		{
-			To: rooftopHideout{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the stairs up to the roof"},
-				{Lang: "hu", Text: "a lépcső fel a tetőre"},
-			},
-			Side: inkwell.ExitBack,
-		},
-		{
-			To: bbsTerminal{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "Norman's terminal"},
-				{Lang: "hu", Text: "Norman terminálja"},
-			},
-			Side: inkwell.ExitRight,
-		},
-	},
-	Hotspots: normanApartment{}.hotspots(),
-})
-
-func (normanApartment) hotspots() []inkwell.Hotspot {
-	seen := inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "His Armilla. Slot one empty. Still here, and he isn't."},
-		{Lang: "hu", Text: "Az Armillája. Az egyes foglalat üres. Ez itt maradt, ő nem."},
-	})
-	gone := inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "Just the jacket now. The wallet's on me."},
-		{Lang: "hu", Text: "Már csak a zakó. A tárca nálam van."},
-	})
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "armilla",
 			Label: inkwell.Text{
@@ -59,8 +34,8 @@ func (normanApartment) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Norman Armillája"},
 			},
 			Area:   inkwell.Rect(300, 150, 60, 40),
-			OnLook: inkwell.If(inkwell.Flag(inc.FlagArmillaSeen), seen, inkwell.RunScript(script.ArmillaFound)),
-			OnUse:  inkwell.If(inkwell.Flag(inc.FlagArmillaSeen), seen, inkwell.RunScript(script.ArmillaFound)),
+			OnLook: inkwell.If(inkwell.Flag(inc.FlagArmillaSeen), normanApartmentSeen, inkwell.RunScript(script.ArmillaFound)),
+			OnUse:  inkwell.If(inkwell.Flag(inc.FlagArmillaSeen), normanApartmentSeen, inkwell.RunScript(script.ArmillaFound)),
 			OnTake: inkwell.Say(character.Paul, inkwell.Text{
 				{Lang: "en", Text: "One wrist, one Armilla. And it's his."},
 				{Lang: "hu", Text: "Egy csukló, egy Armilla. És ez az övé."},
@@ -97,14 +72,14 @@ func (normanApartment) hotspots() []inkwell.Hotspot {
 			},
 			Area: inkwell.Rect(200, 160, 60, 70),
 			OnLook: inkwell.If(inkwell.HasItem(item.NormanWallet),
-				gone,
+				normanApartmentGone,
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "His jacket, over the chair. Whoever took him didn't let him dress."},
 					{Lang: "hu", Text: "A zakója, a széken. Aki elvitte, nem hagyta felöltözni."},
 				}),
 			),
-			OnUse:  inkwell.If(inkwell.HasItem(item.NormanWallet), gone, inkwell.RunScript(script.WalletFound)),
-			OnTake: inkwell.If(inkwell.HasItem(item.NormanWallet), gone, inkwell.RunScript(script.WalletFound)),
+			OnUse:  inkwell.If(inkwell.HasItem(item.NormanWallet), normanApartmentGone, inkwell.RunScript(script.WalletFound)),
+			OnTake: inkwell.If(inkwell.HasItem(item.NormanWallet), normanApartmentGone, inkwell.RunScript(script.WalletFound)),
 		},
 		{
 			Name: "bed",
@@ -138,7 +113,25 @@ func (normanApartment) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "A bajusz az egyetlen jó rész, és tollal van."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (normanApartment) Scene() *inkwell.Scene { return NormanApartment }
+var _ = NormanApartment.Leads(
+	exitToSelector,
+	inkwell.Exit{
+		To: RooftopHideout,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the stairs up to the roof"},
+			{Lang: "hu", Text: "a lépcső fel a tetőre"},
+		},
+		Side: inkwell.ExitBack,
+	},
+	inkwell.Exit{
+		To: BBSTerminal,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "Norman's terminal"},
+			{Lang: "hu", Text: "Norman terminálja"},
+		},
+		Side: inkwell.ExitRight,
+	},
+)

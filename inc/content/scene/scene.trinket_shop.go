@@ -10,39 +10,11 @@ import (
 	"realworld/inc/system"
 )
 
-type trinketShop struct{}
-
-var _ place = trinketShop{}
-
 var TrinketShop = SceneManager.Register(&Scene{
 	Name: "trinket_shop",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "CHINATOWN — TRINKET SHOP"},
 		{Lang: "hu", Text: "KÍNAI NEGYED — CSECSEBECSEBOLT"},
-	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
-		{
-			To: smallRestaurant{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the eating place next door"},
-				{Lang: "hu", Text: "a szomszédos falatozó"},
-			},
-			Side: inkwell.ExitRight,
-		},
-		{
-			To: secretClub{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the way in at the back"},
-				{Lang: "hu", Text: "a hátsó bejárat"},
-			},
-			Side:  inkwell.ExitBack,
-			Needs: inc.FlagClubEntry,
-			Blocked: inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "Just a shop, as far as the man behind the counter is concerned."},
-				{Lang: "hu", Text: "Csak egy bolt, már ami a pult mögötti embert illeti."},
-			}),
-		},
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -60,11 +32,7 @@ var TrinketShop = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Hotspots: trinketShop{}.hotspots(),
-})
-
-func (trinketShop) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "shopkeeper",
 			Label: inkwell.Text{
@@ -168,7 +136,30 @@ func (trinketShop) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Nem lopok el egy függönyt."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (trinketShop) Scene() *inkwell.Scene { return TrinketShop }
+var _ = TrinketShop.Leads(
+	exitToSelector,
+	inkwell.Exit{
+		To: SmallRestaurant,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the eating place next door"},
+			{Lang: "hu", Text: "a szomszédos falatozó"},
+		},
+		Side: inkwell.ExitRight,
+	},
+	inkwell.Exit{
+		To: SecretClub,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the way in at the back"},
+			{Lang: "hu", Text: "a hátsó bejárat"},
+		},
+		Side:  inkwell.ExitBack,
+		Needs: inc.FlagClubEntry,
+		Blocked: inkwell.Say(character.Paul, inkwell.Text{
+			{Lang: "en", Text: "Just a shop, as far as the man behind the counter is concerned."},
+			{Lang: "hu", Text: "Csak egy bolt, már ami a pult mögötti embert illeti."},
+		}),
+	},
+)

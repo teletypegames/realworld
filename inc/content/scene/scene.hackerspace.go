@@ -9,9 +9,17 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type hackerspace struct{}
-
-var _ place = hackerspace{}
+var hackerspaceHandOver = inkwell.Seq(
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "Half-finished access tape. Datacenter door group, cloned off somebody's badge."},
+		{Lang: "hu", Text: "Félkész belépőkazetta. Adatközponti ajtócsoport, valaki kitűzőjéről klónozva."},
+	}),
+	inkwell.Give(item.ServerFarmTape),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "The kids here would rather you had it than the BVK. They just won't say so to your face."},
+		{Lang: "hu", Text: "Az itteni kölykök inkább nálad látják, mint a BVK-nál. Csak nem mondják a szemedbe."},
+	}),
+)
 
 var Hackerspace = SceneManager.Register(&Scene{
 	Name: "hackerspace",
@@ -19,25 +27,7 @@ var Hackerspace = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "HACKERSPACE"},
 		{Lang: "hu", Text: "HACKERSPACE"},
 	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
-	},
-	Hotspots: hackerspace{}.hotspots(),
-})
-
-func (hackerspace) hotspots() []inkwell.Hotspot {
-	handOver := inkwell.Seq(
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Half-finished access tape. Datacenter door group, cloned off somebody's badge."},
-			{Lang: "hu", Text: "Félkész belépőkazetta. Adatközponti ajtócsoport, valaki kitűzőjéről klónozva."},
-		}),
-		inkwell.Give(item.ServerFarmTape),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "The kids here would rather you had it than the BVK. They just won't say so to your face."},
-			{Lang: "hu", Text: "Az itteni kölykök inkább nálad látják, mint a BVK-nál. Csak nem mondják a szemedbe."},
-		}),
-	)
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "workbench",
 			Label: inkwell.Text{
@@ -55,7 +45,7 @@ func (hackerspace) hotspots() []inkwell.Hotspot {
 					{Lang: "hu", Text: "Már megvan."},
 				}),
 				inkwell.If(inkwell.Flag(inc.FlagTapeSpeaks),
-					handOver,
+					hackerspaceHandOver,
 					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "Nobody here hands a stranger a credential. I'd need a reason they'd believe."},
 						{Lang: "hu", Text: "Itt senki nem ad egy idegennek belépőt. Kéne egy ok, amit elhisznek."},
@@ -101,7 +91,9 @@ func (hackerspace) hotspots() []inkwell.Hotspot {
 				}),
 			),
 		},
-	}
-}
+	},
+})
 
-func (hackerspace) Scene() *inkwell.Scene { return Hackerspace }
+var _ = Hackerspace.Leads(
+	exitToSelector,
+)

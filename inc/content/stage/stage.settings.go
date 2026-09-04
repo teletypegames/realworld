@@ -7,8 +7,6 @@ import (
 	"realworld/inc/system/widget"
 )
 
-type settingsScreen struct{}
-
 var Settings = StageManager.Register(&Stage{
 	Name: "settings",
 	Title: inkwell.Text{
@@ -27,13 +25,13 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 			{Lang: "en", Text: "SETTINGS"},
 			{Lang: "hu", Text: "BEÁLLÍTÁSOK"},
 		},
-		Expand: settingsScreen{}.expand,
+		Expand: settingsExpand,
 	},
 })
 
 var _ = widget.WidgetManager.Register(escapeToMenu("settings_escape", Settings))
 
-func (settingsScreen) expand(context *inkwell.Ctx) []inkwell.MenuItem {
+func settingsExpand(context *inkwell.Ctx) []inkwell.MenuItem {
 	otherLanguage := "hu"
 	if inkwell.Lang == "hu" {
 		otherLanguage = "en"

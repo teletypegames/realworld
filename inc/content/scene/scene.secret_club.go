@@ -12,33 +12,11 @@ import (
 	"realworld/inc/system"
 )
 
-type secretClub struct{}
-
-var _ place = secretClub{}
-
 var SecretClub = SceneManager.Register(&Scene{
 	Name: "secret_club",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SECRET CLUB — THE UNDERWATER SUN"},
 		{Lang: "hu", Text: "TITKOS KLUB — A VÍZ ALATTI NAP"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: bbsTerminal{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the terminal in the corner"},
-				{Lang: "hu", Text: "a terminál a sarokban"},
-			},
-			Side: inkwell.ExitBack,
-		},
-		{
-			To: trinketShop{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back out through the shop"},
-				{Lang: "hu", Text: "vissza a bolton át"},
-			},
-			Side: inkwell.ExitNear,
-		},
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -56,12 +34,7 @@ var SecretClub = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Hotspots: secretClub{}.hotspots(),
-	Triggers: secretClub{}.triggers(),
-})
-
-func (secretClub) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "secretary",
 			Label: inkwell.Text{
@@ -190,11 +163,8 @@ func (secretClub) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "A város egyetlen terminálja, amit a BVK nem olvas, és te ki akarod vinni egy bolton át."},
 			}),
 		},
-	}
-}
-
-func (secretClub) triggers() []inkwell.Trigger {
-	return []inkwell.Trigger{
+	},
+	Triggers: []inkwell.Trigger{
 		{
 			Name: "tape_speaks",
 			Once: true,
@@ -219,7 +189,24 @@ func (secretClub) triggers() []inkwell.Trigger {
 				{Lang: "hu", Text: "A rejtvény szerint a kulcsot itt kovácsolták. Ha az a kazetta hall valamit, a foglalatból hallja."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (secretClub) Scene() *inkwell.Scene { return SecretClub }
+var _ = SecretClub.Leads(
+	inkwell.Exit{
+		To: BBSTerminal,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the terminal in the corner"},
+			{Lang: "hu", Text: "a terminál a sarokban"},
+		},
+		Side: inkwell.ExitBack,
+	},
+	inkwell.Exit{
+		To: TrinketShop,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back out through the shop"},
+			{Lang: "hu", Text: "vissza a bolton át"},
+		},
+		Side: inkwell.ExitNear,
+	},
+)

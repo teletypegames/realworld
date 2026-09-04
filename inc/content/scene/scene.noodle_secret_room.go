@@ -10,25 +10,28 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type noodleSecretRoom struct{}
+var noodleSecretRoomTake = inkwell.Seq(
+	inkwell.Give(item.CommentaryTape),
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "A tape. Label says PAUL, in that handwriting."},
+		{Lang: "hu", Text: "Egy kazetta. A címkén PAUL, azzal a kézírással."},
+	}),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "He labelled it for you and put it where only you'd look. That's the most sentimental thing Noodle ever did."},
+		{Lang: "hu", Text: "Neked címkézte, és oda tette, ahol csak te keresnéd. Ez a legérzelmesebb dolog, amit Noodle valaha tett."},
+	}),
+)
 
-var _ place = noodleSecretRoom{}
+var noodleSecretRoomGone = inkwell.Say(character.Paul, inkwell.Text{
+	{Lang: "en", Text: "Empty shelf. An evidence tag where something used to sit."},
+	{Lang: "hu", Text: "Üres polc. Egy bűnjelcédula ott, ahol valami állt."},
+})
 
 var NoodleSecretRoom = SceneManager.Register(&Scene{
 	Name: "noodle_secret_room",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "NOODLE'S BACK ROOM"},
 		{Lang: "hu", Text: "NOODLE HÁTSÓ SZOBÁJA"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: alley{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back out to the alley"},
-				{Lang: "hu", Text: "vissza a sikátorba"},
-			},
-			Side: inkwell.ExitNear,
-		},
 	},
 	Triggers: []inkwell.Trigger{
 		{
@@ -41,26 +44,7 @@ var NoodleSecretRoom = SceneManager.Register(&Scene{
 			Once: true,
 		},
 	},
-	Hotspots: noodleSecretRoom{}.hotspots(),
-})
-
-func (noodleSecretRoom) hotspots() []inkwell.Hotspot {
-	take := inkwell.Seq(
-		inkwell.Give(item.CommentaryTape),
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "A tape. Label says PAUL, in that handwriting."},
-			{Lang: "hu", Text: "Egy kazetta. A címkén PAUL, azzal a kézírással."},
-		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "He labelled it for you and put it where only you'd look. That's the most sentimental thing Noodle ever did."},
-			{Lang: "hu", Text: "Neked címkézte, és oda tette, ahol csak te keresnéd. Ez a legérzelmesebb dolog, amit Noodle valaha tett."},
-		}),
-	)
-	gone := inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "Empty shelf. An evidence tag where something used to sit."},
-		{Lang: "hu", Text: "Üres polc. Egy bűnjelcédula ott, ahol valami állt."},
-	})
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "shelf",
 			Label: inkwell.Text{
@@ -69,7 +53,7 @@ func (noodleSecretRoom) hotspots() []inkwell.Hotspot {
 			},
 			Area: inkwell.Rect(260, 70, 140, 50),
 			OnLook: inkwell.If(inkwell.Flag(inc.FlagNoodleCode),
-				gone,
+				noodleSecretRoomGone,
 				inkwell.If(inkwell.HasItem(item.CommentaryTape),
 					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "Dust, and the clean rectangle where the tape was."},
@@ -82,23 +66,23 @@ func (noodleSecretRoom) hotspots() []inkwell.Hotspot {
 				),
 			),
 			OnUse: inkwell.If(inkwell.Flag(inc.FlagNoodleCode),
-				gone,
+				noodleSecretRoomGone,
 				inkwell.If(inkwell.HasItem(item.CommentaryTape),
 					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "Nothing else on it worth having."},
 						{Lang: "hu", Text: "Más nincs rajta, amit érdemes lenne."},
 					}),
-					take,
+					noodleSecretRoomTake,
 				),
 			),
 			OnTake: inkwell.If(inkwell.Flag(inc.FlagNoodleCode),
-				gone,
+				noodleSecretRoomGone,
 				inkwell.If(inkwell.HasItem(item.CommentaryTape),
 					inkwell.Say(character.Paul, inkwell.Text{
 						{Lang: "en", Text: "I've got it."},
 						{Lang: "hu", Text: "Megvan."},
 					}),
-					take,
+					noodleSecretRoomTake,
 				),
 			),
 		},
@@ -154,7 +138,16 @@ func (noodleSecretRoom) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Nem."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (noodleSecretRoom) Scene() *inkwell.Scene { return NoodleSecretRoom }
+var _ = NoodleSecretRoom.Leads(
+	inkwell.Exit{
+		To: Alley,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back out to the alley"},
+			{Lang: "hu", Text: "vissza a sikátorba"},
+		},
+		Side: inkwell.ExitNear,
+	},
+)

@@ -9,9 +9,16 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type prototypeRoom struct{}
-
-var _ place = prototypeRoom{}
+var prototypeRoomRefuse = inkwell.Seq(
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "A chair, a helmet, a fist of cables. I am not sitting in that."},
+		{Lang: "hu", Text: "Egy szék, egy sisak, egy marék kábel. Nem ülök bele."},
+	}),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "Good. That is the chair that emptied Sumphor out. You look at it. You do not sit in it."},
+		{Lang: "hu", Text: "Helyes. Ez az a szék, ami kiürítette Sumphort. Ránézel. Nem ülsz bele."},
+	}),
+)
 
 var PrototypeRoom = SceneManager.Register(&Scene{
 	Name: "prototype_room",
@@ -19,31 +26,7 @@ var PrototypeRoom = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "PROTOTYPE ROOM"},
 		{Lang: "hu", Text: "PROTOTÍPUS SZOBA"},
 	},
-	Exits: []inkwell.Exit{
-		{
-			To: abandonedOffice{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back out past the fridge"},
-				{Lang: "hu", Text: "vissza ki a hűtő mellett"},
-			},
-			Side: inkwell.ExitNear,
-		},
-	},
-	Hotspots: prototypeRoom{}.hotspots(),
-})
-
-func (prototypeRoom) hotspots() []inkwell.Hotspot {
-	refuse := inkwell.Seq(
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "A chair, a helmet, a fist of cables. I am not sitting in that."},
-			{Lang: "hu", Text: "Egy szék, egy sisak, egy marék kábel. Nem ülök bele."},
-		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "Good. That is the chair that emptied Sumphor out. You look at it. You do not sit in it."},
-			{Lang: "hu", Text: "Helyes. Ez az a szék, ami kiürítette Sumphort. Ránézel. Nem ülsz bele."},
-		}),
-	)
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "chair",
 			Label: inkwell.Text{
@@ -51,8 +34,8 @@ func (prototypeRoom) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "szék a sisakkal"},
 			},
 			Area:   inkwell.Rect(240, 120, 90, 110),
-			OnLook: refuse,
-			OnUse:  refuse,
+			OnLook: prototypeRoomRefuse,
+			OnUse:  prototypeRoomRefuse,
 			OnTake: inkwell.Say(character.Paul, inkwell.Text{
 				{Lang: "en", Text: "I wouldn't carry that out if it were the last chair in the city."},
 				{Lang: "hu", Text: "Ezt nem vinném ki, ha ez lenne az utolsó szék a városban."},
@@ -99,7 +82,16 @@ func (prototypeRoom) hotspots() []inkwell.Hotspot {
 				}),
 			),
 		},
-	}
-}
+	},
+})
 
-func (prototypeRoom) Scene() *inkwell.Scene { return PrototypeRoom }
+var _ = PrototypeRoom.Leads(
+	inkwell.Exit{
+		To: AbandonedOffice,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back out past the fridge"},
+			{Lang: "hu", Text: "vissza ki a hűtő mellett"},
+		},
+		Side: inkwell.ExitNear,
+	},
+)

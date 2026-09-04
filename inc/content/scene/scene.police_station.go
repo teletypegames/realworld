@@ -10,38 +10,31 @@ import (
 	"realworld/inc/system"
 )
 
-type policeStation struct{}
-
-var _ place = policeStation{}
+var policeStationTip = inkwell.Seq(
+	inkwell.Say(character.Receptionist, inkwell.Text{
+		{Lang: "en", Text: "Sir. A moment."},
+		{Lang: "hu", Text: "Uram. Egy pillanat."},
+	}),
+	inkwell.Say(character.Receptionist, inkwell.Text{
+		{Lang: "en", Text: "What your friend meant for you isn't in the house. Behind it. The alley, a loose brick at the foot of the wall."},
+		{Lang: "hu", Text: "Ami a barátja maga számára szánt, az nincs a házban. Mögötte. A sikátorban, egy laza tégla a fal tövében."},
+	}),
+	inkwell.Say(character.Receptionist, inkwell.Text{
+		{Lang: "en", Text: "Take it before somebody else finds it. I never said this."},
+		{Lang: "hu", Text: "Vigye el, mielőtt más találja meg. Én ezt nem mondtam."},
+	}),
+	inkwell.SetFlag(inc.FlagPoliceTip),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "A government office just tipped you off to remove something from a scene. Hold on to that thought."},
+		{Lang: "hu", Text: "Egy állami hivatal most súgta meg, hogy vigyél el valamit egy helyszínről. Tartsd észben ezt a gondolatot."},
+	}),
+)
 
 var PoliceStation = SceneManager.Register(&Scene{
 	Name: "police_station",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SFPD — RECEPTION"},
 		{Lang: "hu", Text: "SFPD — RECEPCIÓ"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: policeStreet{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back out to the street"},
-				{Lang: "hu", Text: "vissza az utcára"},
-			},
-			Side: inkwell.ExitNear,
-		},
-		{
-			To: interrogationRoom{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the interview rooms"},
-				{Lang: "hu", Text: "a kihallgatószobák"},
-			},
-			Side:  inkwell.ExitBack,
-			Needs: inc.FlagReceptionPassed,
-			Blocked: inkwell.Say(character.Receptionist, inkwell.Text{
-				{Lang: "en", Text: "Reason for your visit first, sir."},
-				{Lang: "hu", Text: "Először a látogatás okát, uram."},
-			}),
-		},
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -73,12 +66,18 @@ var PoliceStation = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Triggers: policeStation{}.triggers(),
-	Hotspots: policeStation{}.hotspots(),
-})
-
-func (policeStation) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Triggers: []inkwell.Trigger{
+		{
+			Name: "tip",
+			Once: true,
+			When: inkwell.Given{
+				Flag:    inc.FlagVasquezDeal,
+				NotFlag: inc.FlagPoliceTip,
+			},
+			Do: policeStationTip,
+		},
+	},
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "receptionist",
 			Label: inkwell.Text{
@@ -214,40 +213,29 @@ func (policeStation) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Az az enyém, uram."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (policeStation) triggers() []inkwell.Trigger {
-	tip := inkwell.Seq(
-		inkwell.Say(character.Receptionist, inkwell.Text{
-			{Lang: "en", Text: "Sir. A moment."},
-			{Lang: "hu", Text: "Uram. Egy pillanat."},
-		}),
-		inkwell.Say(character.Receptionist, inkwell.Text{
-			{Lang: "en", Text: "What your friend meant for you isn't in the house. Behind it. The alley, a loose brick at the foot of the wall."},
-			{Lang: "hu", Text: "Ami a barátja maga számára szánt, az nincs a házban. Mögötte. A sikátorban, egy laza tégla a fal tövében."},
-		}),
-		inkwell.Say(character.Receptionist, inkwell.Text{
-			{Lang: "en", Text: "Take it before somebody else finds it. I never said this."},
-			{Lang: "hu", Text: "Vigye el, mielőtt más találja meg. Én ezt nem mondtam."},
-		}),
-		inkwell.SetFlag(inc.FlagPoliceTip),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "A government office just tipped you off to remove something from a scene. Hold on to that thought."},
-			{Lang: "hu", Text: "Egy állami hivatal most súgta meg, hogy vigyél el valamit egy helyszínről. Tartsd észben ezt a gondolatot."},
-		}),
-	)
-	return []inkwell.Trigger{
-		{
-			Name: "tip",
-			Once: true,
-			When: inkwell.Given{
-				Flag:    inc.FlagVasquezDeal,
-				NotFlag: inc.FlagPoliceTip,
-			},
-			Do: tip,
+var _ = PoliceStation.Leads(
+	inkwell.Exit{
+		To: PoliceStreet,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back out to the street"},
+			{Lang: "hu", Text: "vissza az utcára"},
 		},
-	}
-}
-
-func (policeStation) Scene() *inkwell.Scene { return PoliceStation }
+		Side: inkwell.ExitNear,
+	},
+	inkwell.Exit{
+		To: InterrogationRoom,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the interview rooms"},
+			{Lang: "hu", Text: "a kihallgatószobák"},
+		},
+		Side:  inkwell.ExitBack,
+		Needs: inc.FlagReceptionPassed,
+		Blocked: inkwell.Say(character.Receptionist, inkwell.Text{
+			{Lang: "en", Text: "Reason for your visit first, sir."},
+			{Lang: "hu", Text: "Először a látogatás okát, uram."},
+		}),
+	},
+)

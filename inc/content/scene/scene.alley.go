@@ -12,38 +12,11 @@ import (
 	"realworld/inc/system/armilla"
 )
 
-type alley struct{}
-
-var _ place = alley{}
-
 var Alley = SceneManager.Register(&Scene{
 	Name: "alley",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "ALLEY — BEHIND NOODLE'S HOUSE"},
 		{Lang: "hu", Text: "SIKÁTOR — NOODLE HÁZA MÖGÖTT"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: noodleHouse{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back out to the street"},
-				{Lang: "hu", Text: "vissza az utcára"},
-			},
-			Side: inkwell.ExitLeft,
-		},
-		{
-			To: noodleSecretRoom{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the back door"},
-				{Lang: "hu", Text: "a hátsó ajtó"},
-			},
-			Side:  inkwell.ExitBack,
-			Needs: inc.FlagSecretRoomOpen,
-			Blocked: inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "Locked. Four digits between me and whatever's behind it."},
-				{Lang: "hu", Text: "Zárva. Négy számjegy köztem és aközött, ami mögötte van."},
-			}),
-		},
 	},
 	Triggers: []inkwell.Trigger{
 		{
@@ -78,11 +51,7 @@ var Alley = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SRP: 1 tape"},
 		{Lang: "hu", Text: "SRP: 1 kazetta"},
 	}),
-	Hotspots: alley{}.hotspots(),
-})
-
-func (alley) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "hiding_place",
 			Label: inkwell.Text{
@@ -212,7 +181,29 @@ func (alley) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Nem érem el. Kéne valami, amire felállhatok."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (alley) Scene() *inkwell.Scene { return Alley }
+var _ = Alley.Leads(
+	inkwell.Exit{
+		To: NoodleHouse,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back out to the street"},
+			{Lang: "hu", Text: "vissza az utcára"},
+		},
+		Side: inkwell.ExitLeft,
+	},
+	inkwell.Exit{
+		To: NoodleSecretRoom,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the back door"},
+			{Lang: "hu", Text: "a hátsó ajtó"},
+		},
+		Side:  inkwell.ExitBack,
+		Needs: inc.FlagSecretRoomOpen,
+		Blocked: inkwell.Say(character.Paul, inkwell.Text{
+			{Lang: "en", Text: "Locked. Four digits between me and whatever's behind it."},
+			{Lang: "hu", Text: "Zárva. Négy számjegy köztem és aközött, ami mögötte van."},
+		}),
+	},
+)

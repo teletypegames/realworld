@@ -9,25 +9,11 @@ import (
 	"realworld/inc/system"
 )
 
-type interrogationRoom struct{}
-
-var _ place = interrogationRoom{}
-
 var InterrogationRoom = SceneManager.Register(&Scene{
 	Name: "interrogation_room",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "SFPD — INTERVIEW ROOM"},
 		{Lang: "hu", Text: "SFPD — KIHALLGATÓSZOBA"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: policeStation{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back to the front desk"},
-				{Lang: "hu", Text: "vissza a recepcióhoz"},
-			},
-			Side: inkwell.ExitNear,
-		},
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -52,11 +38,7 @@ var InterrogationRoom = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Hotspots: interrogationRoom{}.hotspots(),
-})
-
-func (interrogationRoom) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "vasquez",
 			Label: inkwell.Text{
@@ -141,7 +123,16 @@ func (interrogationRoom) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Ellopni a magnót egy kihallgatószobából. Még nekem is vannak határaim."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (interrogationRoom) Scene() *inkwell.Scene { return InterrogationRoom }
+var _ = InterrogationRoom.Leads(
+	inkwell.Exit{
+		To: PoliceStation,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back to the front desk"},
+			{Lang: "hu", Text: "vissza a recepcióhoz"},
+		},
+		Side: inkwell.ExitNear,
+	},
+)

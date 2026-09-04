@@ -9,25 +9,11 @@ import (
 	"realworld/inc/system"
 )
 
-type noodleOffice struct{}
-
-var _ place = noodleOffice{}
-
 var NoodleOffice = SceneManager.Register(&Scene{
 	Name: "noodle_office",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "NOODLE'S OFFICE"},
 		{Lang: "hu", Text: "NOODLE IRODÁJA"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: noodleHouse{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back out to the street"},
-				{Lang: "hu", Text: "vissza az utcára"},
-			},
-			Side: inkwell.ExitNear,
-		},
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -45,11 +31,7 @@ var NoodleOffice = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Hotspots: noodleOffice{}.hotspots(),
-})
-
-func (noodleOffice) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "noodle",
 			Label: inkwell.Text{
@@ -141,7 +123,16 @@ func (noodleOffice) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Paul. Látom, mit csinálsz."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (noodleOffice) Scene() *inkwell.Scene { return NoodleOffice }
+var _ = NoodleOffice.Leads(
+	inkwell.Exit{
+		To: NoodleHouse,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back out to the street"},
+			{Lang: "hu", Text: "vissza az utcára"},
+		},
+		Side: inkwell.ExitNear,
+	},
+)

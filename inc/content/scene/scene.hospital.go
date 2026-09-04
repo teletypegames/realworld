@@ -9,18 +9,11 @@ import (
 	"realworld/inc/system"
 )
 
-type hospital struct{}
-
-var _ place = hospital{}
-
 var Hospital = SceneManager.Register(&Scene{
 	Name: "hospital",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "HOSPITAL — PSYCHIATRIC WING"},
 		{Lang: "hu", Text: "KÓRHÁZ — PSZICHIÁTRIAI SZÁRNY"},
-	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -38,11 +31,7 @@ var Hospital = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Hotspots: hospital{}.hotspots(),
-})
-
-func (hospital) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "doctor_maren",
 			Label: inkwell.Text{
@@ -102,7 +91,9 @@ func (hospital) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Tejüveg, benne drótháló. A fény bejut. Más semmi."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (hospital) Scene() *inkwell.Scene { return Hospital }
+var _ = Hospital.Leads(
+	exitToSelector,
+)

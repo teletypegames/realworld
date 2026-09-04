@@ -12,18 +12,16 @@ import (
 	"realworld/inc/system"
 )
 
-type iceCreamShop struct{}
-
-var _ place = iceCreamShop{}
+var iceCreamShopGone = inkwell.Say(character.Paul, inkwell.Text{
+	{Lang: "en", Text: "Empty booth. A BVK compliance notice where his sundae was."},
+	{Lang: "hu", Text: "Üres boksz. Egy BVK megfelelőségi értesítő a fagyija helyén."},
+})
 
 var IceCreamShop = SceneManager.Register(&Scene{
 	Name: "ice_cream_shop",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "ICE CREAM SHOP — WHERE THE BAR WAS"},
 		{Lang: "hu", Text: "FAGYIZÓ — A RÉGI BÁR HELYÉN"},
-	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
 	},
 	Actors: []inkwell.SceneActor{
 		{
@@ -48,15 +46,7 @@ var IceCreamShop = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Hotspots: iceCreamShop{}.hotspots(),
-})
-
-func (iceCreamShop) hotspots() []inkwell.Hotspot {
-	gone := inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "Empty booth. A BVK compliance notice where his sundae was."},
-		{Lang: "hu", Text: "Üres boksz. Egy BVK megfelelőségi értesítő a fagyija helyén."},
-	})
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "vendor",
 			Label: inkwell.Text{
@@ -86,18 +76,18 @@ func (iceCreamShop) hotspots() []inkwell.Hotspot {
 			},
 			Area: inkwell.Rect(496, 164, 48, 84),
 			OnLook: inkwell.If(inkwell.Flag(inc.FlagBVKLogged),
-				gone,
+				iceCreamShopGone,
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "Thumbs going like pistons. He's parked in front of the only terminal in the place."},
 					{Lang: "hu", Text: "A hüvelykujjai úgy járnak, mint a dugattyúk. A hely egyetlen termináljának elé parkolt."},
 				}),
 			),
 			OnTalk: inkwell.If(inkwell.Flag(inc.FlagBVKLogged),
-				gone,
+				iceCreamShopGone,
 				system.System.Paused(inkwell.RunDialog(dialog.CandyCrusher)),
 			),
 			OnUse: inkwell.If(inkwell.Flag(inc.FlagBVKLogged),
-				gone,
+				iceCreamShopGone,
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "Shoving him won't get me the terminal. It'll get me the manager."},
 					{Lang: "hu", Text: "Ha félretolom, nem a terminált kapom meg. Az üzletvezetőt."},
@@ -109,7 +99,7 @@ func (iceCreamShop) hotspots() []inkwell.Hotspot {
 			}),
 			OnUseWith: map[*inkwell.Item]inkwell.Action{
 				item.IceCream: inkwell.If(inkwell.Flag(inc.FlagBVKLogged),
-					gone,
+					iceCreamShopGone,
 					inkwell.If(inkwell.Flag(inc.FlagTerminalAllowed),
 						inkwell.Say(character.Paul, inkwell.Text{
 							{Lang: "en", Text: "He's already moved over. I'll keep the ice cream."},
@@ -190,7 +180,9 @@ func (iceCreamShop) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Nem viszek el egy pultot."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (iceCreamShop) Scene() *inkwell.Scene { return IceCreamShop }
+var _ = IceCreamShop.Leads(
+	exitToSelector,
+)

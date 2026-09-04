@@ -8,9 +8,29 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type paulShop struct{}
+var paulShopTake = inkwell.Seq(
+	inkwell.Give(item.BreakfastBox),
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "Breakfast. Still warm-ish."},
+		{Lang: "hu", Text: "Reggeli. Még többé-kevésbé meleg."},
+	}),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "Take it. A man travels badly on an empty stomach, and worse on a full conscience."},
+		{Lang: "hu", Text: "Vidd. Üres gyomorral rosszul utazik az ember, tele lelkiismerettel még rosszabbul."},
+	}),
+)
 
-var _ place = paulShop{}
+var paulShopArmillaShelfTake = inkwell.Seq(
+	inkwell.Give(item.BlackArmilla),
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "Might sell it on the coast. Might not."},
+		{Lang: "hu", Text: "A parton talán eladom. Talán nem."},
+	}),
+	inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "You bought it to fix it. That was three years ago."},
+		{Lang: "hu", Text: "Azért vetted, hogy megjavítsd. Három éve volt."},
+	}),
+)
 
 var PaulShop = SceneManager.Register(&Scene{
 	Name: "paul_shop",
@@ -18,43 +38,7 @@ var PaulShop = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "PAUL'S SHOP — JUNK AND GARAGE"},
 		{Lang: "hu", Text: "PAUL BOLTJA — ÓCSKAVAS ÉS MŰHELY"},
 	},
-	Exits: []inkwell.Exit{
-		{
-			To: bus{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the bus to San Francisco"},
-				{Lang: "hu", Text: "a busz San Franciscóba"},
-			},
-			Side: inkwell.ExitNear,
-		},
-	},
-	Hotspots: paulShop{}.hotspots(),
-})
-
-func (paulShop) hotspots() []inkwell.Hotspot {
-	take := inkwell.Seq(
-		inkwell.Give(item.BreakfastBox),
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Breakfast. Still warm-ish."},
-			{Lang: "hu", Text: "Reggeli. Még többé-kevésbé meleg."},
-		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "Take it. A man travels badly on an empty stomach, and worse on a full conscience."},
-			{Lang: "hu", Text: "Vidd. Üres gyomorral rosszul utazik az ember, tele lelkiismerettel még rosszabbul."},
-		}),
-	)
-	armillaShelfTake := inkwell.Seq(
-		inkwell.Give(item.BlackArmilla),
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Might sell it on the coast. Might not."},
-			{Lang: "hu", Text: "A parton talán eladom. Talán nem."},
-		}),
-		inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "You bought it to fix it. That was three years ago."},
-			{Lang: "hu", Text: "Azért vetted, hogy megjavítsd. Három éve volt."},
-		}),
-	)
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "door_mat",
 			Label: inkwell.Text{
@@ -103,14 +87,14 @@ func (paulShop) hotspots() []inkwell.Hotspot {
 					{Lang: "en", Text: "It's in my bag already."},
 					{Lang: "hu", Text: "Már a táskámban van."},
 				}),
-				take,
+				paulShopTake,
 			),
 			OnTake: inkwell.If(inkwell.HasItem(item.BreakfastBox),
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "One breakfast is what I ordered, and one is what I have."},
 					{Lang: "hu", Text: "Egy reggelit rendeltem, és egy van nálam."},
 				}),
-				take,
+				paulShopTake,
 			),
 		},
 		{
@@ -135,14 +119,14 @@ func (paulShop) hotspots() []inkwell.Hotspot {
 					{Lang: "en", Text: "Already on me."},
 					{Lang: "hu", Text: "Már nálam van."},
 				}),
-				armillaShelfTake,
+				paulShopArmillaShelfTake,
 			),
 			OnTake: inkwell.If(inkwell.HasItem(item.BlackArmilla),
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "I only had the one."},
 					{Lang: "hu", Text: "Csak egy volt belőle."},
 				}),
-				armillaShelfTake,
+				paulShopArmillaShelfTake,
 			),
 		},
 		{
@@ -171,7 +155,16 @@ func (paulShop) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Egyszer az életben könnyű csomaggal utazom."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (paulShop) Scene() *inkwell.Scene { return PaulShop }
+var _ = PaulShop.Leads(
+	inkwell.Exit{
+		To: Bus,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the bus to San Francisco"},
+			{Lang: "hu", Text: "a busz San Franciscóba"},
+		},
+		Side: inkwell.ExitNear,
+	},
+)

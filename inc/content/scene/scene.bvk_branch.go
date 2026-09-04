@@ -4,19 +4,14 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
-type bvkBranch struct{}
-
-var _ place = bvkBranch{}
-
 var BVKBranch = SceneManager.Register(&Scene{
 	Name: "bvk_branch",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "BVK — SAN FRANCISCO BRANCH"},
 		{Lang: "hu", Text: "BVK — SAN FRANCISCÓI FIÓK"},
 	},
-	Exits: []inkwell.Exit{
-		exitToSelector,
-	},
 })
 
-func (bvkBranch) Scene() *inkwell.Scene { return BVKBranch }
+var _ = BVKBranch.Leads(
+	exitToSelector,
+)

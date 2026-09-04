@@ -10,9 +10,25 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type restaurantToilet struct{}
-
-var _ place = restaurantToilet{}
+var restaurantToiletToggle = inkwell.If(inkwell.Flag(inc.FlagMirrorPassword),
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "It's dead, and the sun is still there behind it. I've got what it was hiding."},
+		{Lang: "hu", Text: "Kihalt, és a nap még mindig ott van mögötte. Megvan, amit rejtett."},
+	}),
+	inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
+		inkwell.RunScript(script.MirrorPassword),
+		inkwell.Seq(
+			inkwell.Say(character.Paul, inkwell.Text{
+				{Lang: "en", Text: "Off. On. The mirror comes back, brighter than before. Nothing behind it."},
+				{Lang: "hu", Text: "Ki. Be. A tükör visszajön, fényesebben, mint előtte. Semmi mögötte."},
+			}),
+			inkwell.Say(speaker.Dex, inkwell.Text{
+				{Lang: "en", Text: "There's a trick to it, and I don't know the trick. That's a rarer sentence than you think."},
+				{Lang: "hu", Text: "Van ennek valami trükkje, és én nem ismerem. Ez ritkább mondat, mint gondolnád."},
+			}),
+		),
+	),
+)
 
 var RestaurantToilet = SceneManager.Register(&Scene{
 	Name: "restaurant_toilet",
@@ -20,40 +36,7 @@ var RestaurantToilet = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "TOILET — THE LIT MIRROR"},
 		{Lang: "hu", Text: "MOSDÓ — A KIVILÁGÍTOTT TÜKÖR"},
 	},
-	Exits: []inkwell.Exit{
-		{
-			To: smallRestaurant{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back into the restaurant"},
-				{Lang: "hu", Text: "vissza az étterembe"},
-			},
-			Side: inkwell.ExitNear,
-		},
-	},
-	Hotspots: restaurantToilet{}.hotspots(),
-})
-
-func (restaurantToilet) hotspots() []inkwell.Hotspot {
-	toggle := inkwell.If(inkwell.Flag(inc.FlagMirrorPassword),
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "It's dead, and the sun is still there behind it. I've got what it was hiding."},
-			{Lang: "hu", Text: "Kihalt, és a nap még mindig ott van mögötte. Megvan, amit rejtett."},
-		}),
-		inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
-			inkwell.RunScript(script.MirrorPassword),
-			inkwell.Seq(
-				inkwell.Say(character.Paul, inkwell.Text{
-					{Lang: "en", Text: "Off. On. The mirror comes back, brighter than before. Nothing behind it."},
-					{Lang: "hu", Text: "Ki. Be. A tükör visszajön, fényesebben, mint előtte. Semmi mögötte."},
-				}),
-				inkwell.Say(speaker.Dex, inkwell.Text{
-					{Lang: "en", Text: "There's a trick to it, and I don't know the trick. That's a rarer sentence than you think."},
-					{Lang: "hu", Text: "Van ennek valami trükkje, és én nem ismerem. Ez ritkább mondat, mint gondolnád."},
-				}),
-			),
-		),
-	)
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "mirror",
 			Label: inkwell.Text{
@@ -77,7 +60,7 @@ func (restaurantToilet) hotspots() []inkwell.Hotspot {
 					}),
 				),
 			),
-			OnUse: toggle,
+			OnUse: restaurantToiletToggle,
 			OnTake: inkwell.Say(character.Paul, inkwell.Text{
 				{Lang: "en", Text: "Bolted to the tiles. And I'd only see myself in it anyway."},
 				{Lang: "hu", Text: "A csempéhez csavarozva. És úgyis csak magamat látnám benne."},
@@ -100,7 +83,7 @@ func (restaurantToilet) hotspots() []inkwell.Hotspot {
 				{Lang: "en", Text: "One switch for the mirror light. Worn smooth. People fiddle with it."},
 				{Lang: "hu", Text: "Egy kapcsoló a tükörfénynek. Simára kopott. Babrálnak vele."},
 			}),
-			OnUse: toggle,
+			OnUse: restaurantToiletToggle,
 			OnTake: inkwell.Say(character.Paul, inkwell.Text{
 				{Lang: "en", Text: "It's in the wall."},
 				{Lang: "hu", Text: "A falban van."},
@@ -126,7 +109,16 @@ func (restaurantToilet) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "Vízvezeték, Paul. Hagyd a vízvezetéket."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (restaurantToilet) Scene() *inkwell.Scene { return RestaurantToilet }
+var _ = RestaurantToilet.Leads(
+	inkwell.Exit{
+		To: SmallRestaurant,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back into the restaurant"},
+			{Lang: "hu", Text: "vissza az étterembe"},
+		},
+		Side: inkwell.ExitNear,
+	},
+)

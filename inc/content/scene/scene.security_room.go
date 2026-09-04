@@ -12,38 +12,22 @@ import (
 	"realworld/inc/system"
 )
 
-type securityRoom struct{}
-
-var _ place = securityRoom{}
+var securityRoomRefused = inkwell.Seq(
+	inkwell.Say(character.SecurityACP, inkwell.Text{
+		{Lang: "en", Text: "ACCESS DENIED. THE SIMULATION MAY NOT BE INTERRUPTED."},
+		{Lang: "hu", Text: "HOZZÁFÉRÉS MEGTAGADVA. A SZIMULÁCIÓ NEM SZAKÍTHATÓ MEG."},
+	}),
+	inkwell.Say(character.SecurityACP, inkwell.Text{
+		{Lang: "en", Text: "NO TAPE MAY BE CARRIED IN. STANDING ORDER OF THE OPERATOR."},
+		{Lang: "hu", Text: "KAZETTA NEM VIHETŐ BE. AZ OPERÁTOR ÁLLANDÓ UTASÍTÁSA."},
+	}),
+)
 
 var SecurityRoom = SceneManager.Register(&Scene{
 	Name: "security_room",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "OBSERVATION ROOM — INSIDE THE STRUCTURE"},
 		{Lang: "hu", Text: "MEGFIGYELŐSZOBA — A SZERKEZET BELSEJÉBEN"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: bridgeFoot{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "back down"},
-				{Lang: "hu", Text: "vissza le"},
-			},
-			Side: inkwell.ExitNear,
-		},
-		{
-			To: secretLab{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the chamber door"},
-				{Lang: "hu", Text: "a kamra ajtaja"},
-			},
-			Side:  inkwell.ExitBack,
-			Needs: inc.FlagACPDistracted,
-			Blocked: inkwell.Say(character.SecurityACP, inkwell.Text{
-				{Lang: "en", Text: "ACCESS DENIED."},
-				{Lang: "hu", Text: "HOZZÁFÉRÉS MEGTAGADVA."},
-			}),
-		},
 	},
 	Triggers: []inkwell.Trigger{
 		{
@@ -53,21 +37,7 @@ var SecurityRoom = SceneManager.Register(&Scene{
 			Once: true,
 		},
 	},
-	Hotspots: securityRoom{}.hotspots(),
-})
-
-func (securityRoom) hotspots() []inkwell.Hotspot {
-	refused := inkwell.Seq(
-		inkwell.Say(character.SecurityACP, inkwell.Text{
-			{Lang: "en", Text: "ACCESS DENIED. THE SIMULATION MAY NOT BE INTERRUPTED."},
-			{Lang: "hu", Text: "HOZZÁFÉRÉS MEGTAGADVA. A SZIMULÁCIÓ NEM SZAKÍTHATÓ MEG."},
-		}),
-		inkwell.Say(character.SecurityACP, inkwell.Text{
-			{Lang: "en", Text: "NO TAPE MAY BE CARRIED IN. STANDING ORDER OF THE OPERATOR."},
-			{Lang: "hu", Text: "KAZETTA NEM VIHETŐ BE. AZ OPERÁTOR ÁLLANDÓ UTASÍTÁSA."},
-		}),
-	)
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "glass_wall",
 			Label: inkwell.Text{
@@ -123,7 +93,7 @@ func (securityRoom) hotspots() []inkwell.Hotspot {
 				}),
 				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
 					inkwell.RunScript(script.ACPDistracted),
-					refused,
+					securityRoomRefused,
 				),
 			),
 			OnUseWithAny: inkwell.Say(character.SecurityACP, inkwell.Text{
@@ -131,7 +101,29 @@ func (securityRoom) hotspots() []inkwell.Hotspot {
 				{Lang: "hu", Text: "IDEGEN TÁRGY. HOZZÁFÉRÉS MEGTAGADVA."},
 			}),
 		},
-	}
-}
+	},
+})
 
-func (securityRoom) Scene() *inkwell.Scene { return SecurityRoom }
+var _ = SecurityRoom.Leads(
+	inkwell.Exit{
+		To: BridgeFoot,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "back down"},
+			{Lang: "hu", Text: "vissza le"},
+		},
+		Side: inkwell.ExitNear,
+	},
+	inkwell.Exit{
+		To: SecretLab,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the chamber door"},
+			{Lang: "hu", Text: "a kamra ajtaja"},
+		},
+		Side:  inkwell.ExitBack,
+		Needs: inc.FlagACPDistracted,
+		Blocked: inkwell.Say(character.SecurityACP, inkwell.Text{
+			{Lang: "en", Text: "ACCESS DENIED."},
+			{Lang: "hu", Text: "HOZZÁFÉRÉS MEGTAGADVA."},
+		}),
+	},
+)

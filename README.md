@@ -380,9 +380,9 @@ from below it, so the voices became declared entities in a package of their
 own, `speaker/`, and both edges turned downward. Scenes are the other place
 Go pushes back: two package-level variables may not refer to each other in
 their initialisers, and a round trip between two rooms does exactly that.
-So an exit names its target through the scene file's own empty type,
-`To: street{}`, whose `Scene()` method returns the variable; the engine asks
-at run time, when every variable exists, and a type is not a dependency.
+So a scene file declares the scene first and its exits second,
+`var _ = Alley.Leads(…)`, a declaration that depends on both scenes while
+neither depends on it — and `Exit.To` holds the `*Scene` itself.
 
 A tape is a card, not a character. It is pushed into a device and talks back
 like a chatbot, so nothing about it stands in a scene, and the file is the

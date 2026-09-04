@@ -10,38 +10,39 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-type abandonedOffice struct{}
+var abandonedOfficeTaken = inkwell.Say(character.Paul, inkwell.Text{
+	{Lang: "en", Text: "Nothing else on the desk worth carrying."},
+	{Lang: "hu", Text: "Semmi más az asztalon, amit érdemes elvinni."},
+})
 
-var _ place = abandonedOffice{}
+var abandonedOfficePickUp = inkwell.Seq(
+	inkwell.Give(item.SumphorTape),
+	inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "A Personal Tape, label peeled off. Sumphor's desk, so presumably Sumphor's."},
+		{Lang: "hu", Text: "Egy Személyes Kazetta, a címke lehúzva. Sumphor asztala, tehát feltehetően Sumphoré."},
+	}),
+	inkwell.If(inkwell.Flag(inc.FlagTapeSpeaks),
+		inkwell.Say(speaker.TapeMystery, inkwell.Text{
+			{Lang: "en", Text: "That one is Norman's. It got mixed up with Sumphor's things. Bring it, it belongs with me."},
+			{Lang: "hu", Text: "Az Normané. Összekeveredett Sumphor holmijával. Hozd, hozzám tartozik."},
+		}),
+		inkwell.Say(speaker.Dex, inkwell.Text{
+			{Lang: "en", Text: "Or it's exactly what it looks like: a broken man's tape on a broken man's desk."},
+			{Lang: "hu", Text: "Vagy pontosan az, aminek látszik: egy összetört ember kazettája egy összetört ember asztalán."},
+		}),
+	),
+)
+
+var abandonedOfficeOpen = inkwell.Say(character.Paul, inkwell.Text{
+	{Lang: "en", Text: "Dead and swung aside. The room behind it is open."},
+	{Lang: "hu", Text: "Kihalt, és félretolva. A mögötte lévő szoba nyitva."},
+})
 
 var AbandonedOffice = SceneManager.Register(&Scene{
 	Name: "abandoned_office",
 	Title: inkwell.Text{
 		{Lang: "en", Text: "ABANDONED OFFICE"},
 		{Lang: "hu", Text: "ELHAGYATOTT IRODA"},
-	},
-	Exits: []inkwell.Exit{
-		{
-			To: workplaceLobby{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "the lift down"},
-				{Lang: "hu", Text: "a lift lefelé"},
-			},
-			Side: inkwell.ExitNear,
-		},
-		{
-			To: prototypeRoom{},
-			Label: inkwell.Text{
-				{Lang: "en", Text: "behind the fridge"},
-				{Lang: "hu", Text: "a hűtő mögött"},
-			},
-			Side:  inkwell.ExitBack,
-			Needs: inc.FlagFridgeOpen,
-			Blocked: inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "There's a room back there, but the fridge is bolted to the wall over the gap."},
-				{Lang: "hu", Text: "Hátul van egy szoba, de a hűtő rá van csavarozva a falra a rés fölött."},
-			}),
-		},
 	},
 	Triggers: []inkwell.Trigger{
 		{
@@ -54,36 +55,7 @@ var AbandonedOffice = SceneManager.Register(&Scene{
 			Do: inkwell.RunScript(script.SumphorEnters),
 		},
 	},
-	Hotspots: abandonedOffice{}.hotspots(),
-})
-
-func (abandonedOffice) hotspots() []inkwell.Hotspot {
-	taken := inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "Nothing else on the desk worth carrying."},
-		{Lang: "hu", Text: "Semmi más az asztalon, amit érdemes elvinni."},
-	})
-	pickUp := inkwell.Seq(
-		inkwell.Give(item.SumphorTape),
-		inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "A Personal Tape, label peeled off. Sumphor's desk, so presumably Sumphor's."},
-			{Lang: "hu", Text: "Egy Személyes Kazetta, a címke lehúzva. Sumphor asztala, tehát feltehetően Sumphoré."},
-		}),
-		inkwell.If(inkwell.Flag(inc.FlagTapeSpeaks),
-			inkwell.Say(speaker.TapeMystery, inkwell.Text{
-				{Lang: "en", Text: "That one is Norman's. It got mixed up with Sumphor's things. Bring it, it belongs with me."},
-				{Lang: "hu", Text: "Az Normané. Összekeveredett Sumphor holmijával. Hozd, hozzám tartozik."},
-			}),
-			inkwell.Say(speaker.Dex, inkwell.Text{
-				{Lang: "en", Text: "Or it's exactly what it looks like: a broken man's tape on a broken man's desk."},
-				{Lang: "hu", Text: "Vagy pontosan az, aminek látszik: egy összetört ember kazettája egy összetört ember asztalán."},
-			}),
-		),
-	)
-	open := inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "Dead and swung aside. The room behind it is open."},
-		{Lang: "hu", Text: "Kihalt, és félretolva. A mögötte lévő szoba nyitva."},
-	})
-	return []inkwell.Hotspot{
+	Hotspots: []inkwell.Hotspot{
 		{
 			Name: "computer",
 			Label: inkwell.Text{
@@ -114,14 +86,14 @@ func (abandonedOffice) hotspots() []inkwell.Hotspot {
 			},
 			Area: inkwell.Rect(220, 130, 100, 70),
 			OnLook: inkwell.If(inkwell.HasItem(item.SumphorTape),
-				taken,
+				abandonedOfficeTaken,
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "Untouched since the day. A cold coffee, a chewed pen, and a tape sitting square in the middle."},
 					{Lang: "hu", Text: "Aznap óta érintetlen. Egy hideg kávé, egy megrágott toll, és egy kazetta pontosan középen."},
 				}),
 			),
-			OnTake: inkwell.If(inkwell.HasItem(item.SumphorTape), taken, pickUp),
-			OnUse:  inkwell.If(inkwell.HasItem(item.SumphorTape), taken, pickUp),
+			OnTake: inkwell.If(inkwell.HasItem(item.SumphorTape), abandonedOfficeTaken, abandonedOfficePickUp),
+			OnUse:  inkwell.If(inkwell.HasItem(item.SumphorTape), abandonedOfficeTaken, abandonedOfficePickUp),
 		},
 		{
 			Name: "fridge",
@@ -131,14 +103,14 @@ func (abandonedOffice) hotspots() []inkwell.Hotspot {
 			},
 			Area: inkwell.Rect(420, 110, 80, 110),
 			OnLook: inkwell.If(inkwell.Flag(inc.FlagFridgeOpen),
-				open,
+				abandonedOfficeOpen,
 				inkwell.Say(character.Paul, inkwell.Text{
 					{Lang: "en", Text: "A full-height fridge against the back wall. Humming. There's a draught coming from behind it."},
 					{Lang: "hu", Text: "Egy padlótól plafonig érő hűtő a hátsó falnál. Zümmög. Huzat jön mögüle."},
 				}),
 			),
 			OnUse: inkwell.If(inkwell.Flag(inc.FlagFridgeOpen),
-				open,
+				abandonedOfficeOpen,
 				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
 					inkwell.Seq(
 						inkwell.Say(speaker.TapeSupport, inkwell.Text{
@@ -168,7 +140,29 @@ func (abandonedOffice) hotspots() []inkwell.Hotspot {
 				),
 			),
 		},
-	}
-}
+	},
+})
 
-func (abandonedOffice) Scene() *inkwell.Scene { return AbandonedOffice }
+var _ = AbandonedOffice.Leads(
+	inkwell.Exit{
+		To: WorkplaceLobby,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "the lift down"},
+			{Lang: "hu", Text: "a lift lefelé"},
+		},
+		Side: inkwell.ExitNear,
+	},
+	inkwell.Exit{
+		To: PrototypeRoom,
+		Label: inkwell.Text{
+			{Lang: "en", Text: "behind the fridge"},
+			{Lang: "hu", Text: "a hűtő mögött"},
+		},
+		Side:  inkwell.ExitBack,
+		Needs: inc.FlagFridgeOpen,
+		Blocked: inkwell.Say(character.Paul, inkwell.Text{
+			{Lang: "en", Text: "There's a room back there, but the fridge is bolted to the wall over the gap."},
+			{Lang: "hu", Text: "Hátul van egy szoba, de a hűtő rá van csavarozva a falra a rés fölött."},
+		}),
+	},
+)
