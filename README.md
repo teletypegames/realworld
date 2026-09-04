@@ -24,7 +24,7 @@ go run .
 
 ```bash
 go run .                   # the two splash cards, then the main menu
-go run . -lang hu          # the same game in Hungarian
+go run . -lang hu          # the same game in Hungarian, for this run only
 go run . -finale           # the finale — try the Nokia-punk theme switch
 go run . -scene alley      # straight into the alley (beat 3), no main menu
 go run . -scene selector   # the location selector: the map the city hangs off
@@ -38,6 +38,16 @@ Scene names are the `Name` fields of the scene files (`selector`, `paul_shop`,
 `bbs_terminal`, `street`, `hospital`, `server_farm`, `secret_lab`,
 `rooftop_hideout`, `public_bbs`, `bvk_branch`, `curator_shop`, `scrap_market`,
 `samizdat_press`, `showroom`, `columbarium`).
+
+Settings and saves outlive the process. The engine keeps two JSON documents
+under the game's name, `realworld`, in the user's configuration directory —
+`~/Library/Application Support/realworld/` on macOS, `~/.config/realworld/` on
+Linux, `%AppData%\realworld\` on Windows — and in `localStorage` for the wasm
+build. `settings.json` is the language and the theme, written the moment they
+are changed on the Settings screen; `slots.json` is every save slot in one
+table, the session itself a base64 string beside the time and the scene a
+load screen lists. `-lang` chooses the language for one run without writing it
+back; with no flag and nothing saved yet the game speaks English.
 
 To work against a local inkwell checkout, add a `replace` line temporarily —
 and take it out before committing:

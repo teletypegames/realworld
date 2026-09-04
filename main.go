@@ -51,7 +51,7 @@ type options struct {
 func parseOptions() options {
 	startScene := flag.String("scene", "", "start straight in this scene, skipping the main menu")
 	finale := flag.Bool("finale", false, "start with the finale, to try the Nokia-punk theme switch")
-	language := flag.String("lang", "en", "language the game speaks (en, hu)")
+	language := flag.String("lang", "", "language the game speaks for this run (en, hu); the saved setting otherwise")
 	debug := flag.Bool("debug", false, "open the debug menu with d (a debug build has it anyway)")
 	flag.Parse()
 
@@ -94,6 +94,7 @@ func (chosen options) flags() []string {
 func (chosen options) game() *inkwell.Game {
 	return inkwell.New(inkwell.Game{
 		Title:       "Real World",
+		App:         "realworld",
 		Width:       widget.ScreenWidth,
 		Height:      widget.ScreenHeight,
 		WindowScale: 2,

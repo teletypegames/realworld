@@ -553,6 +553,7 @@ is, the same way a scene is what its literal says it is.
 ```go
 game := inkwell.New(inkwell.Game{
 	Title:       "Real World",
+	App:         "realworld",
 	Width:       widget.ScreenWidth,
 	Height:      widget.ScreenHeight,
 	WindowScale: 2,
@@ -587,6 +588,13 @@ that arrives as a string, the `-scene` flag, becomes one through
 `ExitLook`, `ExitTake` and `UseWithFail` are the three responses the engine asks
 the game for, and all three are `script` functions — a line the player reads
 belongs with the rest of the writing, not in the wiring.
+
+`App` is the game's name to the machine: the engine keeps `settings.json` and
+`slots.json` under it in the user's configuration directory, and under the
+same prefix in `localStorage` for wasm. Nothing here writes either — `UseLang`
+and `UseTheme` save the settings as they run, `SaveSlot` writes a slot — and
+`-lang` sets `inkwell.Lang` for the run only, which the engine leaves alone
+when it is already set.
 
 The command line is a type rather than four loose pointers: `options` carries
 what the flags chose, and the two answers the literal needs that a flag does not
