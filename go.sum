@@ -1,5 +1,7 @@
 git.teletypegames.org/engines/inkwell v0.1.1-0.20260904162123-3f2278d397ae h1:rBG+9q1V6xk4BNRePI5vZaB9JdLB8n0tbyFD/2BbbOA=
 git.teletypegames.org/engines/inkwell v0.1.1-0.20260904162123-3f2278d397ae/go.mod h1:/v6QtismTE8+e7kobbVR5B/CpTSrd4j2DYwJ8DvINhs=
+git.teletypegames.org/engines/inkwell v0.1.1-0.20260904164842-9ae4e5e362b0 h1:W9u9BdfSTN0vgEuqnOy9tzLZpnIbvuDcFD1v4yBX5kM=
+git.teletypegames.org/engines/inkwell v0.1.1-0.20260904164842-9ae4e5e362b0/go.mod h1:/v6QtismTE8+e7kobbVR5B/CpTSrd4j2DYwJ8DvINhs=
 github.com/ebitengine/gomobile v0.0.0-20250923094054-ea854a63cce1 h1:+kz5iTT3L7uU+VhlMfTb8hHcxLO3TlaELlX8wa4XjA0=
 github.com/ebitengine/gomobile v0.0.0-20250923094054-ea854a63cce1/go.mod h1:lKJoeixeJwnFmYsBny4vvCJGVFc3aYDalhuDsfZzWHI=
 github.com/ebitengine/hideconsole v1.0.0 h1:5J4U0kXF+pv/DhiXt5/lTz0eO5ogJ1iXb8Yj1yReDqE=
