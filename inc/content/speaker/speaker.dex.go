@@ -12,6 +12,6 @@ var Dex = SpeakerManager.Register(&Speaker{
 		{Lang: "en", Text: "DEX"},
 		{Lang: "hu", Text: "DEX"},
 	},
-	Voice: inkwell.VoiceLog,
-	Color: theme.Amber,
+	Delivery: inkwell.DeliveryLog,
+	Color:    theme.Amber,
 })

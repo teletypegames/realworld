@@ -12,6 +12,6 @@ var TapeSupport = SpeakerManager.Register(&Speaker{
 		{Lang: "en", Text: "TECH SUPPORT"},
 		{Lang: "hu", Text: "ÜGYFÉLSZOLGÁLAT"},
 	},
-	Voice: inkwell.VoiceLog,
-	Color: theme.AmberPale,
+	Delivery: inkwell.DeliveryLog,
+	Color:    theme.AmberPale,
 })

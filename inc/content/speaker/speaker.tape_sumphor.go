@@ -12,6 +12,6 @@ var TapeSumphor = SpeakerManager.Register(&Speaker{
 		{Lang: "en", Text: "SUMPHOR'S TAPE"},
 		{Lang: "hu", Text: "SUMPHOR KAZETTÁJA"},
 	},
-	Voice: inkwell.VoiceLog,
-	Color: theme.InkDim,
+	Delivery: inkwell.DeliveryLog,
+	Color:    theme.InkDim,
 })

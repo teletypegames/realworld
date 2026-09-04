@@ -14,6 +14,6 @@ var _ = widget.WidgetManager.Register(&inkwell.ChatLog{
 	LineHeight: widget.LineHeight,
 	Padding:    widget.Padding,
 	Speaker:    inkwell.SpeakerHeader,
-	Voices:     []inkwell.Voice{inkwell.VoiceLog},
+	Deliveries: []inkwell.Delivery{inkwell.DeliveryLog},
 	Resting:    speaker.Dex,
 })

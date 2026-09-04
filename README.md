@@ -51,8 +51,9 @@ configuration:
 | wasm | `localStorage`, keys `realworld.settings` and `realworld.slots` |
 
 The place is Go's `os.UserConfigDir()`; when it cannot be found, `realworld/`
-under the working directory stands in. `settings.json` is the language and the
-theme, written the moment they are changed on the Settings screen — so it does
+under the working directory stands in. `settings.json` is the language, the
+theme and whether recorded lines play, written the moment they are changed on
+the Settings screen — so it does
 not exist until you change one. `slots.json` is every save slot in one table,
 the session itself a base64 string beside the time and the scene a load screen
 lists. `-lang` chooses the language for one run without writing it back; with
@@ -274,6 +275,7 @@ inc/content/stage/                     one file per full-screen screen
 inc/content/scene/  …/background/       one file per location, twice
 inc/content/tape/                      the Tape entity, the slots, the channel
 inc/content/speaker/                   the voices with no body: Dex and the cards
+inc/content/music/  …/sound/           tracks and noises, as entities
 inc/content/item/  …/character/  …/dialog/  …/script/
 ```
 
@@ -294,8 +296,8 @@ known back.
 `widget → tape` used to be the exception, because the tape slots asked which
 cassette a tape was in. Both halves of it went. The tape channel does not ask
 `tape` anything — it asks the engine which **voice** a speaker has, and a tape
-is a `VoiceLog` speaker, so the filter is one field
-(`Voices: []inkwell.Voice{inkwell.VoiceLog}`) and the HUD learns nothing about
+is a `DeliveryLog` speaker, so the filter is one field
+(`Deliveries: []inkwell.Delivery{inkwell.DeliveryLog}`) and the HUD learns nothing about
 cassettes. The tape slots went the other way: a slot you push a cassette into
 is a cassette thing, so `tape/tape.slots.go` is a content file that registers a
 widget, like every other content file registering into a manager.
@@ -390,12 +392,12 @@ card: the item it travels in, the voice it speaks with, the dialog it plays,
 which is a file in `dialog/` like every other tree, and `OnInsert`, its first
 words when it clicks into slot two — run after the generic `tape_insert`
 script, which is the part of an insertion every card shares. The voice is an
-`inkwell.Speaker` in `speaker/` — `VoiceLog`, so the line lands in the channel
+`inkwell.Speaker` in `speaker/` — `DeliveryLog`, so the line lands in the channel
 and never in a bubble — and `speaker.SpeakerManager` is what `main.go` hands
 the engine. Dex is such a voice and such a card, so he is in neither
 `character/`, which holds Paul and everyone he meets, nor only in `tape/` — and
 one voice with no body stays a character, the security ACP, a `Character` with
-`Voice: VoiceLog` because it is a room, not a cassette.
+`Delivery: DeliveryLog` because it is a room, not a cassette.
 
 A choice a card only offers under a condition says so in `Show`, and the
 condition is a literal: `inkwell.Given{Item: …, NotFlag: …}`, every set field
@@ -474,7 +476,7 @@ cycle — and "the Stage showing is the world" is what it meant anyway.
 Tapes are the one entity type this game invents. `Tape` holds the voice it
 speaks with, the cassette that carries it and the dialog it plays, one file
 each — what a tape *sounds* like stays on the `Speaker`, as its `Label`,
-`Color` and `Voice`, because that is a fact about a voice.
+`Color` and `Delivery`, because that is a fact about a voice.
 A tape's line is `speaker.TapeSupport.Say(…)` like anybody else's; the engine
 sends it to the log instead of a speech bubble because the voice says so.
 
@@ -613,7 +615,7 @@ field in a literal:
 |---|---|
 | a scratch-image text blitter, because `drawText` dropped the colour | `Game.DrawText` renders in colour; `inkwell.TextWidth`, `WrapText`, `ClipText`, `GlyphW/H` are the library's |
 | a pump widget driving its own `Runner`, because `queueAction` was unexported | `g.Do(action)` — one queue, in order, engine-side |
-| `TapeSay`, a second spelling of `Say` that skipped the speech bubble | `Speaker.Voice` — `VoiceLog` sends a speaker's lines to the log |
+| `TapeSay`, a second spelling of `Say` that skipped the speech bubble | `Speaker.Delivery` — `DeliveryLog` sends a speaker's lines to the log |
 | a `Tapes` map of display names | `Speaker.Label` |
 | a `Character` per cassette, so that it could speak | `inkwell.Speaker` and `Game.SpeakerManager`: a voice with no body |
 | `inc.SceneAlley`, `inc.ItemMysteryTape`: a string constant per entity, looked up by name at boot | every manager holds pointers and every reference is typed — `*Asset`, `*Item`, `*Stage`, `*Scene`, `Talker` — so the compiler holds the graph and the editor follows a field to its struct |

@@ -77,14 +77,13 @@ Every field of a struct instance goes on its own line, with a trailing comma —
 never on the same line as the brace, never two fields on one line.
 
 ```go
-return inkwell.Asset{
-	Name: BgStreet,
+return &inkwell.Asset{
+	Name: "street",
 	Path: "assets/bg/street.png",
-	Kind: inkwell.AssetImage,
 }
 ```
 
-Not `inkwell.Asset{Name: BgStreet, Path: "...", Kind: inkwell.AssetImage}`.
+Not `&inkwell.Asset{Name: "street", Path: "..."}`.
 
 This holds for nested literals too, including small ones such as
 `inkwell.Point`. Slice and map literals are not covered by the rule.
@@ -99,6 +98,10 @@ Title: Text{
 	{Lang: "hu", Text: "SIKÁTOR — NOODLE HÁZA MÖGÖTT"},
 },
 ```
+
+A recorded line is the third field on that one line, `Voice: &inkwell.Voice{…}`,
+because the English and the Hungarian recording are two files and the line
+that carries the words carries its own reading of them.
 
 Inside a `[]inkwell.Text` or a `map[string]inkwell.Text` the element type is
 implied and left off, which is what `gofmt -s` produces.
@@ -155,6 +158,8 @@ inc/content/scene/scene.*.go             one file per scene
 inc/content/background/background.manager.go  one asset per registered scene
 inc/content/character/character.*.go     the cast: people who stand in a scene
 inc/content/speaker/speaker.*.go         the voices with no body: Dex and the tape cards
+inc/content/music/music.manager.go       the Music alias and its Manager: tracks a scene or stage plays
+inc/content/sound/sound.manager.go       the Sound alias and its Manager: noises a hotspot plays
 inc/content/item/item.*.go               inventory
 inc/content/dialog/dialog.*.go           dialog trees
 inc/content/script/script.*.go           named action sequences
@@ -181,9 +186,9 @@ knows the caller back.
 `widget → tape` used to be the exception, and it was defended here: the tape
 slots asked which cassette a tape was in. It is gone, and both halves of it are
 worth knowing why. The tape channel does not ask `tape` anything — it asks the
-engine which **voice** a speaker has, and a tape is a `VoiceLog` speaker, so
-the filter is `Voices: []inkwell.Voice{inkwell.VoiceLog}` and the HUD learns
-nothing about cassettes. The tape slots moved the other way: they are a
+engine how a speaker's lines are **delivered**, and a tape is a `DeliveryLog`
+speaker, so the filter is `Deliveries: []inkwell.Delivery{inkwell.DeliveryLog}`
+and the HUD learns nothing about cassettes. The tape slots moved the other way: they are a
 *cassette* thing, so `tape.slots.go` is a content file that registers a widget,
 the way every other content file registers into a manager.
 
@@ -271,7 +276,7 @@ card went in.
 
 The voice is declared, not derived. `speaker/` holds one `inkwell.Speaker` per
 voice with no body — `speaker.Dex`, `speaker.TapeSupport`, … — each with its
-`Label`, its `Color` and `VoiceLog`, so the line lands in the channel and never
+`Label`, its `Color` and `DeliveryLog`, so the line lands in the channel and never
 in a bubble; `speaker.SpeakerManager` is what `main.go` hands the engine. It
 used to be derived from the cards, and that is exactly why a dialog could not
 name the voice it was giving a line to: the voice lived one package *above*
@@ -279,7 +284,7 @@ it. Dex is such a voice and such a card — `speaker.Dex` says how he sounds,
 `tape.Dex` is the cassette in slot one — which is why he is in neither
 `character/` nor only in `tape/`. One voice stays a character on purpose: the
 security ACP is a room-scale system, so it stands in its scene as a
-`Character` with `Voice: inkwell.VoiceLog`, and speaks through the log. The
+`Character` with `Delivery: inkwell.DeliveryLog`, and speaks through the log. The
 two lookups are `tape.Of`, the card an item is, and `tape.DialogOf`, the
 dialog to run for a loaded item, which is the card's own or Dex's when the
 card names none.
@@ -330,7 +335,7 @@ so the content packages stand in a strict order and a reference only ever
 points **down**:
 
 ```
-character, speaker ← item ← script ← dialog ← tape ← scene ← background ← stage
+character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← background ← stage
 ```
 
 A dialog can give a line to `speaker.Dex` and hand out `item.NoodleLetter`,
@@ -393,7 +398,6 @@ scene.SceneManager.Each(func(entity *scene.Scene) {
 	entity.Background = BackgroundManager.Register(&Background{
 		Name: entity.Name,
 		Path: "assets/bg/" + entity.Name + ".png",
-		Kind: inkwell.AssetImage,
 	})
 })
 ```
@@ -807,7 +811,7 @@ The layering is the import graph, so the compiler keeps it:
 ```
 inc ← theme ← system ← armilla ← widget ← main
  ↑      ↑        ↑                  ↑
-util    └── character, speaker ← item ← script ← dialog ← tape ← scene ← background ← stage
+util    └── character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← background ← stage
 ```
 
 `inc` imports nothing and everything imports it, and `util` sits beside it on

@@ -12,6 +12,6 @@ var TapeCommentary = SpeakerManager.Register(&Speaker{
 		{Lang: "en", Text: "DEV COMMENTARY"},
 		{Lang: "hu", Text: "FEJLESZTŐI KOMMENTÁR"},
 	},
-	Voice: inkwell.VoiceLog,
-	Color: theme.Amber,
+	Delivery: inkwell.DeliveryLog,
+	Color:    theme.Amber,
 })

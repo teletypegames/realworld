@@ -12,6 +12,6 @@ var TapeServerFarm = SpeakerManager.Register(&Speaker{
 		{Lang: "en", Text: "ACCESS TAPE"},
 		{Lang: "hu", Text: "BELÉPŐKAZETTA"},
 	},
-	Voice: inkwell.VoiceLog,
-	Color: theme.AmberLow,
+	Delivery: inkwell.DeliveryLog,
+	Color:    theme.AmberLow,
 })

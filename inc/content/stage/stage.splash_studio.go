@@ -1,8 +1,6 @@
 package stage
 
 import (
-	inkwell "git.teletypegames.org/engines/inkwell"
-
 	"realworld/inc/content/background"
 )
 
@@ -15,7 +13,6 @@ var SplashStudio = StageManager.Register(&Stage{
 	Background: background.BackgroundManager.Register(&background.Background{
 		Name: "splash_studio",
 		Path: "assets/stage/splash_studio.png",
-		Kind: inkwell.AssetImage,
 	}),
 	Transition: splashTransition,
 	Hold:       splashHold,

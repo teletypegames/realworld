@@ -12,6 +12,6 @@ var SecurityACP = CharacterManager.Register(&Character{
 		{Lang: "en", Text: "SECURITY ACP"},
 		{Lang: "hu", Text: "BIZTONSÁGI ACP"},
 	},
-	Voice:       inkwell.VoiceLog,
+	Delivery:    inkwell.DeliveryLog,
 	SpeechColor: theme.Green,
 })

@@ -12,6 +12,6 @@ var TapeMystery = SpeakerManager.Register(&Speaker{
 		{Lang: "en", Text: "UNKNOWN TAPE"},
 		{Lang: "hu", Text: "ISMERETLEN KAZETTA"},
 	},
-	Voice: inkwell.VoiceLog,
-	Color: theme.Bone,
+	Delivery: inkwell.DeliveryLog,
+	Color:    theme.Bone,
 })

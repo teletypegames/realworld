@@ -59,6 +59,15 @@ func settingsExpand(context *inkwell.Ctx) []MenuItem {
 			Do:       inkwell.UseTheme(otherTheme),
 			KeepOpen: true,
 		},
+		{
+			Label: Text{
+				{Lang: "en", Text: "Voices"},
+				{Lang: "hu", Text: "Szinkron"},
+			},
+			Value:    inkwell.FixedValue(switchNames[context.Game.VoiceOn()]),
+			Do:       inkwell.SetVoice(!context.Game.VoiceOn()),
+			KeepOpen: true,
+		},
 		backRow(),
 	}
 }
@@ -71,6 +80,17 @@ var languageNames = map[string]Text{
 	"hu": {
 		{Lang: "en", Text: "Hungarian"},
 		{Lang: "hu", Text: "magyar"},
+	},
+}
+
+var switchNames = map[bool]Text{
+	true: {
+		{Lang: "en", Text: "on"},
+		{Lang: "hu", Text: "be"},
+	},
+	false: {
+		{Lang: "en", Text: "off"},
+		{Lang: "hu", Text: "ki"},
 	},
 }
 

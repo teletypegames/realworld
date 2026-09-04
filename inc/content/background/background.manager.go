@@ -15,7 +15,6 @@ func init() {
 		entity.Background = BackgroundManager.Register(&Background{
 			Name: entity.Name,
 			Path: "assets/bg/" + entity.Name + ".png",
-			Kind: inkwell.AssetImage,
 		})
 	})
 }
