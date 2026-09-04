@@ -40,14 +40,23 @@ Scene names are the `Name` fields of the scene files (`selector`, `paul_shop`,
 `samizdat_press`, `showroom`, `columbarium`).
 
 Settings and saves outlive the process. The engine keeps two JSON documents
-under the game's name, `realworld`, in the user's configuration directory —
-`~/Library/Application Support/realworld/` on macOS, `~/.config/realworld/` on
-Linux, `%AppData%\realworld\` on Windows — and in `localStorage` for the wasm
-build. `settings.json` is the language and the theme, written the moment they
-are changed on the Settings screen; `slots.json` is every save slot in one
-table, the session itself a base64 string beside the time and the scene a
-load screen lists. `-lang` chooses the language for one run without writing it
-back; with no flag and nothing saved yet the game speaks English.
+under the game's name, `realworld`, where the platform keeps a user's
+configuration:
+
+| platform | `settings.json` and `slots.json` |
+|---|---|
+| macOS | `~/Library/Application Support/realworld/` |
+| Linux | `~/.config/realworld/` — or `$XDG_CONFIG_HOME/realworld/` when set |
+| Windows | `%AppData%\realworld\` |
+| wasm | `localStorage`, keys `realworld.settings` and `realworld.slots` |
+
+The place is Go's `os.UserConfigDir()`; when it cannot be found, `realworld/`
+under the working directory stands in. `settings.json` is the language and the
+theme, written the moment they are changed on the Settings screen — so it does
+not exist until you change one. `slots.json` is every save slot in one table,
+the session itself a base64 string beside the time and the scene a load screen
+lists. `-lang` chooses the language for one run without writing it back; with
+no flag and nothing saved yet the game speaks English.
 
 To work against a local inkwell checkout, add a `replace` line temporarily —
 and take it out before committing:
