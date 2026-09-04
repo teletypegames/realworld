@@ -634,6 +634,19 @@ Also: the inkwell README gives the module path as
 `git.teletypegames.org/games/inkwell`; the real path per its `go.mod` is
 `git.teletypegames.org/engines/inkwell`.
 
+## Sprites
+
+Nobody in the deck has artwork yet, so every character is the engine's
+placeholder figure, sized by its `W` and `H`. When the art comes, it comes as
+`inkwell.Sprite`s: a sheet and the frames cut from it, one `Sprite` per
+`Pose` the character can be seen in — `PoseIdle`, `PoseWalk`, `PoseTalk`,
+`PoseWait` — in the character's `Poses`. The engine picks the pose from what
+the character is doing, and mirrors the frame when it walks the other way, so
+one walk cycle serves both directions. An item's `Sprite` is the same type
+with one frame, or several if a cassette is to glint in the inventory. A
+sheet belongs to one character, so it nests in the character's literal the
+way the splash logo nests in its stage.
+
 ## Known gaps
 
 - **The HUD still covers the foot of every painting.** The art is no longer
