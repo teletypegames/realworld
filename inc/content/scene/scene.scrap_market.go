@@ -6,6 +6,8 @@ import (
 
 type scrapMarket struct{}
 
+var _ place = scrapMarket{}
+
 var ScrapMarket = SceneManager.Register(&Scene{
 	Name: "scrap_market",
 	Title: inkwell.Text{

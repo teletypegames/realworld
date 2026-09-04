@@ -6,6 +6,8 @@ import (
 
 type bbsTerminal struct{}
 
+var _ place = bbsTerminal{}
+
 var BBSTerminal = SceneManager.Register(&Scene{
 	Name: "bbs_terminal",
 	Title: inkwell.Text{

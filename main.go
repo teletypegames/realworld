@@ -42,10 +42,10 @@ func main() {
 }
 
 type options struct {
-	startScene string
-	finale     bool
-	language   string
-	debug      bool
+	scene    string
+	finale   bool
+	language string
+	debug    bool
 }
 
 func parseOptions() options {
@@ -56,25 +56,25 @@ func parseOptions() options {
 	flag.Parse()
 
 	return options{
-		startScene: *startScene,
-		finale:     *finale,
-		language:   *language,
-		debug:      *debug,
+		scene:    *startScene,
+		finale:   *finale,
+		language: *language,
+		debug:    *debug,
 	}
 }
 
 func (chosen options) startStage() *stage.Stage {
-	if chosen.startScene != "" || chosen.finale {
+	if chosen.scene != "" || chosen.finale {
 		return stage.Game
 	}
 	return stage.SplashStudio
 }
 
-func (chosen options) scene() *scene.Scene {
-	if chosen.startScene == "" {
+func (chosen options) startScene() *scene.Scene {
+	if chosen.scene == "" {
 		return scene.PaulShop
 	}
-	return scene.SceneManager.MustGet(chosen.startScene)
+	return scene.SceneManager.MustGet(chosen.scene)
 }
 
 func (chosen options) finaleScript() *script.Script {
@@ -102,7 +102,7 @@ func (chosen options) game() *inkwell.Game {
 		SceneRect:   inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.HUDTop-widget.TopBarHeight),
 
 		StartStage:   chosen.startStage(),
-		StartScene:   chosen.scene(),
+		StartScene:   chosen.startScene(),
 		StartScript:  script.Opening,
 		FinaleScript: chosen.finaleScript(),
 		StartTheme:   theme.RealWorld,

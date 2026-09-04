@@ -6,6 +6,8 @@ import (
 
 type showroom struct{}
 
+var _ place = showroom{}
+
 var Showroom = SceneManager.Register(&Scene{
 	Name: "showroom",
 	Title: inkwell.Text{

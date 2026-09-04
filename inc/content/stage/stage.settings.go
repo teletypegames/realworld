@@ -27,13 +27,21 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 			{Lang: "en", Text: "SETTINGS"},
 			{Lang: "hu", Text: "BEÁLLÍTÁSOK"},
 		},
-		Expand: settingsScreen{}.rows,
+		Expand: settingsScreen{}.expand,
 	},
 })
 
 var _ = widget.WidgetManager.Register(escapeToMenu("settings_escape", Settings))
 
-func (settings settingsScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
+func (settingsScreen) expand(context *inkwell.Ctx) []inkwell.MenuItem {
+	otherLanguage := "hu"
+	if inkwell.Lang == "hu" {
+		otherLanguage = "en"
+	}
+	otherTheme := theme.NokiaPunk
+	if context.Game.Theme() == theme.NokiaPunk {
+		otherTheme = theme.RealWorld
+	}
 	return []inkwell.MenuItem{
 		{
 			Label: inkwell.Text{
@@ -41,7 +49,7 @@ func (settings settingsScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 				{Lang: "hu", Text: "Nyelv"},
 			},
 			Value:    inkwell.FixedValue(languageNames[inkwell.Lang]),
-			Do:       inkwell.UseLang(settings.otherLanguage()),
+			Do:       inkwell.UseLang(otherLanguage),
 			KeepOpen: true,
 		},
 		{
@@ -50,25 +58,11 @@ func (settings settingsScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
 				{Lang: "hu", Text: "Téma"},
 			},
 			Value:    inkwell.FixedValue(themeNames[context.Game.Theme()]),
-			Do:       inkwell.UseTheme(settings.otherTheme(context)),
+			Do:       inkwell.UseTheme(otherTheme),
 			KeepOpen: true,
 		},
 		backRow(),
 	}
-}
-
-func (settingsScreen) otherLanguage() string {
-	if inkwell.Lang == "hu" {
-		return "en"
-	}
-	return "hu"
-}
-
-func (settingsScreen) otherTheme(context *inkwell.Ctx) *theme.Theme {
-	if context.Game.Theme() == theme.NokiaPunk {
-		return theme.RealWorld
-	}
-	return theme.NokiaPunk
 }
 
 var languageNames = map[string]inkwell.Text{

@@ -11,6 +11,8 @@ import (
 
 type serverFarm struct{}
 
+var _ place = serverFarm{}
+
 var ServerFarm = SceneManager.Register(&Scene{
 	Name: "server_farm",
 	Title: inkwell.Text{
@@ -23,15 +25,7 @@ var ServerFarm = SceneManager.Register(&Scene{
 	Hotspots: serverFarm{}.hotspots(),
 })
 
-func (place serverFarm) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
-		place.door(),
-		place.rack(),
-		place.temperaturePanel(),
-	}
-}
-
-func (serverFarm) door() inkwell.Hotspot {
+func (serverFarm) hotspots() []inkwell.Hotspot {
 	walkTheRacks := inkwell.Seq(
 		inkwell.Say(speaker.TapeServerFarm, inkwell.Text{
 			{Lang: "en", Text: "DOOR GROUP MATCHED. WELCOME."},
@@ -51,70 +45,66 @@ func (serverFarm) door() inkwell.Hotspot {
 		}),
 		inkwell.SetFlag(inc.FlagServerFarmMapped),
 	)
-	return inkwell.Hotspot{
-		Name: "badge_door",
-		Label: inkwell.Text{
-			{Lang: "en", Text: "badge door"},
-			{Lang: "hu", Text: "kártyás ajtó"},
-		},
-		Area: inkwell.Rect(270, 70, 110, 170),
-		OnLook: inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Airlock door. The reader wants a credential it can read off an Armilla."},
-			{Lang: "hu", Text: "Zsilipajtó. Az olvasó olyan hitelesítőt akar, amit Armilláról tud olvasni."},
-		}),
-		OnUse: inkwell.If(inkwell.Flag(inc.FlagServerFarmMapped),
-			inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "I've seen the floor. It's one thing in there, spread thin, and it's growing."},
-				{Lang: "hu", Text: "Láttam a szintet. Egyetlen dolog van bent, vékonyan elterülve, és nő."},
+	return []inkwell.Hotspot{
+		{
+			Name: "badge_door",
+			Label: inkwell.Text{
+				{Lang: "en", Text: "badge door"},
+				{Lang: "hu", Text: "kártyás ajtó"},
+			},
+			Area: inkwell.Rect(270, 70, 110, 170),
+			OnLook: inkwell.Say(character.Paul, inkwell.Text{
+				{Lang: "en", Text: "Airlock door. The reader wants a credential it can read off an Armilla."},
+				{Lang: "hu", Text: "Zsilipajtó. Az olvasó olyan hitelesítőt akar, amit Armilláról tud olvasni."},
 			}),
-			inkwell.If(inkwell.VarEq(inc.VarSlot2, item.ServerFarmTape),
-				walkTheRacks,
-				inkwell.Seq(
-					inkwell.Say(character.Paul, inkwell.Text{
-						{Lang: "en", Text: "Red blink. It doesn't like what's on my wrist."},
-						{Lang: "hu", Text: "Piros villanás. Nem tetszik neki, ami a csuklómon van."},
-					}),
-					inkwell.Say(speaker.Dex, inkwell.Text{
-						{Lang: "en", Text: "It wants a credential in slot two. Not me. Definitely not me."},
-						{Lang: "hu", Text: "Hitelesítőt akar a kettes foglalatban. Nem engem. Határozottan nem engem."},
-					}),
+			OnUse: inkwell.If(inkwell.Flag(inc.FlagServerFarmMapped),
+				inkwell.Say(character.Paul, inkwell.Text{
+					{Lang: "en", Text: "I've seen the floor. It's one thing in there, spread thin, and it's growing."},
+					{Lang: "hu", Text: "Láttam a szintet. Egyetlen dolog van bent, vékonyan elterülve, és nő."},
+				}),
+				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.ServerFarmTape),
+					walkTheRacks,
+					inkwell.Seq(
+						inkwell.Say(character.Paul, inkwell.Text{
+							{Lang: "en", Text: "Red blink. It doesn't like what's on my wrist."},
+							{Lang: "hu", Text: "Piros villanás. Nem tetszik neki, ami a csuklómon van."},
+						}),
+						inkwell.Say(speaker.Dex, inkwell.Text{
+							{Lang: "en", Text: "It wants a credential in slot two. Not me. Definitely not me."},
+							{Lang: "hu", Text: "Hitelesítőt akar a kettes foglalatban. Nem engem. Határozottan nem engem."},
+						}),
+					),
 				),
 			),
-		),
-	}
-}
-
-func (serverFarm) rack() inkwell.Hotspot {
-	return inkwell.Hotspot{
-		Name: "rack",
-		Label: inkwell.Text{
-			{Lang: "en", Text: "server rack"},
-			{Lang: "hu", Text: "szerverrack"},
 		},
-		Area: inkwell.Rect(420, 40, 190, 200),
-		OnLook: inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "LEDs in rows, blinking in a rhythm I can almost follow. Almost."},
-			{Lang: "hu", Text: "LED-ek sorokban, olyan ritmusban villognak, amit majdnem követek. Majdnem."},
-		}),
-		OnUse: inkwell.Say(speaker.Dex, inkwell.Text{
-			{Lang: "en", Text: "Pull one and it reroutes around the hole before your hand is back. Don't bother."},
-			{Lang: "hu", Text: "Húzz ki egyet, és a lyukat megkerüli, mielőtt visszaér a kezed. Ne fáradj."},
-		}),
-	}
-}
-
-func (serverFarm) temperaturePanel() inkwell.Hotspot {
-	return inkwell.Hotspot{
-		Name: "temperature_panel",
-		Label: inkwell.Text{
-			{Lang: "en", Text: "temperature panel"},
-			{Lang: "hu", Text: "hőmérséklet-panel"},
+		{
+			Name: "rack",
+			Label: inkwell.Text{
+				{Lang: "en", Text: "server rack"},
+				{Lang: "hu", Text: "szerverrack"},
+			},
+			Area: inkwell.Rect(420, 40, 190, 200),
+			OnLook: inkwell.Say(character.Paul, inkwell.Text{
+				{Lang: "en", Text: "LEDs in rows, blinking in a rhythm I can almost follow. Almost."},
+				{Lang: "hu", Text: "LED-ek sorokban, olyan ritmusban villognak, amit majdnem követek. Majdnem."},
+			}),
+			OnUse: inkwell.Say(speaker.Dex, inkwell.Text{
+				{Lang: "en", Text: "Pull one and it reroutes around the hole before your hand is back. Don't bother."},
+				{Lang: "hu", Text: "Húzz ki egyet, és a lyukat megkerüli, mielőtt visszaér a kezed. Ne fáradj."},
+			}),
 		},
-		Area: inkwell.Rect(40, 60, 120, 80),
-		OnLook: inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Eighteen degrees on every floor. Load: ninety-six percent, and climbing. Nobody rents that much."},
-			{Lang: "hu", Text: "Tizennyolc fok minden szinten. Terhelés: kilencvenhat százalék, és emelkedik. Ennyit senki nem bérel."},
-		}),
+		{
+			Name: "temperature_panel",
+			Label: inkwell.Text{
+				{Lang: "en", Text: "temperature panel"},
+				{Lang: "hu", Text: "hőmérséklet-panel"},
+			},
+			Area: inkwell.Rect(40, 60, 120, 80),
+			OnLook: inkwell.Say(character.Paul, inkwell.Text{
+				{Lang: "en", Text: "Eighteen degrees on every floor. Load: ninety-six percent, and climbing. Nobody rents that much."},
+				{Lang: "hu", Text: "Tizennyolc fok minden szinten. Terhelés: kilencvenhat százalék, és emelkedik. Ennyit senki nem bérel."},
+			}),
+		},
 	}
 }
 

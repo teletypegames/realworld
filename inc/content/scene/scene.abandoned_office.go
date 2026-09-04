@@ -12,6 +12,8 @@ import (
 
 type abandonedOffice struct{}
 
+var _ place = abandonedOffice{}
+
 var AbandonedOffice = SceneManager.Register(&Scene{
 	Name: "abandoned_office",
 	Title: inkwell.Text{
@@ -55,40 +57,7 @@ var AbandonedOffice = SceneManager.Register(&Scene{
 	Hotspots: abandonedOffice{}.hotspots(),
 })
 
-func (place abandonedOffice) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{
-		place.computer(),
-		place.sumphorDesk(),
-		place.fridge(),
-	}
-}
-
-func (abandonedOffice) computer() inkwell.Hotspot {
-	return inkwell.Hotspot{
-		Name: "computer",
-		Label: inkwell.Text{
-			{Lang: "en", Text: "Norman's second machine"},
-			{Lang: "hu", Text: "Norman második gépe"},
-		},
-		Area: inkwell.Rect(80, 120, 100, 80),
-		OnLook: inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Still on a UPS, humming to itself in the dark. He never turned it off."},
-			{Lang: "hu", Text: "Még mindig szünetmentesen, magának dúdol a sötétben. Sosem kapcsolta ki."},
-		}),
-		OnUse: inkwell.Seq(
-			inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "Dev logs. Two names on every commit: Reds and one they scrubbed to initials. The trance protocol, version after version."},
-				{Lang: "hu", Text: "Fejlesztői naplók. Minden bejegyzésen két név: Reds és egy, amit kezdőbetűkre töröltek. A transz-protokoll, verzióról verzióra."},
-			}),
-			inkwell.Say(speaker.Dex, inkwell.Text{
-				{Lang: "en", Text: "The scrubbed one is Sumphor. They didn't fire him. They deleted him."},
-				{Lang: "hu", Text: "A törölt Sumphor. Nem kirúgták. Kitörölték."},
-			}),
-		),
-	}
-}
-
-func (abandonedOffice) sumphorDesk() inkwell.Hotspot {
+func (abandonedOffice) hotspots() []inkwell.Hotspot {
 	taken := inkwell.Say(character.Paul, inkwell.Text{
 		{Lang: "en", Text: "Nothing else on the desk worth carrying."},
 		{Lang: "hu", Text: "Semmi más az asztalon, amit érdemes elvinni."},
@@ -110,74 +79,95 @@ func (abandonedOffice) sumphorDesk() inkwell.Hotspot {
 			}),
 		),
 	)
-	return inkwell.Hotspot{
-		Name: "sumphor_desk",
-		Label: inkwell.Text{
-			{Lang: "en", Text: "Sumphor's desk"},
-			{Lang: "hu", Text: "Sumphor asztala"},
-		},
-		Area: inkwell.Rect(220, 130, 100, 70),
-		OnLook: inkwell.If(inkwell.HasItem(item.SumphorTape),
-			taken,
-			inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "Untouched since the day. A cold coffee, a chewed pen, and a tape sitting square in the middle."},
-				{Lang: "hu", Text: "Aznap óta érintetlen. Egy hideg kávé, egy megrágott toll, és egy kazetta pontosan középen."},
-			}),
-		),
-		OnTake: inkwell.If(inkwell.HasItem(item.SumphorTape), taken, pickUp),
-		OnUse:  inkwell.If(inkwell.HasItem(item.SumphorTape), taken, pickUp),
-	}
-}
-
-func (abandonedOffice) fridge() inkwell.Hotspot {
 	open := inkwell.Say(character.Paul, inkwell.Text{
 		{Lang: "en", Text: "Dead and swung aside. The room behind it is open."},
 		{Lang: "hu", Text: "Kihalt, és félretolva. A mögötte lévő szoba nyitva."},
 	})
-	return inkwell.Hotspot{
-		Name: "fridge",
-		Label: inkwell.Text{
-			{Lang: "en", Text: "humming fridge"},
-			{Lang: "hu", Text: "zümmögő hűtő"},
-		},
-		Area: inkwell.Rect(420, 110, 80, 110),
-		OnLook: inkwell.If(inkwell.Flag(inc.FlagFridgeOpen),
-			open,
-			inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "A full-height fridge against the back wall. Humming. There's a draught coming from behind it."},
-				{Lang: "hu", Text: "Egy padlótól plafonig érő hűtő a hátsó falnál. Zümmög. Huzat jön mögüle."},
+	return []inkwell.Hotspot{
+		{
+			Name: "computer",
+			Label: inkwell.Text{
+				{Lang: "en", Text: "Norman's second machine"},
+				{Lang: "hu", Text: "Norman második gépe"},
+			},
+			Area: inkwell.Rect(80, 120, 100, 80),
+			OnLook: inkwell.Say(character.Paul, inkwell.Text{
+				{Lang: "en", Text: "Still on a UPS, humming to itself in the dark. He never turned it off."},
+				{Lang: "hu", Text: "Még mindig szünetmentesen, magának dúdol a sötétben. Sosem kapcsolta ki."},
 			}),
-		),
-		OnUse: inkwell.If(inkwell.Flag(inc.FlagFridgeOpen),
-			open,
-			inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
-				inkwell.Seq(
-					inkwell.Say(speaker.TapeSupport, inkwell.Text{
-						{Lang: "en", Text: "Have you tried turning it off and on again?"},
-						{Lang: "hu", Text: "Próbálta már ki- és bekapcsolni?"},
-					}),
-					inkwell.Say(character.Paul, inkwell.Text{
-						{Lang: "en", Text: "…fine. Pulling the plug."},
-						{Lang: "hu", Text: "…jó. Kihúzom."},
-					}),
-					inkwell.Say(speaker.Dex, inkwell.Text{
-						{Lang: "en", Text: "The hum stops. The whole thing rolls on a hidden castor. There's your door."},
-						{Lang: "hu", Text: "A zümmögés eláll. Az egész elgurul egy rejtett görgőn. Ott az ajtód."},
-					}),
-					inkwell.SetFlag(inc.FlagFridgeOpen),
-				),
-				inkwell.Seq(
-					inkwell.Say(character.Paul, inkwell.Text{
-						{Lang: "en", Text: "Won't budge. It's plugged in and it does not want to move."},
-						{Lang: "hu", Text: "Meg se mozdul. Be van dugva, és nem akar elmozdulni."},
-					}),
-					inkwell.Say(speaker.Dex, inkwell.Text{
-						{Lang: "en", Text: "Listen to the compressor. It has a rhythm. Kill the power and it'll roll."},
-						{Lang: "hu", Text: "Hallgasd a kompresszort. Van ritmusa. Vedd le róla az áramot, és elgurul."},
-					}),
+			OnUse: inkwell.Seq(
+				inkwell.Say(character.Paul, inkwell.Text{
+					{Lang: "en", Text: "Dev logs. Two names on every commit: Reds and one they scrubbed to initials. The trance protocol, version after version."},
+					{Lang: "hu", Text: "Fejlesztői naplók. Minden bejegyzésen két név: Reds és egy, amit kezdőbetűkre töröltek. A transz-protokoll, verzióról verzióra."},
+				}),
+				inkwell.Say(speaker.Dex, inkwell.Text{
+					{Lang: "en", Text: "The scrubbed one is Sumphor. They didn't fire him. They deleted him."},
+					{Lang: "hu", Text: "A törölt Sumphor. Nem kirúgták. Kitörölték."},
+				}),
+			),
+		},
+		{
+			Name: "sumphor_desk",
+			Label: inkwell.Text{
+				{Lang: "en", Text: "Sumphor's desk"},
+				{Lang: "hu", Text: "Sumphor asztala"},
+			},
+			Area: inkwell.Rect(220, 130, 100, 70),
+			OnLook: inkwell.If(inkwell.HasItem(item.SumphorTape),
+				taken,
+				inkwell.Say(character.Paul, inkwell.Text{
+					{Lang: "en", Text: "Untouched since the day. A cold coffee, a chewed pen, and a tape sitting square in the middle."},
+					{Lang: "hu", Text: "Aznap óta érintetlen. Egy hideg kávé, egy megrágott toll, és egy kazetta pontosan középen."},
+				}),
+			),
+			OnTake: inkwell.If(inkwell.HasItem(item.SumphorTape), taken, pickUp),
+			OnUse:  inkwell.If(inkwell.HasItem(item.SumphorTape), taken, pickUp),
+		},
+		{
+			Name: "fridge",
+			Label: inkwell.Text{
+				{Lang: "en", Text: "humming fridge"},
+				{Lang: "hu", Text: "zümmögő hűtő"},
+			},
+			Area: inkwell.Rect(420, 110, 80, 110),
+			OnLook: inkwell.If(inkwell.Flag(inc.FlagFridgeOpen),
+				open,
+				inkwell.Say(character.Paul, inkwell.Text{
+					{Lang: "en", Text: "A full-height fridge against the back wall. Humming. There's a draught coming from behind it."},
+					{Lang: "hu", Text: "Egy padlótól plafonig érő hűtő a hátsó falnál. Zümmög. Huzat jön mögüle."},
+				}),
+			),
+			OnUse: inkwell.If(inkwell.Flag(inc.FlagFridgeOpen),
+				open,
+				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
+					inkwell.Seq(
+						inkwell.Say(speaker.TapeSupport, inkwell.Text{
+							{Lang: "en", Text: "Have you tried turning it off and on again?"},
+							{Lang: "hu", Text: "Próbálta már ki- és bekapcsolni?"},
+						}),
+						inkwell.Say(character.Paul, inkwell.Text{
+							{Lang: "en", Text: "…fine. Pulling the plug."},
+							{Lang: "hu", Text: "…jó. Kihúzom."},
+						}),
+						inkwell.Say(speaker.Dex, inkwell.Text{
+							{Lang: "en", Text: "The hum stops. The whole thing rolls on a hidden castor. There's your door."},
+							{Lang: "hu", Text: "A zümmögés eláll. Az egész elgurul egy rejtett görgőn. Ott az ajtód."},
+						}),
+						inkwell.SetFlag(inc.FlagFridgeOpen),
+					),
+					inkwell.Seq(
+						inkwell.Say(character.Paul, inkwell.Text{
+							{Lang: "en", Text: "Won't budge. It's plugged in and it does not want to move."},
+							{Lang: "hu", Text: "Meg se mozdul. Be van dugva, és nem akar elmozdulni."},
+						}),
+						inkwell.Say(speaker.Dex, inkwell.Text{
+							{Lang: "en", Text: "Listen to the compressor. It has a rhythm. Kill the power and it'll roll."},
+							{Lang: "hu", Text: "Hallgasd a kompresszort. Van ritmusa. Vedd le róla az áramot, és elgurul."},
+						}),
+					),
 				),
 			),
-		),
+		},
 	}
 }
 

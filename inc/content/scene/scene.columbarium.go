@@ -6,6 +6,8 @@ import (
 
 type columbarium struct{}
 
+var _ place = columbarium{}
+
 var Columbarium = SceneManager.Register(&Scene{
 	Name: "columbarium",
 	Title: inkwell.Text{

@@ -6,6 +6,8 @@ import (
 
 type curatorShop struct{}
 
+var _ place = curatorShop{}
+
 var CuratorShop = SceneManager.Register(&Scene{
 	Name: "curator_shop",
 	Title: inkwell.Text{

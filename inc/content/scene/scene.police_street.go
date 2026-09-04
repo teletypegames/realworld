@@ -10,6 +10,8 @@ import (
 
 type policeStreet struct{}
 
+var _ place = policeStreet{}
+
 var PoliceStreet = SceneManager.Register(&Scene{
 	Name: "police_street",
 	Title: inkwell.Text{
@@ -50,27 +52,73 @@ var PoliceStreet = SceneManager.Register(&Scene{
 			},
 		},
 	},
-	Triggers: []inkwell.Trigger{
-		{
-			Name: "chatter",
-			Once: true,
-			When: inkwell.Not(inkwell.Flag(inc.FlagPoliceTip)),
-			Do:   policeStreet{}.chatter(),
-		},
-	},
+	Triggers: policeStreet{}.triggers(),
 	Hotspots: policeStreet{}.hotspots(),
 })
 
-func (street policeStreet) hotspots() []inkwell.Hotspot {
+func (policeStreet) hotspots() []inkwell.Hotspot {
+	noticed := inkwell.Say(character.Paul, inkwell.Text{
+		{Lang: "en", Text: "I'd rather they didn't remember me more than necessary."},
+		{Lang: "hu", Text: "Inkább nem akarom, hogy megjegyezzenek a kelleténél jobban."},
+	})
 	return []inkwell.Hotspot{
-		street.fatCop(),
-		street.thinFigure(),
-		street.cruiser(),
+		{
+			Name: "fat_cop",
+			Label: inkwell.Text{
+				{Lang: "en", Text: "cop eating a donut"},
+				{Lang: "hu", Text: "fánkot evő rendőr"},
+			},
+			Area:         inkwell.Rect(396, 164, 48, 84),
+			OnLook:       noticed,
+			OnUse:        noticed,
+			OnTalk:       noticed,
+			OnTake:       noticed,
+			OnUseWithAny: noticed,
+		},
+		{
+			Name: "thin_figure",
+			Label: inkwell.Text{
+				{Lang: "en", Text: "thin figure in the passenger seat"},
+				{Lang: "hu", Text: "vékony alak az anyósülésen"},
+			},
+			Area:         inkwell.Rect(476, 146, 48, 84),
+			OnLook:       noticed,
+			OnUse:        noticed,
+			OnTalk:       noticed,
+			OnTake:       noticed,
+			OnUseWithAny: noticed,
+		},
+		{
+			Name: "cruiser",
+			Label: inkwell.Text{
+				{Lang: "en", Text: "parked cruiser"},
+				{Lang: "hu", Text: "parkoló rendőrautó"},
+			},
+			Area: inkwell.Rect(440, 178, 180, 60),
+			OnLook: inkwell.Say(character.Paul, inkwell.Text{
+				{Lang: "en", Text: "Engine running, doors open, donut crumbs on the dash. Nobody is in a hurry."},
+				{Lang: "hu", Text: "Jár a motor, nyitva az ajtók, fánkmorzsa a műszerfalon. Senki nem siet."},
+			}),
+			OnUse: inkwell.Seq(
+				inkwell.Say(character.Paul, inkwell.Text{
+					{Lang: "en", Text: "I'm not getting into a police car voluntarily."},
+					{Lang: "hu", Text: "Önként nem szállok be egy rendőrautóba."},
+				}),
+				inkwell.Say(speaker.Dex, inkwell.Text{
+					{Lang: "en", Text: "That leaves the other way of getting in. Keep walking."},
+					{Lang: "hu", Text: "Akkor marad a másik módja a beszállásnak. Menj tovább."},
+				}),
+			),
+			OnTake: inkwell.Say(character.Paul, inkwell.Text{
+				{Lang: "en", Text: "Grand theft, in front of two officers. No."},
+				{Lang: "hu", Text: "Autólopás, két rendőr előtt. Nem."},
+			}),
+		},
 	}
 }
 
-func (policeStreet) chatter() inkwell.Action {
-	return inkwell.Seq(
+func (policeStreet) triggers() []inkwell.Trigger {
+	chatter := inkwell.Seq(
 		inkwell.Say(character.ThinFigure, inkwell.Text{
 			{Lang: "en", Text: "That nutcase is back at the hot dog stand. Third day running. Talks to the mustard."},
 			{Lang: "hu", Text: "Az a bolond megint ott van a hotdogosnál. Harmadik napja. A mustárral beszélget."},
@@ -96,73 +144,13 @@ func (policeStreet) chatter() inkwell.Action {
 			{Lang: "hu", Text: "A fura alakok is esznek. Add ide a másik fánkot."},
 		}),
 	)
-}
-
-func (policeStreet) noticed() inkwell.Action {
-	return inkwell.Say(character.Paul, inkwell.Text{
-		{Lang: "en", Text: "I'd rather they didn't remember me more than necessary."},
-		{Lang: "hu", Text: "Inkább nem akarom, hogy megjegyezzenek a kelleténél jobban."},
-	})
-}
-
-func (street policeStreet) fatCop() inkwell.Hotspot {
-	return inkwell.Hotspot{
-		Name: "fat_cop",
-		Label: inkwell.Text{
-			{Lang: "en", Text: "cop eating a donut"},
-			{Lang: "hu", Text: "fánkot evő rendőr"},
+	return []inkwell.Trigger{
+		{
+			Name: "chatter",
+			Once: true,
+			When: inkwell.Not(inkwell.Flag(inc.FlagPoliceTip)),
+			Do:   chatter,
 		},
-		Area:         inkwell.Rect(396, 164, 48, 84),
-		OnLook:       street.noticed(),
-		OnUse:        street.noticed(),
-		OnTalk:       street.noticed(),
-		OnTake:       street.noticed(),
-		OnUseWithAny: street.noticed(),
-	}
-}
-
-func (street policeStreet) thinFigure() inkwell.Hotspot {
-	return inkwell.Hotspot{
-		Name: "thin_figure",
-		Label: inkwell.Text{
-			{Lang: "en", Text: "thin figure in the passenger seat"},
-			{Lang: "hu", Text: "vékony alak az anyósülésen"},
-		},
-		Area:         inkwell.Rect(476, 146, 48, 84),
-		OnLook:       street.noticed(),
-		OnUse:        street.noticed(),
-		OnTalk:       street.noticed(),
-		OnTake:       street.noticed(),
-		OnUseWithAny: street.noticed(),
-	}
-}
-
-func (policeStreet) cruiser() inkwell.Hotspot {
-	return inkwell.Hotspot{
-		Name: "cruiser",
-		Label: inkwell.Text{
-			{Lang: "en", Text: "parked cruiser"},
-			{Lang: "hu", Text: "parkoló rendőrautó"},
-		},
-		Area: inkwell.Rect(440, 178, 180, 60),
-		OnLook: inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Engine running, doors open, donut crumbs on the dash. Nobody is in a hurry."},
-			{Lang: "hu", Text: "Jár a motor, nyitva az ajtók, fánkmorzsa a műszerfalon. Senki nem siet."},
-		}),
-		OnUse: inkwell.Seq(
-			inkwell.Say(character.Paul, inkwell.Text{
-				{Lang: "en", Text: "I'm not getting into a police car voluntarily."},
-				{Lang: "hu", Text: "Önként nem szállok be egy rendőrautóba."},
-			}),
-			inkwell.Say(speaker.Dex, inkwell.Text{
-				{Lang: "en", Text: "That leaves the other way of getting in. Keep walking."},
-				{Lang: "hu", Text: "Akkor marad a másik módja a beszállásnak. Menj tovább."},
-			}),
-		),
-		OnTake: inkwell.Say(character.Paul, inkwell.Text{
-			{Lang: "en", Text: "Grand theft, in front of two officers. No."},
-			{Lang: "hu", Text: "Autólopás, két rendőr előtt. Nem."},
-		}),
 	}
 }
 

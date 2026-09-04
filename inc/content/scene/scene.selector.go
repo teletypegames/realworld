@@ -17,6 +17,8 @@ var exitToSelector = inkwell.Exit{
 
 type selector struct{}
 
+var _ place = selector{}
+
 var Selector = SceneManager.Register(&Scene{
 	Name: "selector",
 	Title: inkwell.Text{
@@ -25,32 +27,40 @@ var Selector = SceneManager.Register(&Scene{
 	},
 	Actors:    []inkwell.SceneActor{},
 	Walkboxes: []inkwell.Polygon{},
-	Derived:   selector{}.fromGraph,
+	Derived:   selector{}.derived,
 })
 
-func (selector) fromGraph(game *inkwell.Game) []inkwell.Exit {
-	pins := selector{}
+func (selector) derived(game *inkwell.Game) []inkwell.Exit {
+	leadsHere := func(scene *Scene) bool {
+		for _, exit := range scene.Exits {
+			if _, toSelector := exit.To.(selector); toSelector {
+				return true
+			}
+		}
+		return false
+	}
+	pin := func(index int) inkwell.Shape {
+		column, row := index%pinColumns, index/pinColumns
+		return inkwell.Rect(pinX+float64(column)*pinGapX, pinY+float64(row)*pinGapY, pinWidth, pinHeight)
+	}
+	shortTitle := func(title inkwell.Text) inkwell.Text {
+		return title.Map(func(title string) string {
+			name, _, _ := strings.Cut(title, " — ")
+			return name
+		})
+	}
 	var exits []inkwell.Exit
 	for _, entity := range game.SceneManager.All() {
-		if !pins.leadsTo(entity) {
+		if !leadsHere(entity) {
 			continue
 		}
 		exits = append(exits, inkwell.Exit{
 			To:    entity,
-			Label: pins.label(entity.Title),
-			Area:  pins.area(len(exits)),
+			Label: shortTitle(entity.Title),
+			Area:  pin(len(exits)),
 		})
 	}
 	return exits
-}
-
-func (selector) leadsTo(scene *Scene) bool {
-	for _, exit := range scene.Exits {
-		if _, toSelector := exit.To.(selector); toSelector {
-			return true
-		}
-	}
-	return false
 }
 
 const (
@@ -62,17 +72,5 @@ const (
 	pinGapX    = 156.0
 	pinGapY    = 38.0
 )
-
-func (selector) area(index int) inkwell.Shape {
-	column, row := index%pinColumns, index/pinColumns
-	return inkwell.Rect(pinX+float64(column)*pinGapX, pinY+float64(row)*pinGapY, pinWidth, pinHeight)
-}
-
-func (selector) label(title inkwell.Text) inkwell.Text {
-	return title.Map(func(title string) string {
-		name, _, _ := strings.Cut(title, " — ")
-		return name
-	})
-}
 
 func (selector) Scene() *inkwell.Scene { return Selector }

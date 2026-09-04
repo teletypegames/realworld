@@ -392,52 +392,65 @@ in its stage's `Background`, registered in place.
 
 Adding an entity is adding a file. Deleting one is deleting a file.
 
-### A file's helpers hang off the file's own type
+### A file's helpers speak a closed vocabulary
 
-An entity file that is too long to read as one literal breaks pieces out —
-`scene.alley.go` builds its four hotspots that way. Those helpers are **not**
-package functions. Twenty-four scene files share one `scene` namespace, so a
-package-level `bin()` is the *package's* bin, and the next scene that wants one
-cannot have it. The file declares an empty type instead, named after itself, and
-hangs its helpers off that:
+An entity file that is too long to read as one literal breaks a **field** out
+into a method — never a piece of a field, and never a helper with a name of
+its own. Twenty-four scene files share one `scene` namespace, so the method
+hangs off an empty type the file declares and names after itself, and the
+method takes the name of the field it fills:
 
 ```go
 type alley struct{}
+
+var _ place = alley{}
 
 var Alley = SceneManager.Register(&Scene{
 	…
 	Hotspots: alley{}.hotspots(),
 })
 
-func (place alley) hotspots() []inkwell.Hotspot {
-	return []inkwell.Hotspot{place.hidingPlace(), place.backDoor(), place.bin(), place.fireEscape()}
+func (alley) hotspots() []inkwell.Hotspot {
+	locked := inkwell.Say(character.Paul, …)
+	return []inkwell.Hotspot{
+		{Name: "hiding_place", …},
+		{Name: "back_door", OnUse: locked, …},
+	}
 }
-
-func (alley) bin() inkwell.Hotspot { … }
 
 func (alley) Scene() *inkwell.Scene { return Alley }
 ```
 
-The last method is the one every scene file has, helpers or not: it is what
-makes `alley{}` a reference another scene can write in an `Exit`, under
-**References are pointers**.
+The vocabulary is the entity's field names in lowerCamel and nothing else. A
+scene's type may carry `hotspots`, `exits`, `triggers`, `actors` and
+`derived`; a dialog's `nodes` and `choices`; a stage's menu `expand`, after
+`MenuItem.Expand`; a widget the engine's own `Draw`. The one word that is not
+a field is `Scene`, the method every scene type has, because it is what makes
+`alley{}` a reference another scene can write in an `Exit`, under **References
+are pointers**. `var _ place = alley{}` is the compiler holding the one word the
+files must share; the rest of the vocabulary it cannot forbid, so a
+`func (…)` in a content package that is not one of these is a review comment.
+
+What a helper used to be — one method per hotspot, `bin()`, `fireEscape()`,
+`tip()`, a name invented per file — is a **local** inside the field's method
+now. A line two hotspots share is a variable before the `return`; a piece that
+takes a parameter is a closure. The file reads top to bottom as the literal,
+then the one or two fields that were too long for it, and the reader never
+meets a name the previous file did not have.
 
 `alley{}` in the literal rather than a local is the same rule read from the
 other end: the type is the namespace, so naming an instance of it adds a word
-that says nothing. Where the helpers are used more than once, a method that
-gathers them — `alley{}.hotspots()` — keeps the receiver out of the literal
-entirely.
-
-The receiver is the namespace, so the method name drops what the type already
-says — `selector.leadsTo`, not `leadsToSelector`. Where the helpers read from
-data rather than build it, the type is not empty and the data are its fields:
-`script.usewith_fail.go` carries the two `inkwell.Ladder` values as fields of
-`useWithFail` and answers with `fail.paul.At(n)` and `fail.dex.At(n)`.
+that says nothing. The receiver stays unnamed unless the body reads a field of
+it, which only the tape slots do — `slots.first`, a rectangle computed once
+in `init()` and kept on the struct rather than recomputed by a method.
 
 The rule stops where the package is already the namespace: `armilla.Slot2`,
 `armilla.Insert` and `tape.DialogOf` stay functions, because a receiver there
 would be an empty word. `system` is the other way round — the receiver is
-the whole point, so everything it offers is a method on `System`.
+the whole point, so everything it offers is a method on `System`. `main` is
+the same as a content file: `options` carries the flags, and its methods are
+the `Game` fields they answer — `startStage`, `startScene`, `finaleScript`,
+`flags` — plus `game`, the literal itself.
 
 Initialisation order is file-name order, so **registration order is
 alphabetical**. Nothing may depend on it — including the order the debug menu

@@ -6,6 +6,8 @@ import (
 
 type bvkBranch struct{}
 
+var _ place = bvkBranch{}
+
 var BVKBranch = SceneManager.Register(&Scene{
 	Name: "bvk_branch",
 	Title: inkwell.Text{

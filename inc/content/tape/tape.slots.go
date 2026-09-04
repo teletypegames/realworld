@@ -5,8 +5,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 
-	"realworld/inc/content/dialog"
-	"realworld/inc/content/item"
 	"realworld/inc/content/script"
 	"realworld/inc/content/speaker"
 	"realworld/inc/system"
@@ -16,138 +14,127 @@ import (
 
 type slotPanel struct {
 	inkwell.HotspotPanel
+	first  inkwell.Rectangle
+	second inkwell.Rectangle
 }
 
 func init() {
+	bounds := inkwell.Rect(192, widget.SlotsY, 194, widget.SlotsHeight)
+	width := (bounds.W - widget.Padding) / 2
 	panel := &slotPanel{
 		HotspotPanel: inkwell.HotspotPanel{
 			Name:   "tapes",
 			When:   widget.WhenPlaying,
-			Bounds: inkwell.Rect(192, widget.SlotsY, 194, widget.SlotsHeight),
+			Bounds: bounds,
 		},
+		first:  inkwell.Rect(bounds.X, bounds.Y, width, bounds.H),
+		second: inkwell.Rect(bounds.X+width+widget.Padding, bounds.Y, width, bounds.H),
 	}
 	panel.Hotspots = panel.hotspots
 	widget.WidgetManager.Register(panel)
 }
 
-func (slots *slotPanel) areas() (inkwell.Rectangle, inkwell.Rectangle) {
-	bounds := slots.Bounds
-	width := (bounds.W - widget.Padding) / 2
-	return inkwell.Rect(bounds.X, bounds.Y, width, bounds.H),
-		inkwell.Rect(bounds.X+width+widget.Padding, bounds.Y, width, bounds.H)
-}
-
 func (slots *slotPanel) hotspots(game *inkwell.Game) []inkwell.Hotspot {
-	first, second := slots.areas()
-	return []inkwell.Hotspot{
-		slots.dex(game, first),
-		slots.cassette(game, second, armilla.Slot2()),
-	}
-}
-
-func (slotPanel) dex(game *inkwell.Game, area inkwell.Rectangle) inkwell.Hotspot {
-	remark := inkwell.Say(speaker.Dex, inkwell.Text{
+	dexRemark := inkwell.Say(speaker.Dex, inkwell.Text{
 		{Lang: "en", Text: "Me. Four kilobytes of a dead man. Be grateful."},
 		{Lang: "hu", Text: "Én. Egy halott ember négy kilobájtja. Légy hálás."},
 	})
-	return inkwell.Hotspot{
+	notATape := inkwell.Say(speaker.Dex, inkwell.Text{
+		{Lang: "en", Text: "That isn't a tape, Paul. That's an object. There is a difference."},
+		{Lang: "hu", Text: "Az nem kazetta, Paul. Az egy tárgy. Van különbség."},
+	})
+	insertions := make(map[*inkwell.Item]inkwell.Action)
+	for _, candidate := range TapeManager.All() {
+		if candidate.Item == nil {
+			continue
+		}
+		insertions[candidate.Item] = inkwell.Seq(
+			armilla.Insert(candidate.Item),
+			inkwell.RunScript(script.TapeInsert),
+			candidate.OnInsert,
+		)
+	}
+	dex := inkwell.Hotspot{
 		Name:   "slot1",
 		Label:  speaker.Dex.DisplayName(),
-		Area:   area,
-		OnLook: remark,
-		OnUse:  remark,
-		OnTake: remark,
-		OnTalk: system.System.Paused(inkwell.RunDialog(dialog.Dex)),
+		Area:   slots.first,
+		OnLook: dexRemark,
+		OnUse:  dexRemark,
+		OnTake: dexRemark,
+		OnTalk: system.System.Paused(inkwell.RunDialog(Dex.Dialog)),
 		OnUseWithAny: inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "The first slot is mine. I'm not moving."},
 			{Lang: "hu", Text: "Az első foglalat az enyém. Nem megyek sehová."},
 		}),
 	}
-}
-
-func (slots *slotPanel) cassette(game *inkwell.Game, area inkwell.Rectangle, loaded *item.Item) inkwell.Hotspot {
-	notATape := inkwell.Say(speaker.Dex, inkwell.Text{
-		{Lang: "en", Text: "That isn't a tape, Paul. That's an object. There is a difference."},
-		{Lang: "hu", Text: "Az nem kazetta, Paul. Az egy tárgy. Van különbség."},
-	})
+	loaded := armilla.Slot2()
 	if loaded == nil {
 		empty := inkwell.Say(speaker.Dex, inkwell.Text{
 			{Lang: "en", Text: "The second slot is empty. That's the rarer state."},
 			{Lang: "hu", Text: "A második foglalat üres. Ez a ritkább állapot."},
 		})
-		return inkwell.Hotspot{
-			Name:   "slot2",
-			Label:  slotEmptyLabel,
-			Area:   area,
-			OnLook: empty,
-			OnUse:  empty,
-			OnTake: empty,
-			OnTalk: inkwell.Say(speaker.Dex, inkwell.Text{
-				{Lang: "en", Text: "Empty. Nobody to talk to."},
-				{Lang: "hu", Text: "Üres. Nincs kivel beszélni."},
-			}),
-			OnUseWith:    slots.insertions(),
-			OnUseWithAny: notATape,
+		return []inkwell.Hotspot{
+			dex,
+			{
+				Name:   "slot2",
+				Label:  slotEmptyLabel,
+				Area:   slots.second,
+				OnLook: empty,
+				OnUse:  empty,
+				OnTake: empty,
+				OnTalk: inkwell.Say(speaker.Dex, inkwell.Text{
+					{Lang: "en", Text: "Empty. Nobody to talk to."},
+					{Lang: "hu", Text: "Üres. Nincs kivel beszélni."},
+				}),
+				OnUseWith:    insertions,
+				OnUseWithAny: notATape,
+			},
 		}
 	}
 	careful := inkwell.Say(speaker.Dex, inkwell.Text{
 		{Lang: "en", Text: "That is the second slot. Be careful what you let in."},
 		{Lang: "hu", Text: "Az a második foglalat. Vigyázz, mit engedsz be."},
 	})
-	return inkwell.Hotspot{
-		Name:         "slot2",
-		Label:        loaded.Description,
-		Area:         area,
-		OnLook:       careful,
-		OnUse:        careful,
-		OnTake:       careful,
-		OnTalk:       system.System.Paused(inkwell.RunDialog(DialogOf(loaded))),
-		OnUseWith:    slots.insertions(),
-		OnUseWithAny: notATape,
+	return []inkwell.Hotspot{
+		dex,
+		{
+			Name:         "slot2",
+			Label:        loaded.Description,
+			Area:         slots.second,
+			OnLook:       careful,
+			OnUse:        careful,
+			OnTake:       careful,
+			OnTalk:       system.System.Paused(inkwell.RunDialog(DialogOf(loaded))),
+			OnUseWith:    insertions,
+			OnUseWithAny: notATape,
+		},
 	}
-}
-
-func (slotPanel) insertions() map[*inkwell.Item]inkwell.Action {
-	pairs := make(map[*inkwell.Item]inkwell.Action)
-	for _, candidate := range TapeManager.All() {
-		if candidate.Item == nil {
-			continue
-		}
-		pairs[candidate.Item] = inkwell.Seq(
-			armilla.Insert(candidate.Item),
-			inkwell.RunScript(script.TapeInsert),
-			candidate.OnInsert,
-		)
-	}
-	return pairs
 }
 
 func (slots *slotPanel) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
 	game := context.Game
-	first, second := slots.areas()
-	slots.paint(destination, game, first, slot1Label, speaker.Dex.DisplayName(), true)
+	theme := game.Theme()
+	paint := func(area inkwell.Rectangle, label, body inkwell.Text, filled bool) {
+		background, border, textColor := theme.InventorySlotBG, theme.ChatLogSystem, theme.ChatLogSystem
+		if filled {
+			background, border, textColor = theme.PanelBG, theme.CharacterPanelBorder, theme.ChatLogResponse
+		}
+		vector.DrawFilledRect(destination, float32(area.X), float32(area.Y),
+			float32(area.W), float32(area.H), background, false)
+		vector.StrokeRect(destination, float32(area.X), float32(area.Y),
+			float32(area.W), float32(area.H), 1, border, false)
+
+		textX, innerWidth := int(area.X)+widget.Padding, int(area.W)-widget.Padding*2
+		game.DrawText(destination, label.String(), textX, int(area.Y)+widget.Padding/2, theme.ChatLogSystem)
+		game.DrawText(destination, inkwell.ClipText(body.String(), innerWidth), textX,
+			int(area.Y)+widget.Padding/2+widget.LineHeight, textColor)
+	}
+	paint(slots.first, slot1Label, speaker.Dex.DisplayName(), true)
 	if loaded := armilla.Slot2(); loaded != nil {
-		slots.paint(destination, game, second, slot2Label, loaded.Description, true)
+		paint(slots.second, slot2Label, loaded.Description, true)
 		return
 	}
-	slots.paint(destination, game, second, slot2Label, slotEmpty, false)
-}
-
-func (slotPanel) paint(destination *ebiten.Image, game *inkwell.Game, area inkwell.Rectangle, label, body inkwell.Text, filled bool) {
-	theme := game.Theme()
-	background, border, textColor := theme.InventorySlotBG, theme.ChatLogSystem, theme.ChatLogSystem
-	if filled {
-		background, border, textColor = theme.PanelBG, theme.CharacterPanelBorder, theme.ChatLogResponse
-	}
-	vector.DrawFilledRect(destination, float32(area.X), float32(area.Y),
-		float32(area.W), float32(area.H), background, false)
-	vector.StrokeRect(destination, float32(area.X), float32(area.Y),
-		float32(area.W), float32(area.H), 1, border, false)
-
-	textX, innerWidth := int(area.X)+widget.Padding, int(area.W)-widget.Padding*2
-	game.DrawText(destination, label.String(), textX, int(area.Y)+widget.Padding/2, theme.ChatLogSystem)
-	game.DrawText(destination, inkwell.ClipText(body.String(), innerWidth), textX,
-		int(area.Y)+widget.Padding/2+widget.LineHeight, textColor)
+	paint(slots.second, slot2Label, slotEmpty, false)
 }
 
 var (

@@ -27,13 +27,13 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 			{Lang: "en", Text: "LOAD"},
 			{Lang: "hu", Text: "BETÖLTÉS"},
 		},
-		Expand: loadScreen{}.rows,
+		Expand: loadScreen{}.expand,
 	},
 })
 
 var _ = widget.WidgetManager.Register(escapeToMenu("load_escape", Load))
 
-func (loadScreen) rows(context *inkwell.Ctx) []inkwell.MenuItem {
+func (loadScreen) expand(context *inkwell.Ctx) []inkwell.MenuItem {
 	var rows []inkwell.MenuItem
 	for _, info := range context.Game.Slots(inc.SaveSlots) {
 		rows = append(rows, inkwell.MenuItem{

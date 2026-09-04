@@ -6,6 +6,8 @@ import (
 
 type samizdatPress struct{}
 
+var _ place = samizdatPress{}
+
 var SamizdatPress = SceneManager.Register(&Scene{
 	Name: "samizdat_press",
 	Title: inkwell.Text{

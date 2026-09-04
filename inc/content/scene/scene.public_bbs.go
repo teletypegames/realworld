@@ -6,6 +6,8 @@ import (
 
 type publicBBS struct{}
 
+var _ place = publicBBS{}
+
 var PublicBBS = SceneManager.Register(&Scene{
 	Name: "public_bbs",
 	Title: inkwell.Text{
