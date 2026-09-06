@@ -658,7 +658,8 @@ Do: inkwell.Seq(inkwell.Restart(), inkwell.GoToStage(stage.Game)),
 The front door is two splash cards before the menu, `stage.splash_studio.go`
 — the Teletype Games logo, a 640×380 `Background` nested in the literal as the
 asset it is — and `stage.splash_title.go`, and each is a `Stage` that says
-how long it shows and where it goes: `Hold: 2`, `Next`, and a `Transition` of
+how long it shows and where it goes: `Hold: 2`, `Next`, `Skippable` so that
+Space, Enter or a click moves on early, and a `Transition` of
 `inkwell.Fade(0.5)` it leaves through. A `Transition` is the leaving Stage's,
 so the menu and its sub-screens, which name none, keep cutting. The two
 numbers are shared in `stage.manager.go`.

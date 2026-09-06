@@ -12,5 +12,6 @@ var SplashStudio = StageManager.Register(&Stage{
 	},
 	Transition: splashTransition,
 	Hold:       splashHold,
+	Skippable:  true,
 	Next:       SplashTitle,
 })

@@ -14,6 +14,7 @@ var SplashTitle = StageManager.Register(&Stage{
 	},
 	Transition: splashTransition,
 	Hold:       splashHold,
+	Skippable:  true,
 	Next:       MainMenu,
 })
 
