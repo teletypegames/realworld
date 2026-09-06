@@ -37,7 +37,7 @@ somebody else's word, not ours:
 
 - **Acronyms that are the domain's own**: `HUD`, `BBS`, `BVK`, `SRP`, `RGB`. An
   acronym is the full name of the thing; `RGB` is what `image/color` calls it.
-- **The engine's vocabulary**: `inc.VarMode` and `inc.VarNote` stay `Var`,
+- **The engine's vocabulary**: `inc.VarNote` and `inc.VarSlot2` stay `Var`,
   because the engine's own API is `State.Var` and `State.SetVar`, and half a
   translation is worse than none.
 - **`err`**, which is the language's own spelling in every Go program.
@@ -141,7 +141,7 @@ main.release.go                          debugBuild = false, without it
 inc/constants.go                         world-state keys: flags, vars, notes
 inc/util/util.color.go                   RGB and RGBA, hex to color.Color
 
-inc/system/system.go                     System: the binding, the mode, the note
+inc/system/system.go                     System: the binding and the note
 inc/system/widget/widget.manager.go      the Widget alias, HUD layout, the conditions
 inc/system/widget/widget.*.go            one widget per file, registering itself
 inc/system/armilla/armilla.manager.go    Paul's Armilla: slot two and the strip
@@ -486,8 +486,8 @@ A widget that says nothing sits on `LayerHUD`; ours all say it, because the
 layer is the one thing about a widget the file cannot show.
 
 The other thing a widget declares is **when it is there at all**. The HUD is
-hidden for a cutscene, and that is a condition over game state, not a wrapper
-and not an `if` at the top of every `Draw`:
+there on the world stage and nowhere else, and that is a condition over game
+state, not a wrapper and not an `if` at the top of every `Draw`:
 
 ```go
 var _ = WidgetManager.Register(&inkwell.StatusLine{
@@ -497,11 +497,13 @@ var _ = WidgetManager.Register(&inkwell.StatusLine{
 })
 ```
 
-`WhenPlaying`, `whenCutscene` and `whenDebug` are in `widget.manager.go`, and they
-read `inc.VarMode` and `inc.FlagDebug` out of the engine's own `State`.
-`WhenPlaying` is the one of the three that is exported, because `tape.slots.go`
-is a content file that has to name it; the other two are read inside the package
-only. A widget of
+`WhenPlaying` and `whenDebug` are in `widget.manager.go`: the first is
+`inkwell.OnWorld()` and nothing else, the second adds `inc.FlagDebug` read out
+of the engine's own `State`. `WhenPlaying` is the one of the two that is
+exported, because `tape.slots.go` is a content file that has to name it; the
+other is read inside the package only. There is no cutscene mode: a script that
+holds the frame holds it with the HUD still on screen, so a cutscene sets
+nothing before it starts and clears nothing when it ends. A widget of
 ours says the same thing with a method — `VisibleWhen() inkwell.Condition` —
 because it has no literal to put a field in. A widget that is switched off
 neither ticks nor draws nor blocks a click, so nothing else has to ask.
@@ -639,15 +641,12 @@ with nothing behind it must not be closable — and `stage.credits.go`
 registers a `Stage` and an `inkwell.TextCard`. That is the same shape
 `tape.slots.go` already has: a content file registering a widget.
 
-The HUD needed one line, not fourteen. `widget.WhenPlaying` is now
-`And(OnWorld(), Not(inCutscene))`, so every HUD widget disappears off the
-game stage without knowing stages exist — and without naming one, which it
-could not: `stage` registers its menus into `widget`, so `widget` naming
-`stage.Game` back would be an import cycle. `inkwell.OnWorld` says the thing
-the HUD means, "the Stage showing is the world", whichever Stage that is. Note which way
-round that is: **not being in a cutscene is the default**, so a fresh `State`
-after a New Game is a playing one, and nothing has to remember to set the
-mode back.
+The HUD needed one line, not fourteen. `widget.WhenPlaying` is
+`inkwell.OnWorld()`, so every HUD widget disappears off the game stage
+without knowing stages exist — and without naming one, which it could not:
+`stage` registers its menus into `widget`, so `widget` naming `stage.Game`
+back would be an import cycle. `inkwell.OnWorld` says the thing the HUD
+means, "the Stage showing is the world", whichever Stage that is.
 
 `Restart`, `LoadSlot` and `GoToStage` all land at the top of the next frame,
 which is what lets a menu row say the whole of what it means at once:
@@ -683,13 +682,14 @@ var System = &system{}
 
 The type is unexported, so `System` is the only instance that can exist, and
 every name the package offers is a method on it: `System.Do(…)`, `System.Game()`,
-`System.Paused(…)`, `System.SetMode(…)`. There are no package functions beside
-it, and no `Action` or `Runner` types of its own either — nor any closure now:
-`SetMode` is `inkwell.SetVar` over `inc.VarMode`, and `Paused` is
+`System.Paused(…)`. There are no package functions beside it, and no `Action`
+or `Runner` types of its own either — nor any closure now: `Paused` is
 `inkwell.Noting`, the engine's own "hold this var for exactly as long as the
 action runs". `System.Func`, the escape hatch to arbitrary Go, is gone with its
 last caller, and so is `System.UseTheme`, which is now `inkwell.UseTheme` — a
-theme switch mid-script is not this game's idea. One short file
+theme switch mid-script is not this game's idea. `System.SetMode` went with the
+play/cutscene mode itself: a cutscene no longer takes the HUD down, so there
+was nothing left for a mode to switch. One short file
 holds the whole package. The mutable state is the struct's
 fields rather than package variables, so `Attach` is a hand-off to one value and
 not a sweep over several — and nothing is threaded anywhere: a widget holds no
@@ -699,11 +699,10 @@ reachable from anywhere that imports `system`. `main` calls
 building the game twice is clean.
 
 `system` holds as little as it can get away with, and after the Armilla moved out
-it holds nothing but the binding: the engine pointer, the mode, and the top
-bar's note. The mode and the note are `State` vars (`inc.VarMode`,
-`inc.VarNote`), because state the engine can see is state a `Condition` can read
-— that is what makes a widget's `When` possible and what puts "— paused" in the
-top bar without anyone pushing it there. `System.Do` hands its action to
+it holds nothing but the binding: the engine pointer and the top bar's note.
+The note is a `State` var (`inc.VarNote`), because state the engine can see is
+state a `Condition` can read — that is what puts "— paused" in the top bar
+without anyone pushing it there. `System.Do` hands its action to
 `game.Do`, the engine's queue, so the game runs one action at a time without a
 pump of its own.
 
@@ -737,7 +736,7 @@ with the name already in it. `Offer`/`Waiting`/`TakeOffer` — the tape that wan
 to speak during a cutscene — went because **nothing ever called `Offer`**: the
 mechanic was authored, documented as a `SPACE` control, and dead. When content
 wants it back, the declarative shape is an engine action that waits for a key,
-not a package holding a flag the letterbox polls.
+not a package holding a flag a widget polls.
 
 `armilla.Insert` is a `Seq` of three engine actions and no Go: set slot two
 to the cassette's name, take the cassette out of the inventory, write the
@@ -790,15 +789,15 @@ the entity variables, the state keys in `inc/constants.go`, each package's
 `<Category>Manager` and entity type, the colour tokens, the tape lookups
 (`tape.Of`, `tape.DialogOf`), the system (`system.System` and its methods
 `Do`, `Game`, `Attach`, …), the Armilla (`armilla.Slot2`, `armilla.Insert`,
-`armilla.StripIfEmpty`), the action constructors (`System.Paused`,
-`System.SetMode`) and the one HUD condition a content file has to name,
+`armilla.StripIfEmpty`), the action constructor `System.Paused` and the one
+HUD condition a content file has to name,
 `widget.WhenPlaying`. A tape's line is `speaker.TapeSupport.Say(…)` like
 anyone else's — the tape voice is the `Speaker` in `speaker/`, and `Say` is
 the engine's one `Say` on every talker, not a second spelling of it.
 
 Everything else stays unexported, and now the compiler holds the line: the HUD
-widgets (`hudFrame`, `slots`, …), the conditions `whenCutscene` and `whenDebug`,
-and the file-local helpers.
+widgets (`hudFrame`, `slots`, …), the condition `whenDebug`, and the
+file-local helpers.
 
 The word is **scene**, the engine's own. The wiki and the concept-art deck count
 *screens*, and this code used to as well, but everything a screen had that a

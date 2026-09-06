@@ -278,7 +278,7 @@ main.debug.go  main.release.go         debugBuild, the -tags debug pair
 inc/constants.go                       the state keys — flags, vars, notes; imports nothing
 inc/util/                              RGB and RGBA over image/color; imports nothing
 
-inc/system/system.go                   System: the binding, the mode, the note
+inc/system/system.go                   System: the binding and the note
 inc/system/widget/                     HUD layout, visibility conditions, 13 widgets
 inc/system/armilla/                    Paul's Armilla: slot two and the strip
 inc/system/theme/                      the Theme alias, realworld-93, nokia-punk
@@ -476,10 +476,12 @@ happen to be. The layer was added to inkwell for this; the alternative was a
 registration list, which is the thing this package spent its life deleting.
 
 The second thing a widget declares is when it is on screen at all: `When` is an
-`inkwell.Condition` over game state, and the HUD's is `WhenPlaying`, which reads
-`VarMode` out of the engine's `State`. Hiding the HUD for a cutscene is
-therefore one word per widget rather than a wrapper around each of them and an
-`if` at the top of every `Draw`.
+`inkwell.Condition` over game state, and the HUD's is `WhenPlaying`, which is
+`inkwell.OnWorld()`. Taking the HUD off the menu screens is therefore one word
+per widget rather than a wrapper around each of them and an `if` at the top of
+every `Draw`. A cutscene does not take it off at all: the HUD stays on screen
+while a script holds the frame, so there is no play/cutscene mode, no
+`SetMode` at either end of a script, and no letterbox waiting for one.
 
 **Stages.** A stage is one full-screen thing the game shows, and exactly one
 shows at a time: the main menu, load, save, settings, credits — and the game
@@ -511,9 +513,7 @@ at one pace. A `Transition` belongs to the Stage that *leaves* through it,
 which is what keeps the menu and its sub-screens cutting: neither names one.
 `-scene` and `-finale` skip the cards along with the menu, because both mean
 somebody wants to look at the game. The HUD needed one line to follow all
-of this: `WhenPlaying` is `And(OnWorld(), Not(inCutscene))`, and because
-*not being in a cutscene* is the default, a fresh `State` after a New Game is
-already a playing one. `OnWorld` rather than `OnStage(stage.Game)` because the
+of this: `WhenPlaying` is `OnWorld()`. `OnWorld` rather than `OnStage(stage.Game)` because the
 HUD cannot name the stage that registers into it — that would be an import
 cycle — and "the Stage showing is the world" is what it meant anyway.
 
@@ -558,18 +558,18 @@ every other scene file, and `main` says nothing about it.
 There is one game, so there is one system, and it is a value rather than a type
 anyone constructs: `var System = &system{}`, with `system` unexported so no
 second one can exist. Everything the package offers is a method on it —
-`System.Do(…)`, `System.Game()`, `System.SetMode(…)`, `System.Paused(…)` — and
-there are no package functions beside them, no hand-written `Action` or `Runner`
-types, and now no closures either: `SetMode` is `inkwell.SetVar` over
-`VarMode`, and `Paused` is `inkwell.Noting`, the engine's own "hold this var for
-exactly as long as the action runs". `System.Func`, the escape hatch to
+`System.Do(…)`, `System.Game()`, `System.Paused(…)` — and there are no package
+functions beside them, no hand-written `Action` or `Runner` types, and now no
+closures either: `Paused` is `inkwell.Noting`, the engine's own "hold this var
+for exactly as long as the action runs". `SetMode` went with the play/cutscene
+mode, once a cutscene stopped taking the HUD down. `System.Func`, the escape hatch to
 arbitrary Go, went with its last caller; `System.UseTheme` became
 `inkwell.UseTheme`, because a theme switch mid-script is not this game's idea.
 Nothing takes a system parameter and no
 widget holds a back-reference, which is what lets a script file be a literal.
 `System` itself is down to the binding:
-the engine pointer, the mode and the top bar's note, the last two being `State`
-vars the engine can see for itself. What it deliberately does not hold is the
+the engine pointer and the top bar's note, the latter a `State` var the
+engine can see for itself. What it deliberately does not hold is the
 assembly — every content package imports `system`, so the wiring lives in
 `main.go`.
 
@@ -592,7 +592,7 @@ that wanted to speak during a cutscene, once documented in the table above as a
 `SPACE` control — went because nothing ever called `Offer`. The mechanic was
 written, never wired, and therefore never seen. When content wants it back, the
 declarative shape is an engine action that waits for a key, not a package
-holding a flag the letterbox polls each frame.
+holding a flag a widget polls each frame.
 
 The strip is an `inkwell.Text` now rather than a bare English string, because
 `TopBar` resolves a `Text`-valued var into the player's language — so the one

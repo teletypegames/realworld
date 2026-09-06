@@ -6,13 +6,11 @@ import (
 	"realworld/inc"
 	"realworld/inc/content/character"
 	"realworld/inc/content/speaker"
-	"realworld/inc/system"
 )
 
 var NormanFound = ScriptManager.Register(&Script{
 	Name: "norman_found",
 	Actions: inkwell.Seq(
-		system.System.SetMode(system.ModeCutscene),
 		inkwell.Wait(0.5),
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "There's somebody in there. In a chair. Wired into that machine like a lamp into a wall."},
@@ -44,6 +42,5 @@ var NormanFound = ScriptManager.Register(&Script{
 		}),
 		inkwell.SetFlag(inc.FlagNormanFound),
 		inkwell.SetVar(inc.VarDecay, inc.DecayNormanFound),
-		system.System.SetMode(system.ModePlay),
 	),
 })

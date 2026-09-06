@@ -4,7 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
-	"realworld/inc/system"
 )
 
 type Widget = inkwell.Widget
@@ -36,10 +35,6 @@ const (
 var (
 	onWorld = inkwell.OnWorld()
 
-	WhenPlaying = inkwell.And(onWorld, inkwell.Not(inCutscene))
-
-	whenCutscene = inkwell.And(onWorld, inCutscene)
-	whenDebug    = inkwell.And(onWorld, inkwell.Flag(inc.FlagDebug))
-
-	inCutscene = inkwell.VarEq(inc.VarMode, string(system.ModeCutscene))
+	WhenPlaying = onWorld
+	whenDebug   = inkwell.And(onWorld, inkwell.Flag(inc.FlagDebug))
 )

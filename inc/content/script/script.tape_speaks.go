@@ -6,13 +6,11 @@ import (
 	"realworld/inc"
 	"realworld/inc/content/character"
 	"realworld/inc/content/speaker"
-	"realworld/inc/system"
 )
 
 var TapeSpeaks = ScriptManager.Register(&Script{
 	Name: "tape_speaks",
 	Actions: inkwell.Seq(
-		system.System.SetMode(system.ModeCutscene),
 		inkwell.Wait(0.6),
 		speaker.TapeMystery.Say(Text{
 			{Lang: "en", Text: "The key. This is the key!"},
@@ -52,6 +50,5 @@ var TapeSpeaks = ScriptManager.Register(&Script{
 		}),
 		inkwell.SetFlag(inc.FlagTapeSpeaks),
 		inkwell.SetVar(inc.VarDecay, inc.DecayTapeSpeaks),
-		system.System.SetMode(system.ModePlay),
 	),
 })

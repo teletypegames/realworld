@@ -6,13 +6,11 @@ import (
 	"realworld/inc/content/character"
 	"realworld/inc/content/item"
 	"realworld/inc/content/speaker"
-	"realworld/inc/system"
 )
 
 var Opening = ScriptManager.Register(&Script{
 	Name: "opening",
 	Actions: inkwell.Seq(
-		system.System.SetMode(system.ModeCutscene),
 		inkwell.Wait(0.6),
 		speaker.Dex.Say(Text{
 			{Lang: "en", Text: "Something came under the door. Paper. Nobody sends you paper."},
@@ -43,6 +41,5 @@ var Opening = ScriptManager.Register(&Script{
 			{Lang: "en", Text: "I'm going. Grab what's worth grabbing and lock up."},
 			{Lang: "hu", Text: "Megyek. Ami megéri, azt összeszedem, és zárok."},
 		}),
-		system.System.SetMode(system.ModePlay),
 	),
 })

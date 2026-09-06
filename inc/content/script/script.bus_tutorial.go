@@ -6,13 +6,11 @@ import (
 	"realworld/inc"
 	"realworld/inc/content/character"
 	"realworld/inc/content/speaker"
-	"realworld/inc/system"
 )
 
 var BusTutorial = ScriptManager.Register(&Script{
 	Name: "bus_tutorial",
 	Actions: inkwell.Seq(
-		system.System.SetMode(system.ModeCutscene),
 		inkwell.Wait(0.5),
 		speaker.Dex.Say(Text{
 			{Lang: "en", Text: "Forty minutes to the city. Tell me again why a junk dealer flies across the country on a postcard."},
@@ -59,6 +57,5 @@ var BusTutorial = ScriptManager.Register(&Script{
 			{Lang: "hu", Text: "És hat év alatt a kettes foglalat üres volt. Ez az, ami miatt aggódom."},
 		}),
 		inkwell.SetFlag(inc.FlagBusTutorialDone),
-		system.System.SetMode(system.ModePlay),
 	),
 })

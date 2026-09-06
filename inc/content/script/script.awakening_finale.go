@@ -5,14 +5,12 @@ import (
 
 	"realworld/inc/content/character"
 	"realworld/inc/content/speaker"
-	"realworld/inc/system"
 	"realworld/inc/system/theme"
 )
 
 var Finale = ScriptManager.Register(&Script{
 	Name: "awakening_finale",
 	Actions: inkwell.Seq(
-		system.System.SetMode(system.ModeCutscene),
 		inkwell.Wait(0.6),
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "I'm putting it in. That's all this is."},

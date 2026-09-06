@@ -41,7 +41,6 @@ const (
 
 	VarSlot2        = "armilla.slot2"
 	VarArmillaStrip = "armilla.strip"
-	VarMode         = "mode"
 	VarNote         = "note"
 	VarDecay        = "decay"
 
