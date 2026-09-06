@@ -21,6 +21,15 @@ var Selector = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SAN FRANCISCO"},
 		{Lang: "hu", Text: "SAN FRANCISCO"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "selector",
+				Path: "assets/bg/selector.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors:    []SceneActor{},
 	Walkboxes: []Polygon{},
 	Derived:   selectorDerived,

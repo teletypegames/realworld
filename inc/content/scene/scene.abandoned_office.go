@@ -44,6 +44,15 @@ var AbandonedOffice = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "ABANDONED OFFICE"},
 		{Lang: "hu", Text: "ELHAGYATOTT IRODA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "abandoned_office",
+				Path: "assets/bg/abandoned_office.png",
+			},
+			Z: -1,
+		},
+	},
 	Triggers: []Trigger{
 		{
 			Name: "sumphor_enters",

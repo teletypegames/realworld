@@ -18,6 +18,15 @@ var SecretClub = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SECRET CLUB — THE UNDERWATER SUN"},
 		{Lang: "hu", Text: "TITKOS KLUB — A VÍZ ALATTI NAP"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "secret_club",
+				Path: "assets/bg/secret_club.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

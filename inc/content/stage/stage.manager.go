@@ -11,6 +11,7 @@ type (
 	Stage    = inkwell.Stage
 	Text     = inkwell.Text
 	MenuItem = inkwell.MenuItem
+	Asset    = inkwell.Asset
 )
 
 var StageManager = inkwell.NewManager[*Stage]()

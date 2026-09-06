@@ -8,7 +8,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
-	"realworld/inc/content/background"
 	"realworld/inc/content/character"
 	"realworld/inc/content/dialog"
 	"realworld/inc/content/item"
@@ -115,7 +114,6 @@ func (chosen options) game() *inkwell.Game {
 		ExitTake:    script.ExitTake,
 		UseWithFail: script.UseWithFail,
 
-		AssetManager:     background.BackgroundManager,
 		CharacterManager: character.CharacterManager,
 		DialogManager:    dialog.DialogManager,
 		ItemManager:      item.ItemManager,

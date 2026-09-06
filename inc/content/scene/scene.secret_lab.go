@@ -42,6 +42,15 @@ var SecretLab = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SECRET LAB — INSIDE THE GOLDEN GATE"},
 		{Lang: "hu", Text: "TITKOS LABOR — A GOLDEN GATE BELSEJÉBEN"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "secret_lab",
+				Path: "assets/bg/secret_lab.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

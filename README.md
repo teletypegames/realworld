@@ -272,7 +272,7 @@ inc/system/armilla/                    Paul's Armilla: slot two and the strip
 inc/system/theme/                      the Theme alias, realworld-93, nokia-punk
 
 inc/content/stage/                     one file per full-screen screen
-inc/content/scene/  …/background/       one file per location, twice
+inc/content/scene/                     one file per location
 inc/content/tape/                      the Tape entity, the slots, the channel
 inc/content/speaker/                   the voices with no body: Dex and the cards
 inc/content/music/  …/sound/           tracks and noises, as entities
@@ -322,10 +322,43 @@ inc ← theme ← system ← armilla ← widget ← tape ← main
 ```
 
 Adding a scene means adding `inc/content/scene/scene.<name>.go` and a
-`assets/bg/<name>.png` beside it. Nothing else moves — a scene that says nothing
-about its `Background` takes an asset named after itself, and
-`background/background.manager.go` registers one per registered scene, so the
-file name is the whole of the pairing.
+`assets/bg/<name>.png` beside it. Nothing else moves: the scene file names its
+own picture, and nothing else does.
+
+The picture is `Layers`, not one image: every layer is a full 640×380 PNG,
+transparent where what is behind it shows through, at a depth `Z`. The cast
+stands at 0, so a negative `Z` is behind every character and a positive `Z` in
+front of every character. The background is the layer at -1, which everybody
+walks in front of, and a scene that has something for Paul to walk *behind* —
+a counter, a fence along the bottom edge — is one more element of the same
+slice, at 1:
+
+```go
+Layers: []SceneLayer{
+	{
+		Asset: &Asset{
+			Name: "alley",
+			Path: "assets/bg/alley.png",
+		},
+		Z: -1,
+	},
+	{
+		Asset: &Asset{
+			Name: "alley_fence",
+			Path: "assets/bg/alley_fence.png",
+		},
+		Z: 1,
+	},
+},
+```
+
+A layer's asset is a literal nested in place and registered nowhere: the engine
+loads it through the pointer, so a picture that belongs to one scene needs no
+manager and no package of its own — there used to be a `background` package
+deriving one asset per scene, and it went when the picture stopped being one
+image. Because every plane is the whole canvas, the painter exports the fence
+from the same file as the alley into a PNG of its own, and there is no offset
+to keep in step.
 
 Every category owns a manager, and they are all the engine's own
 `inkwell.Manager[T]` — the same registry the `*Game` hangs its content off, kept
@@ -374,7 +407,7 @@ those keys.
 
 The price is that a reference is an import, so the content packages stand in
 a strict order and only ever point down: `character` and `speaker`, then
-`item`, `script`, `dialog`, `tape`, `scene`, `background`, `stage`. The old
+`item`, `script`, `dialog`, `tape`, `scene`, `stage`. The old
 graph had two edges pointing up, and both went through the same thing — the
 tape voices, which `tape.manager.go` used to *derive* from the cards while
 `dialog` and `script` gave them lines. A derived thing cannot be pointed at
@@ -410,9 +443,8 @@ statement can only stand in a function body, an expression can stand in a
 variable initialiser. It buys more than two lines and an indent level: a
 package-level variable is initialised in dependency order, so the manager is
 built before any file that writes into it, whichever the compiler reads first.
-Two files keep an `init()` and earn it — `background.manager.go` loops over
-the scene deck, and `tape.slots.go` builds a value that has to be wired to
-itself, neither of which is an expression.
+One file keeps an `init()` and earns it — `tape.slots.go` builds a value that
+has to be wired to itself, which is not an expression.
 
 A package initialises only if something imports it, so a package whose
 entities nobody names by symbol needs a blank import in `main.go`.
@@ -459,9 +491,9 @@ picture the engine stretches over the whole window, so
 `assets/stage/splash_studio.png` is already 640×380: the logo scaled to
 150 px tall on a black canvas, the logo's own background — and the colour
 the `Fade` goes through, so the card leaves without a visible edge. The asset
-is a literal nested in the stage's `Background`, registered in place —
-`background.manager.go` derives an asset per *scene*, and a stage is not one,
-and a picture that belongs to exactly one thing needs no name of its own. The two numbers are `splashHold` and
+is a literal nested in the stage's `Background`, the way a scene's layers are
+nested in its `Layers`: a picture that belongs to exactly one thing needs no
+name of its own. The two numbers are `splashHold` and
 `splashTransition` in `stage.manager.go`, shared so that the two cards move
 at one pace. A `Transition` belongs to the Stage that *leaves* through it,
 which is what keeps the menu and its sub-screens cutting: neither names one.

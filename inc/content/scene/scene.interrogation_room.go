@@ -15,6 +15,15 @@ var InterrogationRoom = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SFPD — INTERVIEW ROOM"},
 		{Lang: "hu", Text: "SFPD — KIHALLGATÓSZOBA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "interrogation_room",
+				Path: "assets/bg/interrogation_room.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

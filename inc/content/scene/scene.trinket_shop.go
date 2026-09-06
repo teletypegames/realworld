@@ -16,6 +16,15 @@ var TrinketShop = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "CHINATOWN — TRINKET SHOP"},
 		{Lang: "hu", Text: "KÍNAI NEGYED — CSECSEBECSEBOLT"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "trinket_shop",
+				Path: "assets/bg/trinket_shop.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

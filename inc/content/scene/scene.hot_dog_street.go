@@ -15,6 +15,15 @@ var HotDogStreet = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "STREET FRONT — THE HOT DOG STAND"},
 		{Lang: "hu", Text: "UTCAFRONT — A HOTDOGOS"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "hot_dog_street",
+				Path: "assets/bg/hot_dog_street.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

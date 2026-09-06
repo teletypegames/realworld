@@ -46,6 +46,15 @@ var PoliceStreet = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SFPD — STREET FRONT"},
 		{Lang: "hu", Text: "SFPD — UTCAFRONT"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "police_street",
+				Path: "assets/bg/police_street.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

@@ -36,6 +36,15 @@ var PoliceStation = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SFPD — RECEPTION"},
 		{Lang: "hu", Text: "SFPD — RECEPCIÓ"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "police_station",
+				Path: "assets/bg/police_station.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

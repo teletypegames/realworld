@@ -15,6 +15,15 @@ var Hospital = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "HOSPITAL — PSYCHIATRIC WING"},
 		{Lang: "hu", Text: "KÓRHÁZ — PSZICHIÁTRIAI SZÁRNY"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "hospital",
+				Path: "assets/bg/hospital.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

@@ -13,6 +13,15 @@ var SmallRestaurant = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SMALL RESTAURANT — NEXT DOOR"},
 		{Lang: "hu", Text: "KIS ÉTTEREM — A SZOMSZÉDBAN"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "small_restaurant",
+				Path: "assets/bg/small_restaurant.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "counter",

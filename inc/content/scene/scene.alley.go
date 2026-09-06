@@ -18,6 +18,15 @@ var Alley = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "ALLEY — BEHIND NOODLE'S HOUSE"},
 		{Lang: "hu", Text: "SIKÁTOR — NOODLE HÁZA MÖGÖTT"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "alley",
+				Path: "assets/bg/alley.png",
+			},
+			Z: -1,
+		},
+	},
 	Triggers: []Trigger{
 		{
 			Name: "arrival",

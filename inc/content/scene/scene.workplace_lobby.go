@@ -39,6 +39,15 @@ var WorkplaceLobby = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "TOWER B — LOBBY"},
 		{Lang: "hu", Text: "B TORONY — ELŐTÉR"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "workplace_lobby",
+				Path: "assets/bg/workplace_lobby.png",
+			},
+			Z: -1,
+		},
+	},
 	OnEnter: inkwell.If(inkwell.Not(inkwell.Flag(inc.FlagNoodleReleased)),
 		inkwell.RunScript(script.NoodleReleased),
 	),

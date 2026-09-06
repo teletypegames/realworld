@@ -1,19 +1,15 @@
 package stage
 
-import (
-	"realworld/inc/content/background"
-)
-
 var SplashStudio = StageManager.Register(&Stage{
 	Name: "splash_studio",
 	Title: Text{
 		{Lang: "en", Text: "TELETYPE GAMES"},
 		{Lang: "hu", Text: "TELETYPE GAMES"},
 	},
-	Background: background.BackgroundManager.Register(&background.Background{
+	Background: &Asset{
 		Name: "splash_studio",
 		Path: "assets/stage/splash_studio.png",
-	}),
+	},
 	Transition: splashTransition,
 	Hold:       splashHold,
 	Next:       SplashTitle,

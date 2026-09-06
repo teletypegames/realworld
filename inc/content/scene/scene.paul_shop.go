@@ -38,6 +38,15 @@ var PaulShop = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "PAUL'S SHOP — JUNK AND GARAGE"},
 		{Lang: "hu", Text: "PAUL BOLTJA — ÓCSKAVAS ÉS MŰHELY"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "paul_shop",
+				Path: "assets/bg/paul_shop.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "door_mat",

@@ -20,6 +20,15 @@ var RooftopHideout = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "NORMAN'S ROOFTOP HIDEOUT"},
 		{Lang: "hu", Text: "NORMAN BÚVÓHELYE A TETŐN"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "rooftop_hideout",
+				Path: "assets/bg/rooftop_hideout.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "crate",

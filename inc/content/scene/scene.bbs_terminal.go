@@ -10,6 +10,15 @@ var BBSTerminal = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "TERMINAL — BBS ACCESS POINT"},
 		{Lang: "hu", Text: "TERMINÁL — BBS HOZZÁFÉRÉSI PONT"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "bbs_terminal",
+				Path: "assets/bg/bbs_terminal.png",
+			},
+			Z: -1,
+		},
+	},
 })
 
 var _ = BBSTerminal.Leads(

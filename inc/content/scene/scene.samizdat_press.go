@@ -8,6 +8,15 @@ var SamizdatPress = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SAMIZDAT PRINTING HOUSE"},
 		{Lang: "hu", Text: "SZAMIZDAT NYOMDA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "samizdat_press",
+				Path: "assets/bg/samizdat_press.png",
+			},
+			Z: -1,
+		},
+	},
 })
 
 var _ = SamizdatPress.Leads(

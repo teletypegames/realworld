@@ -44,6 +44,15 @@ var ActiveOffice = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "TOWER B — ACTIVE FLOOR"},
 		{Lang: "hu", Text: "B TORONY — AKTÍV EMELET"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "active_office",
+				Path: "assets/bg/active_office.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "desk",

@@ -33,6 +33,15 @@ var NoodleSecretRoom = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "NOODLE'S BACK ROOM"},
 		{Lang: "hu", Text: "NOODLE HÁTSÓ SZOBÁJA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "noodle_secret_room",
+				Path: "assets/bg/noodle_secret_room.png",
+			},
+			Z: -1,
+		},
+	},
 	Triggers: []Trigger{
 		{
 			Name: "raided",

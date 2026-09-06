@@ -27,6 +27,15 @@ var Hackerspace = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "HACKERSPACE"},
 		{Lang: "hu", Text: "HACKERSPACE"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "hackerspace",
+				Path: "assets/bg/hackerspace.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "workbench",

@@ -15,6 +15,15 @@ var NoodleOffice = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "NOODLE'S OFFICE"},
 		{Lang: "hu", Text: "NOODLE IRODÁJA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "noodle_office",
+				Path: "assets/bg/noodle_office.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

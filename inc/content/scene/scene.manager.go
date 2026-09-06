@@ -13,6 +13,8 @@ type (
 	Exit       = inkwell.Exit
 	Trigger    = inkwell.Trigger
 	SceneActor = inkwell.SceneActor
+	SceneLayer = inkwell.SceneLayer
+	Asset      = inkwell.Asset
 	Point      = inkwell.Point
 	Polygon    = inkwell.Polygon
 )

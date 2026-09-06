@@ -115,8 +115,8 @@ inside `inc/[group]/[category]/` — because the prefix is what makes a file
 findable in a list of editor tabs, a grep, or a diff, where the directory has
 already fallen off, and now two directories have.
 
-- The category is always **singular**: `item`, `scene`, `background`,
-  `character`, `tape`, `dialog`, `script`, `armilla`, `widget`, `theme`.
+- The category is always **singular**: `item`, `scene`, `character`, `tape`,
+  `dialog`, `script`, `armilla`, `widget`, `theme`.
 - `[category].manager.go` is the file that ties a package together — its entity
   type, its `Manager`, and whatever else the category shares.
 - Every other file in a package holds exactly one entity: one scene, one
@@ -155,7 +155,6 @@ inc/content/stage/stage.*.go             one screen per file: splash cards, menu
 inc/content/scene/scene.manager.go       the Scene alias, its Manager, the floor
 inc/content/scene/scene.selector.go      the map screen: pins derived from the graph
 inc/content/scene/scene.*.go             one file per scene
-inc/content/background/background.manager.go  one asset per registered scene
 inc/content/character/character.*.go     the cast: people who stand in a scene
 inc/content/speaker/speaker.*.go         the voices with no body: Dex and the tape cards
 inc/content/music/music.manager.go       the Music alias and its Manager: tracks a scene or stage plays
@@ -240,9 +239,8 @@ front of the verb, where a script puts it.
 
 Every manager holds **pointers**, `Manager[*Character]` and never
 `Manager[Character]`, so the variable an entity file binds and the entry the
-engine looks up are one instance. Read from `main.go` the ten of them still
-line up as a list — `background.BackgroundManager`,
-`character.CharacterManager`, `dialog.DialogManager`, `item.ItemManager`,
+engine looks up are one instance. Read from `main.go` the nine of them still
+line up as a list — `character.CharacterManager`, `dialog.DialogManager`, `item.ItemManager`,
 `scene.SceneManager`, `script.ScriptManager`, `speaker.SpeakerManager`,
 `tape.TapeManager`, `theme.ThemeManager`, `widget.WidgetManager` — only now
 the list is a consequence of the imports rather than a block someone has to
@@ -335,7 +333,7 @@ so the content packages stand in a strict order and a reference only ever
 points **down**:
 
 ```
-character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← background ← stage
+character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← stage
 ```
 
 A dialog can give a line to `speaker.Dex` and hand out `item.NoodleLetter`,
@@ -379,34 +377,36 @@ variable is ready before any `init()` runs. The registration order is
 unchanged: still the order the files are presented in, which is alphabetical,
 and still nothing may depend on it.
 
-Two files keep an `init()`, and both earn it. `background.manager.go` loops
-over the scene deck; a loop is not an expression. `tape.slots.go` builds a
-value that has to be wired to itself — `panel.Hotspots = panel.hotspots` —
-which a composite literal cannot do. Where a file is assembly before it is an
-entity, `init()` is the honest word for it; contorting those two into
-declarations would cost more than it saves.
+One file keeps an `init()`, and it earns it. `tape.slots.go` builds a value
+that has to be wired to itself — `panel.Hotspots = panel.hotspots` — which a
+composite literal cannot do. Where a file is assembly before it is an entity,
+`init()` is the honest word for it; contorting it into a declaration would cost
+more than it saves.
 
-Backgrounds are the one category with no per-entity file, and it is not an
-exception to the rule so much as the rule reaching its limit: every one of the
-twenty-four was the same three fields, and two of the three were the scene's own
-name spelled twice more. A scene file says nothing about its picture, and
-`background.manager.go` registers one asset per registered scene and writes it
-into the scene, through the pointer the manager holds:
+A scene's picture is in the scene file like everything else about it: `Layers`,
+full-screen planes at a depth `Z`, with the cast at 0. A negative `Z` is behind
+every character and a positive `Z` in front of every character, so the
+background is the layer at `Z: -1`, and its `Asset` is a literal nested in
+place, named after the scene and paired with a PNG of the same name:
 
 ```go
-scene.SceneManager.Each(func(entity *scene.Scene) {
-	entity.Background = BackgroundManager.Register(&Background{
-		Name: entity.Name,
-		Path: "assets/bg/" + entity.Name + ".png",
-	})
-})
+Layers: []SceneLayer{
+	{
+		Asset: &Asset{
+			Name: "alley",
+			Path: "assets/bg/alley.png",
+		},
+		Z: -1,
+	},
+},
 ```
 
-That is what makes `background → scene` the right direction: the asset is
-*derived from* the deck, so the deriving package imports the source. Adding a
-scene is now a PNG whose name matches. A picture that belongs to exactly one
-thing needs neither a file nor a variable: the splash logo is a literal nested
-in its stage's `Background`, registered in place.
+What Paul walks behind is one more element of the same slice, at a positive
+`Z`, with its own PNG. There is no `background` package and no asset
+manager of ours: a picture that belongs to exactly one thing needs neither a
+file nor a variable nor a registry, since the engine loads it through the
+pointer the layer holds. The splash logo is the same shape, a literal nested
+in its stage's `Background`.
 
 Adding an entity is adding a file. Deleting one is deleting a file.
 
@@ -461,7 +461,7 @@ nothing in the literal is theirs. That list is **per package, not per entity**
 
 A widget is a file like any other entity — `widget.<name>.go`, one widget,
 registering itself — and that includes the engine's own widgets,
-which the game registers as literals the same way it registers a background:
+which the game registers as literals the same way it registers a scene:
 
 ```go
 var _ = WidgetManager.Register(&inkwell.Cursor{
@@ -516,7 +516,6 @@ than keeping two in step:
 ```go
 game := inkwell.New(inkwell.Game{
 	…
-	AssetManager:     background.BackgroundManager,
 	CharacterManager: character.CharacterManager,
 	DialogManager:    dialog.DialogManager,
 	ItemManager:      item.ItemManager,
@@ -529,8 +528,10 @@ game := inkwell.New(inkwell.Game{
 ```
 
 `New` fills in an empty manager for every category a caller leaves out, so the
-nine above are the nine we own and the tenth, `VerbManager`, is the engine's
-four SCUMM verbs untouched.
+eight above are the eight we own and the other two are the engine's:
+`VerbManager`, the four SCUMM verbs untouched, and `AssetManager`, which stays
+empty because a picture is loaded through the pointer its layer or stage holds
+and is registered nowhere.
 
 Themes used to be the odd one out — `NewGame` seeded its `ThemeManager` with
 four presets, so handing ours over would have thrown them away, and the game
@@ -811,7 +812,7 @@ The layering is the import graph, so the compiler keeps it:
 ```
 inc ← theme ← system ← armilla ← widget ← main
  ↑      ↑        ↑                  ↑
-util    └── character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← background ← stage
+util    └── character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← stage
 ```
 
 `inc` imports nothing and everything imports it, and `util` sits beside it on
@@ -822,27 +823,27 @@ an arrow pointing back is now an import cycle, not a review comment.
 The content row is a strict order because a reference is an import, and it
 reads as *what is made of what*: an item is looked at by a character, a script
 hands out items, a dialog runs scripts, a card carries an item and plays a
-dialog, a scene holds all of them, a background is derived from the scenes, a
-stage frames the lot. `tape → widget` and `stage → widget` point the same way:
+dialog, a scene holds all of them, a stage frames the lot. `tape → widget` and `stage → widget` point the same way:
 a cassette and a screen each register the widget that draws them. And the HUD
 names no stage back — `widget.WhenPlaying` reads `inkwell.OnWorld()` — which is
 the one place the strictness had to be paid for.
 
 `main` is at the very top, and it is the only place that names every package at
 once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other
-nine are `inc/content/`, and no arrow leaves `system` for `content`.
+ten are `inc/content/`, and no arrow leaves `system` for `content`.
 
 ## Adding a scene
 
 1. `inc/content/scene/scene.<name>.go`: `var <Name> = SceneManager.Register(&Scene{…})`
-   with its `Title` and every `Label` written in both languages, and under it
-   `var _ = <Name>.Leads(…)` with its exits
+   with its `Title` and every `Label` written in both languages, its
+   background as the `Layers` element at `Z: -1` whose `Asset` is named after
+   the scene, and under it `var _ = <Name>.Leads(…)` with its exits
 2. A 640×380 PNG at `assets/bg/<name>.png`
 
 Nothing else moves. There is no constant and no list to update; another scene
-reaches this one as `To: <Name>`, and nothing names the picture:
-`background.manager.go` registers one asset per registered scene and writes it
-into the scene. The PNG file name is the pairing.
+reaches this one as `To: <Name>`, and the picture is named nowhere but in the
+scene's own literal. Anything Paul walks behind is one more layer in the same
+slice, at a positive `Z`, with its own PNG.
 
 ## The engine next door
 

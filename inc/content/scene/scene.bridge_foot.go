@@ -15,6 +15,15 @@ var BridgeFoot = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "GOLDEN GATE — THE FOOT OF THE BRIDGE"},
 		{Lang: "hu", Text: "GOLDEN GATE — A HÍD LÁBA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "bridge_foot",
+				Path: "assets/bg/bridge_foot.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "service_door",

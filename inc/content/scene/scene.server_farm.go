@@ -35,6 +35,15 @@ var ServerFarm = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SERVER FARM"},
 		{Lang: "hu", Text: "SZERVERFARM"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "server_farm",
+				Path: "assets/bg/server_farm.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "badge_door",

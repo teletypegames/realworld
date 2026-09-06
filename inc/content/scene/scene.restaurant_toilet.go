@@ -36,6 +36,15 @@ var RestaurantToilet = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "TOILET — THE LIT MIRROR"},
 		{Lang: "hu", Text: "MOSDÓ — A KIVILÁGÍTOTT TÜKÖR"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "restaurant_toilet",
+				Path: "assets/bg/restaurant_toilet.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "mirror",

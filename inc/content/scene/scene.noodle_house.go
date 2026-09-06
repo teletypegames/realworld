@@ -22,6 +22,15 @@ var NoodleHouse = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "NOODLE'S HOUSE — SEALED"},
 		{Lang: "hu", Text: "NOODLE HÁZA — LEPECSÉTELVE"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "noodle_house",
+				Path: "assets/bg/noodle_house.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

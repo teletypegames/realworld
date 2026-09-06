@@ -17,6 +17,15 @@ var Bus = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "BUS — AIRPORT TO THE CITY"},
 		{Lang: "hu", Text: "BUSZ — A REPTÉRRŐL A VÁROSBA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "bus",
+				Path: "assets/bg/bus.png",
+			},
+			Z: -1,
+		},
+	},
 	Triggers: []Trigger{
 		{
 			Name: "tutorial",

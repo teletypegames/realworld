@@ -26,6 +26,15 @@ var NormanApartment = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "NORMAN'S APARTMENT"},
 		{Lang: "hu", Text: "NORMAN LAKÁSA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "norman_apartment",
+				Path: "assets/bg/norman_apartment.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "armilla",

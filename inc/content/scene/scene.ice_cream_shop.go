@@ -23,6 +23,15 @@ var IceCreamShop = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "ICE CREAM SHOP — WHERE THE BAR WAS"},
 		{Lang: "hu", Text: "FAGYIZÓ — A RÉGI BÁR HELYÉN"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "ice_cream_shop",
+				Path: "assets/bg/ice_cream_shop.png",
+			},
+			Z: -1,
+		},
+	},
 	Actors: []SceneActor{
 		{
 			Character: character.Paul,

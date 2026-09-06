@@ -15,6 +15,15 @@ var Street = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "STREET"},
 		{Lang: "hu", Text: "UTCA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "street",
+				Path: "assets/bg/street.png",
+			},
+			Z: -1,
+		},
+	},
 	Triggers: []Trigger{
 		{
 			Name: "glitch",

@@ -8,6 +8,15 @@ var Showroom = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "NEUMATRONIC SHOWROOM"},
 		{Lang: "hu", Text: "NEUMATRONIC BEMUTATÓTEREM"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "showroom",
+				Path: "assets/bg/showroom.png",
+			},
+			Z: -1,
+		},
+	},
 })
 
 var _ = Showroom.Leads(

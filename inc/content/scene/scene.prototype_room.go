@@ -26,6 +26,15 @@ var PrototypeRoom = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "PROTOTYPE ROOM"},
 		{Lang: "hu", Text: "PROTOTÍPUS SZOBA"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "prototype_room",
+				Path: "assets/bg/prototype_room.png",
+			},
+			Z: -1,
+		},
+	},
 	Hotspots: []Hotspot{
 		{
 			Name: "chair",

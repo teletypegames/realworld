@@ -8,6 +8,15 @@ var ScrapMarket = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "SCRAP MARKET"},
 		{Lang: "hu", Text: "ÓCSKAPIAC"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "scrap_market",
+				Path: "assets/bg/scrap_market.png",
+			},
+			Z: -1,
+		},
+	},
 })
 
 var _ = ScrapMarket.Leads(

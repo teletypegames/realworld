@@ -29,6 +29,15 @@ var SecurityRoom = SceneManager.Register(&Scene{
 		{Lang: "en", Text: "OBSERVATION ROOM — INSIDE THE STRUCTURE"},
 		{Lang: "hu", Text: "MEGFIGYELŐSZOBA — A SZERKEZET BELSEJÉBEN"},
 	},
+	Layers: []SceneLayer{
+		{
+			Asset: &Asset{
+				Name: "security_room",
+				Path: "assets/bg/security_room.png",
+			},
+			Z: -1,
+		},
+	},
 	Triggers: []Trigger{
 		{
 			Name: "found",
