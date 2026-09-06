@@ -165,6 +165,7 @@ var SecretClub = SceneManager.Register(&Scene{
 						{Lang: "hu", Text: "Norman. A te Normanod. Aki soha nem hívott."},
 					}),
 					inkwell.SetFlag(inc.FlagNormanNamed),
+					inkwell.Learn(character.Norman),
 				),
 			),
 			OnTake: speaker.Dex.Say(Text{

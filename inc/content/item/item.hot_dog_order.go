@@ -13,6 +13,10 @@ var HotDogOrder = ItemManager.Register(&Item{
 		{Lang: "en", Text: "tray of hot dogs"},
 		{Lang: "hu", Text: "tálca hotdog"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "Six with everything, on a tray, going cold. A reason to be upstairs in an office where nobody checks."},
+		{Lang: "hu", Text: "Hat mindennel, egy tálcán, kihűlőben. Ok arra, hogy fent legyen egy irodában, ahol senki nem ellenőriz."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "Six with everything. Getting cold. I'm not eating the cover story."},

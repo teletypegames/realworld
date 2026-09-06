@@ -13,6 +13,10 @@ var BreakfastBox = ItemManager.Register(&Item{
 		{Lang: "en", Text: "box of breakfast"},
 		{Lang: "hu", Text: "doboz reggeli"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "Dumplings in a box from the airport. A hungry officer's price for an address."},
+		{Lang: "hu", Text: "Gombócok egy dobozban a reptérről. Egy éhes rendőr ára egy címért."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "One dumpling won't hurt."},

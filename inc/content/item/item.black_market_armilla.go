@@ -13,6 +13,10 @@ var BlackArmilla = ItemManager.Register(&Item{
 		{Lang: "en", Text: "black-market Armilla"},
 		{Lang: "hu", Text: "feketepiaci Armilla"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "A jailbroken Armilla off the market. Two slots, both lying about the temperature, and it pushes ads. It was cheap."},
+		{Lang: "hu", Text: "Egy feltört Armilla a piacról. Két foglalat, mindkettő hazudik a hőmérsékletről, és reklámot tol. Olcsó volt."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "Jailbroken. Pushes ads, but it was cheap."},

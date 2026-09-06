@@ -13,6 +13,10 @@ var NoodleLetter = ItemManager.Register(&Item{
 		{Lang: "en", Text: "Noodle's letter"},
 		{Lang: "hu", Text: "Noodle levele"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "Come out, Paul. Not a phone conversation. The whole reason Paul is in San Francisco, on one sheet of paper."},
+		{Lang: "hu", Text: "Gyere ki, Paul. Ez nem telefontéma. Az egész ok, amiért Paul San Franciscóban van, egy lapon."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "“Come out, Paul. Not a phone conversation.” That's all it says."},

@@ -12,6 +12,10 @@ var SecurityACP = CharacterManager.Register(&Character{
 		{Lang: "en", Text: "SECURITY ACP"},
 		{Lang: "hu", Text: "BIZTONSÁGI ACP"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "Room-scale ACP over Norman's simulation, running Norman's own standing orders: nobody in, nothing interrupted, no tape past the door. Answers every request the same way."},
+		{Lang: "hu", Text: "Szobaméretű ACP Norman szimulációja fölött, Norman saját állandó utasításai szerint: senki nem jön be, semmi nem szakad meg, kazetta nem jut át az ajtón. Minden kérésre ugyanazt feleli."},
+	},
 	Delivery:    inkwell.DeliveryLog,
 	SpeechColor: theme.Green,
 })

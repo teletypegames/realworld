@@ -13,6 +13,10 @@ var IceCream = ItemManager.Register(&Item{
 		{Lang: "en", Text: "pistachio ice cream"},
 		{Lang: "hu", Text: "pisztáciafagyi"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "Pistachio, melting. Everything in this town is either melting or pretending it never existed."},
+		{Lang: "hu", Text: "Pisztácia, olvadóban. Ebben a városban minden vagy olvad, vagy úgy tesz, mintha sosem létezett volna."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "It's melting. Everything in this town is either melting or pretending it never existed."},

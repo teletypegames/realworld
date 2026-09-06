@@ -13,6 +13,10 @@ var OfficeCards = ItemManager.Register(&Item{
 		{Lang: "en", Text: "office workers' cards"},
 		{Lang: "hu", Text: "irodai dolgozók kártyái"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "Six staff cards on a lanyard from the active office. Half price on hot dogs. Nobody has noticed."},
+		{Lang: "hu", Text: "Hat dolgozói kártya egy nyakpánton az aktív irodából. Félár a hotdogra. Senki nem vette észre."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "Six staff cards on a lanyard. Nobody has noticed. Nobody will."},

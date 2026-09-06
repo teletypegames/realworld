@@ -518,6 +518,24 @@ of this: `WhenPlaying` is `OnWorld()`. `OnWorld` rather than `OnStage(stage.Game
 HUD cannot name the stage that registers into it — that would be an import
 cycle — and "the Stage showing is the world" is what it meant anyway.
 
+The dossier is the screen the colleague asked for as a "character and item
+journal": a list of the people Paul has met and the things he has held, each
+with a bio, so the lore has a place to be read back. It is `stage.dossier.go`,
+a `Stage` and a `Sticky` `inkwell.Menu` with two `Expand` pages, People and
+Things, and a `Body` on every row, which the engine wraps and scrolls as a
+paragraph. The text is the entity's own `Lore`, written beside its `Label`
+or `Description` in the character, item or speaker file, in both languages,
+which is what keeps a bio next to the character it describes; an entity that
+says no `Lore` is never listed. Who is in the dossier is `State.Known`, and
+the engine fills it on its own: a character or a voice once it has spoken,
+an item once it has been in the inventory — so a cassette pushed into slot
+two stays known after it has left the inventory. What those two rules miss a
+script says out loud, `inkwell.Learn(character.Norman)` where the BBS names
+him. The order is the order of discovery, saved with the rest of the
+`State`, so the list reads as Paul's own history. It opens from the main
+menu and from `Tab` on the world, and closes with `inkwell.GoBack()`, an
+engine action that returns to whichever Stage was showing before.
+
 Tapes are the one entity type this game invents. `Tape` holds the voice it
 speaks with, the cassette that carries it and the dialog it plays, one file
 each — what a tape *sounds* like stays on the `Speaker`, as its `Label`,

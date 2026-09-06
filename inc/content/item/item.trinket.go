@@ -13,6 +13,10 @@ var Trinket = ItemManager.Register(&Item{
 		{Lang: "en", Text: "trinket of unknown purpose"},
 		{Lang: "hu", Text: "ismeretlen célú vacak"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "Brass, a hinge, a hole where something isn't. Bought to get into a club. Nobody knows what it is for."},
+		{Lang: "hu", Text: "Réz, egy zsanér, egy lyuk, ahol valami nincs. Azért vette, hogy bejusson egy klubba. Senki nem tudja, mire való."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "Brass. A hinge. A hole where something isn't. Nobody knows what it's for."},

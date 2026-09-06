@@ -23,3 +23,11 @@ var _ = widget.WidgetManager.Register(&inkwell.KeyBinding{
 	Do:           inkwell.GoToStage(MainMenu),
 	DuringScript: true,
 })
+
+var _ = widget.WidgetManager.Register(&inkwell.KeyBinding{
+	Name:         "dossier_open",
+	When:         inkwell.OnStage(Game),
+	Key:          ebiten.KeyTab,
+	Do:           inkwell.GoToStage(Dossier),
+	DuringScript: true,
+})

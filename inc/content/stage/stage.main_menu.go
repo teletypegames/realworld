@@ -45,6 +45,14 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 			},
 			{
 				Label: Text{
+					{Lang: "en", Text: "Dossier"},
+					{Lang: "hu", Text: "Dosszié"},
+				},
+				Enabled: inkwell.Started(),
+				Do:      inkwell.GoToStage(Dossier),
+			},
+			{
+				Label: Text{
 					{Lang: "en", Text: "Load"},
 					{Lang: "hu", Text: "Betöltés"},
 				},

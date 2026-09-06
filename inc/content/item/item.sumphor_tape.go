@@ -13,6 +13,10 @@ var SumphorTape = ItemManager.Register(&Item{
 		{Lang: "en", Text: "Personal Tape from Sumphor's desk"},
 		{Lang: "hu", Text: "Személyes Kazetta Sumphor asztaláról"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "The Personal Tape from Sumphor's desk in the abandoned office. Knows the place, not its owner. The unmarked tape says it was Norman's."},
+		{Lang: "hu", Text: "A Personal Tape Sumphor asztaláról az elhagyatott irodában. Ismeri a helyet, a gazdáját nem. A jelöletlen kazetta szerint Normané volt."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "Standard issue, a label somebody peeled off. Dust in the contacts."},

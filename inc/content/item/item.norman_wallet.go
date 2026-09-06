@@ -13,6 +13,10 @@ var NormanWallet = ItemManager.Register(&Item{
 		{Lang: "en", Text: "Norman's wallet"},
 		{Lang: "hu", Text: "Norman tárcája"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "A hot dog card with eight stamps and a staff card for the complex up the hill. No cash. Where he ate, and where he worked."},
+		{Lang: "hu", Text: "Egy hotdog-kártya nyolc bélyeggel és egy belépőkártya a dombon álló komplexumba. Készpénz nincs. Hol evett, és hol dolgozott."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "Hot dog card, eight stamps. Behind it an access card for the complex up the hill. No cash."},

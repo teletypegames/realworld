@@ -151,7 +151,7 @@ inc/system/theme/theme.nokia_punk.go     nokia-punk
 
 inc/content/stage/stage.manager.go       the Stage alias, its Manager, the shared rows
 inc/content/stage/stage.game.go          the world, and the key that leaves it
-inc/content/stage/stage.*.go             one screen per file: splash cards, menu, load, save, …
+inc/content/stage/stage.*.go             one screen per file: splash cards, menu, load, save, dossier, …
 inc/content/scene/scene.manager.go       the Scene alias, its Manager, the floor
 inc/content/scene/scene.selector.go      the map screen: pins derived from the graph
 inc/content/scene/scene.*.go             one file per scene
@@ -667,6 +667,22 @@ numbers are shared in `stage.manager.go`.
 `-scene` and `-finale` skip the front door: both mean somebody wants to look
 at the game, not at its splash cards or main menu, so `options.startStage`
 answers `stage.Game` for either.
+
+**The dossier** is the one screen that reads the world back to the player:
+who Paul has met and what he has held, each with a paragraph. It is
+`stage.dossier.go`, a `Stage` and the `inkwell.Menu` that is it, with two
+`Expand` pages — People, Things — and a `Body` on every row, so a name opens
+its text rather than running anything. What a row says is the entity's own
+`Lore`, a `Text` beside its `Label` or `Description` in the character, item
+or speaker file, stacked in both languages like every other line; an entity
+with no `Lore` is never listed. Who is *in* it is the engine's `State.Known`:
+a character or a voice once it has said a line, an item once it has been in
+the inventory, and anything else once a script says `inkwell.Learn(…)`, which
+is how Norman gets a page from a name on a list. The rows come in the order
+of discovery, not the order of the files. Paul has a page of his own. The
+screen opens from the main menu and from `Tab` on the world stage, and
+leaves through `inkwell.GoBack()`, so it returns to whichever of the two
+opened it.
 
 ## The system
 

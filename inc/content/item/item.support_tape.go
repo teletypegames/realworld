@@ -13,6 +13,10 @@ var SupportTape = ItemManager.Register(&Item{
 		{Lang: "en", Text: "“tech support” Personal Tape"},
 		{Lang: "hu", Text: "„ügyfélszolgálati” Személyes Kazetta"},
 	},
+	Lore: Text{
+		{Lang: "en", Text: "Twenty dollars from the trinket shop. Tech support, in a voice Dex cannot stand: have you tried turning it off and on again? It has been right twice."},
+		{Lang: "hu", Text: "Húsz dollár a csecsebecse-boltból. Technikai támogatás, olyan hangon, amit Dex ki nem állhat: próbálta már ki-be kapcsolni? Kétszer igaza volt."},
+	},
 	OnUseSelf: inkwell.Seq(
 		character.Paul.Say(Text{
 			{Lang: "en", Text: "Twenty dollars. It was cheap."},
