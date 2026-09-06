@@ -884,6 +884,7 @@ make watch     rebuild on change
 go run . -scene <name>     start on a given scene
 go run . -finale           start with the finale
 go run . -debug            with the debug menu on d
+go run . -explore          the entity explorer, full screen, instead of the game
 ```
 
 The debug menu is the engine's `Menu` widget with `inkwell.DebugMenuRoot`
@@ -892,7 +893,10 @@ handed to it, registered in `widget.debug_menu.go`. Either `-debug` or a
 condition reads; without the flag the widget never ticks. The same flag
 switches on the engine's `HotspotDebug` overlay, `widget.hotspot_debug.go`,
 which plates every clickable on screen in a colour per kind with its name on
-it, `F1` to hide. `README.md` has the rest, under **The debug menu**.
+it, `F1` to hide. The menu's last page is the engine's explorer, the `Game`
+literal field by field, and `-explore` boots straight into it through
+`inkwell.Explore(game)` in place of `inkwell.Run`. `README.md` has the rest,
+under **The debug menu**.
 
 Art is embedded into the binary (`//go:embed assets` in `main.go`), because
 js/wasm has no OS filesystem and `make binaries` ships the executable alone.

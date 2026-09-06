@@ -30,6 +30,7 @@ go run . -scene alley      # straight into the alley (beat 3), no main menu
 go run . -scene selector   # the location selector: the map the city hangs off
 go run . -scene hospital   # any scene in the deck, e.g. to look at the art
 go run . -debug            # with the debug menu on d — see The debug menu below
+go run . -explore          # the entity explorer instead of the game — see below
 ```
 
 Scene names are the `Name` fields of the scene files (`selector`, `paul_shop`,
@@ -110,6 +111,17 @@ make debug          # a binary with it on from the start (-tags debug)
 Both do the same one thing: set `inc.FlagDebug`, which is what the widget's
 `whenDebug` reads. A release build with no flag never ticks the widget, so `d`
 does nothing at all.
+
+The last page of the menu is the engine's **explorer**: the `Game` literal
+itself, field by field, every manager opening onto its entities and every
+entity onto what it was written as — a hotspot's `OnLook` onto the `Seq` it
+is, the `Seq` onto its `Say`s, a `Say` onto its speaker and line, with a
+`run` row on every action. `-explore` boots into nothing but that page, full
+screen, through `inkwell.Explore(game)` in place of `inkwell.Run`:
+
+```bash
+go run . -explore
+```
 
 The same flag switches on the engine's `HotspotDebug` overlay, registered in
 `widget.hotspot_debug.go` with `When: whenDebug` and `Enabled: true`: every

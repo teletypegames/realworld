@@ -35,7 +35,7 @@ func main() {
 	game := chosen.game()
 	system.System.Attach(game)
 
-	if err := inkwell.Run(game); err != nil {
+	if err := chosen.run(game); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -45,6 +45,7 @@ type options struct {
 	finale   bool
 	language string
 	debug    bool
+	explore  bool
 }
 
 func parseOptions() options {
@@ -52,6 +53,7 @@ func parseOptions() options {
 	finale := flag.Bool("finale", false, "start with the finale, to try the Nokia-punk theme switch")
 	language := flag.String("lang", "", "language the game speaks for this run (en, hu); the saved setting otherwise")
 	debug := flag.Bool("debug", false, "open the debug menu with d (a debug build has it anyway)")
+	explore := flag.Bool("explore", false, "browse the game's entities instead of playing it")
 	flag.Parse()
 
 	return options{
@@ -59,7 +61,15 @@ func parseOptions() options {
 		finale:   *finale,
 		language: *language,
 		debug:    *debug,
+		explore:  *explore,
 	}
+}
+
+func (chosen options) run(game *inkwell.Game) error {
+	if chosen.explore {
+		return inkwell.Explore(game)
+	}
+	return inkwell.Run(game)
 }
 
 func (chosen options) startStage() *stage.Stage {
