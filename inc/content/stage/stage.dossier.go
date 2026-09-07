@@ -89,18 +89,19 @@ func dossierRows(entries []dossierEntry) []MenuItem {
 }
 
 func dossierPeopleExpand(context *inkwell.Ctx) []MenuItem {
-	state := context.Game.State
+	game := context.Game.(*inkwell.Game)
+	state := game.State
 	var entries []dossierEntry
-	for _, person := range context.Game.CharacterManager.All() {
+	for _, person := range game.CharacterManager.All() {
 		if state.Known(person) > 0 && len(person.Lore) > 0 {
 			entries = append(entries, dossierEntry{
-				label: context.Game.SpeakerLabel(person.Name),
+				label: game.SpeakerLabel(person.Name),
 				lore:  person.Lore,
 				order: state.Known(person),
 			})
 		}
 	}
-	for _, voice := range context.Game.SpeakerManager.All() {
+	for _, voice := range game.SpeakerManager.All() {
 		if state.Known(voice) > 0 && len(voice.Lore) > 0 {
 			entries = append(entries, dossierEntry{
 				label: voice.DisplayName(),
@@ -113,9 +114,10 @@ func dossierPeopleExpand(context *inkwell.Ctx) []MenuItem {
 }
 
 func dossierThingsExpand(context *inkwell.Ctx) []MenuItem {
-	state := context.Game.State
+	game := context.Game.(*inkwell.Game)
+	state := game.State
 	var entries []dossierEntry
-	for _, thing := range context.Game.ItemManager.All() {
+	for _, thing := range game.ItemManager.All() {
 		if state.Known(thing) > 0 && len(thing.Lore) > 0 {
 			entries = append(entries, dossierEntry{
 				label: thing.Description,

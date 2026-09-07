@@ -20,7 +20,8 @@ func (frame *hudFrame) Layer() inkwell.Layer           { return inkwell.LayerPan
 func (frame *hudFrame) Tick(context *inkwell.UICtx)    {}
 
 func (frame *hudFrame) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
-	theme := context.Game.Theme()
+	game := context.Game.(*inkwell.Game)
+	theme := game.Theme()
 	vector.DrawFilledRect(destination, 0, HUDTop+1, ScreenWidth, ScreenHeight-HUDTop-1, theme.PanelBG, false)
 
 	vector.StrokeLine(destination, 0, HUDTop, ScreenWidth, HUDTop, 1, theme.CharacterPanelBorder, false)

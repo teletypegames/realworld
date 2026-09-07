@@ -32,12 +32,13 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 var _ = widget.WidgetManager.Register(escapeToMenu("settings_escape", Settings))
 
 func settingsExpand(context *inkwell.Ctx) []MenuItem {
+	game := context.Game.(*inkwell.Game)
 	otherLanguage := "hu"
 	if inkwell.Lang == "hu" {
 		otherLanguage = "en"
 	}
 	otherTheme := theme.NokiaPunk
-	if context.Game.Theme() == theme.NokiaPunk {
+	if game.Theme() == theme.NokiaPunk {
 		otherTheme = theme.RealWorld
 	}
 	return []MenuItem{
@@ -55,7 +56,7 @@ func settingsExpand(context *inkwell.Ctx) []MenuItem {
 				{Lang: "en", Text: "Theme"},
 				{Lang: "hu", Text: "Téma"},
 			},
-			Value:    inkwell.FixedValue(themeNames[context.Game.Theme()]),
+			Value:    inkwell.FixedValue(themeNames[game.Theme()]),
 			Do:       inkwell.UseTheme(otherTheme),
 			KeepOpen: true,
 		},
@@ -64,8 +65,8 @@ func settingsExpand(context *inkwell.Ctx) []MenuItem {
 				{Lang: "en", Text: "Voices"},
 				{Lang: "hu", Text: "Szinkron"},
 			},
-			Value:    inkwell.FixedValue(switchNames[context.Game.VoiceOn()]),
-			Do:       inkwell.SetVoice(!context.Game.VoiceOn()),
+			Value:    inkwell.FixedValue(switchNames[game.VoiceOn()]),
+			Do:       inkwell.SetVoice(!game.VoiceOn()),
 			KeepOpen: true,
 		},
 		backRow(),

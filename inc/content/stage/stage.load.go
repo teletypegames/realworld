@@ -32,8 +32,9 @@ var _ = widget.WidgetManager.Register(&inkwell.Menu{
 var _ = widget.WidgetManager.Register(escapeToMenu("load_escape", Load))
 
 func loadExpand(context *inkwell.Ctx) []MenuItem {
+	game := context.Game.(*inkwell.Game)
 	var rows []MenuItem
-	for _, info := range context.Game.Slots(inc.SaveSlots) {
+	for _, info := range game.Slots(inc.SaveSlots) {
 		rows = append(rows, MenuItem{
 			Label:   inkwell.Format(slotName, info.Slot),
 			Value:   inkwell.FixedValue(slotValue(info)),

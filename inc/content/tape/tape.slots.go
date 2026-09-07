@@ -112,7 +112,7 @@ func (slots *slotPanel) hotspots(game *inkwell.Game) []Hotspot {
 }
 
 func (slots *slotPanel) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
-	game := context.Game
+	game := context.Game.(*inkwell.Game)
 	theme := game.Theme()
 	paint := func(area inkwell.Rectangle, label, body Text, filled bool) {
 		background, border, textColor := theme.InventorySlotBG, theme.ChatLogSystem, theme.ChatLogSystem
