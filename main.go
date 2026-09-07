@@ -8,6 +8,7 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
+	"realworld/inc/content/achievement"
 	"realworld/inc/content/character"
 	"realworld/inc/content/dialog"
 	"realworld/inc/content/item"
@@ -116,6 +117,7 @@ func (chosen options) game() *inkwell.Game {
 		FinaleScript: chosen.finaleScript(),
 		StartTheme:   theme.RealWorld,
 		Flags:        chosen.flags(),
+		Extensions:   platformExtensions,
 
 		Player:      character.Paul,
 		WalkOnClick: true,
@@ -124,14 +126,15 @@ func (chosen options) game() *inkwell.Game {
 		ExitTake:    script.ExitTake,
 		UseWithFail: script.UseWithFail,
 
-		CharacterManager: character.CharacterManager,
-		DialogManager:    dialog.DialogManager,
-		ItemManager:      item.ItemManager,
-		SceneManager:     scene.SceneManager,
-		ScriptManager:    script.ScriptManager,
-		SpeakerManager:   speaker.SpeakerManager,
-		StageManager:     stage.StageManager,
-		ThemeManager:     theme.ThemeManager,
-		WidgetManager:    widget.WidgetManager,
+		AchievementManager: achievement.AchievementManager,
+		CharacterManager:   character.CharacterManager,
+		DialogManager:      dialog.DialogManager,
+		ItemManager:        item.ItemManager,
+		SceneManager:       scene.SceneManager,
+		ScriptManager:      script.ScriptManager,
+		SpeakerManager:     speaker.SpeakerManager,
+		StageManager:       stage.StageManager,
+		ThemeManager:       theme.ThemeManager,
+		WidgetManager:      widget.WidgetManager,
 	})
 }

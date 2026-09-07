@@ -76,6 +76,9 @@ make debug                    # the same, with the debug menu switched on
 make wasm                     # dist/game.wasm + wasm_exec.js
 make export VERSION=0.1       # zipped HTML/WASM bundle
 make binaries VERSION=0.1     # win-x86, win-x64, linux-x64 zips
+make steam VERSION=0.1 STEAM_SDK=~/steamworks_sdk/sdk   # win-x64 and linux-x64 zips with Steam
+make steam-mac VERSION=0.1 STEAM_SDK=…                  # the Mac it runs on, with Steam
+make steam-debug              # native binary with Steam and the debug menu on
 make clean
 ```
 
@@ -92,6 +95,59 @@ Release metadata lives in `metadata.json`.
 | `ESC` | in the game: the main menu. On a menu screen: back to the main menu |
 
 Screenshots: `EBITEN_SCREENSHOT_KEY=q go run .`, then press `q` in the window.
+
+## Steam
+
+Steam is a build, not a branch: `-tags steam` links the engine's `steam/`
+package, and without the tag nothing of it and nothing of the binding under
+it — `github.com/bogdannbv/go-steamworks`, purego over Valve's own library —
+is in the binary. The two files behind the tag are `main.steam.go` and
+`main.nosteam.go`, and the whole of the integration's settings is the one
+literal in the first:
+
+```go
+var platformExtensions = []inkwell.Extension{
+	&steam.Steam{
+		AppID: 480,
+		Languages: map[string]string{
+			"english":   "en",
+			"hungarian": "hu",
+		},
+		Cloud: []string{inkwell.SlotsKey},
+	},
+}
+```
+
+`AppID` is Valve's Spacewar test id until the game has one of its own.
+`Languages` maps the Steam client's language names onto ours, so a Hungarian
+client opens the game in Hungarian on its first run and the in-game choice
+wins from then on. `Cloud` names the documents kept in Steam Cloud: the save
+slots, and not the settings, because the window scale is a fact about the
+machine. A slot saved before Steam is still read from the disk and uploaded
+on the next save.
+
+What the player is recognised for is content, `inc/content/achievement/`,
+one file per achievement: the Steam API name, a title and a line in both
+languages — the same words go into the Steamworks partner site — and the
+flag that earns it. The engine reports the rising edge to Steam, once per
+process; a load that finds a flag already raised reports it again, which is
+how an achievement earned offline reaches the client.
+
+Running it: the Steam client has to be up, and Valve's redistributable has to
+be in the working directory — which is where Steam launches from, and what
+`make steam` packages beside the binary from `$(STEAM_SDK)/redistributable_bin`.
+Outside Steam, point the binding at the library and give it the id, and it
+writes the `steam_appid.txt` the API wants:
+
+```bash
+make steam-debug
+STEAMWORKS_LIB_PATH=~/steamworks_sdk/sdk/redistributable_bin/osx/libsteam_api.dylib \
+STEAM_APPID=480 bin/realworld
+```
+
+Without the client or the library the Steam build says so on stderr and runs
+as the plain one. The binding is 64-bit only, so `win-x86` and `wasm` never
+get the tag, and `steam_appid.txt` never goes into a depot.
 
 ## The debug menu
 
@@ -692,6 +748,8 @@ field in a literal:
 | `sceneDefaults` rewriting every scene with Paul and a floor | `Game.Player` and `Game.Walkboxes` |
 | nothing yet — but a second language would have meant a parallel catalogue keyed by id | `inkwell.Text`: every displayed field carries its own languages, in place |
 | nothing yet — the debug font's atlas stops at U+00FF, so `ő` and `ű` drew as blanks (and so did the em dashes already in these scene titles) | inkwell bakes its own atlas through Latin Extended-A |
+| nothing yet — a Steam layer would have been a widget that ticks under a script and a `Store` swapped in before `Run` by hand | `inkwell.Extension`, started before the settings are read, ticked every frame, stopped after the loop; `Game.SystemLang`; `inkwell/steam`, the one extension the engine ships |
+| nothing yet — an achievement would have been a flag watched by a Steam-only trigger | `inkwell.Achievement`, content with a `When`, reported to every `Unlocker` among the extensions |
 
 Also: the inkwell README gives the module path as
 `git.teletypegames.org/games/inkwell`; the real path per its `go.mod` is

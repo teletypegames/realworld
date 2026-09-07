@@ -138,6 +138,8 @@ already fallen off, and now two directories have.
 main.go                                  flags, one Game literal, inkwell.Run
 main.debug.go                            debugBuild = true, behind -tags debug
 main.release.go                          debugBuild = false, without it
+main.steam.go                            platformExtensions = the steam.Steam literal, behind -tags steam
+main.nosteam.go                          platformExtensions = nil, without it
 inc/constants.go                         world-state keys: flags, vars, notes
 inc/util/util.color.go                   RGB and RGBA, hex to color.Color
 
@@ -155,6 +157,8 @@ inc/content/stage/stage.*.go             one screen per file: splash cards, menu
 inc/content/scene/scene.manager.go       the Scene alias, its Manager, the floor
 inc/content/scene/scene.selector.go      the map screen: pins derived from the graph
 inc/content/scene/scene.*.go             one file per scene
+inc/content/achievement/achievement.manager.go   the Achievement alias and its Manager
+inc/content/achievement/achievement.*.go one achievement per file: its Steam name, its words, the flag that earns it
 inc/content/character/character.*.go     the cast: people who stand in a scene
 inc/content/speaker/speaker.*.go         the voices with no body: Dex and the tape cards
 inc/content/music/music.manager.go       the Music alias and its Manager: tracks a scene or stage plays
@@ -239,8 +243,8 @@ front of the verb, where a script puts it.
 
 Every manager holds **pointers**, `Manager[*Character]` and never
 `Manager[Character]`, so the variable an entity file binds and the entry the
-engine looks up are one instance. Read from `main.go` the nine of them still
-line up as a list — `character.CharacterManager`, `dialog.DialogManager`, `item.ItemManager`,
+engine looks up are one instance. Read from `main.go` the ten of them still
+line up as a list — `achievement.AchievementManager`, `character.CharacterManager`, `dialog.DialogManager`, `item.ItemManager`,
 `scene.SceneManager`, `script.ScriptManager`, `speaker.SpeakerManager`,
 `tape.TapeManager`, `theme.ThemeManager`, `widget.WidgetManager` — only now
 the list is a consequence of the imports rather than a block someone has to
@@ -333,7 +337,7 @@ so the content packages stand in a strict order and a reference only ever
 points **down**:
 
 ```
-character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← stage
+achievement, character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← stage
 ```
 
 A dialog can give a line to `speaker.Dex` and hand out `item.NoodleLetter`,
@@ -518,19 +522,21 @@ than keeping two in step:
 ```go
 game := inkwell.New(inkwell.Game{
 	…
-	CharacterManager: character.CharacterManager,
-	DialogManager:    dialog.DialogManager,
-	ItemManager:      item.ItemManager,
-	SceneManager:     scene.SceneManager,
-	ScriptManager:    script.ScriptManager,
-	SpeakerManager:   speaker.SpeakerManager,
-	ThemeManager:     theme.ThemeManager,
-	WidgetManager:    widget.WidgetManager,
+	AchievementManager: achievement.AchievementManager,
+	CharacterManager:   character.CharacterManager,
+	DialogManager:      dialog.DialogManager,
+	ItemManager:        item.ItemManager,
+	SceneManager:       scene.SceneManager,
+	ScriptManager:      script.ScriptManager,
+	SpeakerManager:     speaker.SpeakerManager,
+	StageManager:       stage.StageManager,
+	ThemeManager:       theme.ThemeManager,
+	WidgetManager:      widget.WidgetManager,
 })
 ```
 
 `New` fills in an empty manager for every category a caller leaves out, so the
-eight above are the eight we own and the other two are the engine's:
+ten above are the ten we own and the other two are the engine's:
 `VerbManager`, the four SCUMM verbs untouched, and `AssetManager`, which stays
 empty because a picture is loaded through the pointer its layer or stage holds
 and is registered nowhere.
@@ -575,6 +581,7 @@ game := inkwell.New(inkwell.Game{
 	FinaleScript: chosen.finaleScript(),
 	StartTheme:   theme.RealWorld,
 	Flags:        chosen.flags(),
+	Extensions:   platformExtensions,
 
 	Player:      character.Paul,
 	WalkOnClick: true,
@@ -599,6 +606,19 @@ that arrives as a string, the `-scene` flag, becomes one through
 `ExitLook`, `ExitTake` and `UseWithFail` are the three responses the engine asks
 the game for, and all three are `script` functions — a line the player reads
 belongs with the rest of the writing, not in the wiring.
+
+`Extensions` is the platform: what lives beside the game for the whole run and
+is not a widget. It is `platformExtensions`, a variable one of two build-tag
+files declares, the way `debugBuild` is — `main.steam.go` behind `-tags steam`
+holds the one `steam.Steam` literal, with the AppID, the Steam-name-to-code
+language map and the `Store` keys that go to Steam Cloud, and `main.nosteam.go`
+holds `nil`. So a build without the tag links none of the engine's `steam/`
+package and none of the binding underneath it, and the settings of the
+integration are read in one place, in the game and not in the engine. What the
+player is recognised for is content: `inc/content/achievement/`, one file per
+achievement, each a `When` over an `inc` flag, and the engine reports the
+rising edge to whichever extension can take it. `README.md` has the rest,
+under **Steam**.
 
 `App` is the game's name to the machine: the engine keeps `settings.json` and
 `slots.json` under it in the user's configuration directory, and under the
@@ -828,7 +848,7 @@ The layering is the import graph, so the compiler keeps it:
 ```
 inc ← theme ← system ← armilla ← widget ← main
  ↑      ↑        ↑                  ↑
-util    └── character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← stage
+util    └── achievement, character, speaker, music, sound ← item ← script ← dialog ← tape ← scene ← stage
 ```
 
 `inc` imports nothing and everything imports it, and `util` sits beside it on
@@ -846,7 +866,9 @@ the one place the strictness had to be paid for.
 
 `main` is at the very top, and it is the only place that names every package at
 once. `theme`, `system`, `armilla` and `widget` are `inc/system/`; the other
-ten are `inc/content/`, and no arrow leaves `system` for `content`.
+eleven are `inc/content/`, and no arrow leaves `system` for `content`.
+`achievement` sits at the very bottom of the content row with `character`,
+because an achievement names nothing but a flag in `inc`.
 
 ## Adding a scene
 
@@ -897,6 +919,8 @@ make build     native binary into bin/
 make debug     native binary with the debug menu on, -tags debug
 make wasm      js/wasm build into dist/
 make watch     rebuild on change
+make steam VERSION=<v> STEAM_SDK=<sdk>   win-x64 and linux-x64 zips with Steam, -tags steam
+make steam-debug                         native binary with Steam and the debug menu on
 go run . -scene <name>     start on a given scene
 go run . -finale           start with the finale
 go run . -debug            with the debug menu on d
