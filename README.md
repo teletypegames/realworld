@@ -1,4 +1,4 @@
-# Real World
+# Underwater Sun Rise
 
 Point & click adventure — game two of the Norman Arc. Engine:
 [inkwell](../../engines/inkwell).
@@ -553,7 +553,7 @@ screens, an `inkwell.TextCard` for the credits and for the two splash cards.
 Sticky because a menu with nothing behind it must not be closable.
 
 The splash cards are what the game opens on: `stage.SplashStudio`, the
-Teletype Games logo, and `stage.SplashTitle`, "Real World" centred, each
+Teletype Games logo, and `stage.SplashTitle`, "Underwater Sun Rise" centred, each
 two seconds, each fading to the next. None of that is code in this
 repository: a `Stage` says `Hold: 2` and `Next`, `Skippable` so that Space,
 Enter or a click moves on without the wait, and the fade is its

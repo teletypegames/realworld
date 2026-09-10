@@ -103,7 +103,7 @@ func (chosen options) flags() []string {
 
 func (chosen options) game() *inkwell.Game {
 	return inkwell.New(inkwell.Game{
-		Title:       "Real World",
+		Title:       "Underwater Sun Rise",
 		App:         "realworld",
 		Width:       widget.ScreenWidth,
 		Height:      widget.ScreenHeight,

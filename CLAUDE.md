@@ -1,4 +1,4 @@
-# Real World
+# Underwater Sun Rise
 
 A point & click adventure built on the inkwell engine (Ebitengine).
 
@@ -569,7 +569,7 @@ is, the same way a scene is what its literal says it is.
 
 ```go
 game := inkwell.New(inkwell.Game{
-	Title:       "Real World",
+	Title:       "Underwater Sun Rise",
 	App:         "realworld",
 	Width:       widget.ScreenWidth,
 	Height:      widget.ScreenHeight,
