@@ -4,6 +4,7 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 	"github.com/hajimehoshi/ebiten/v2"
 
+	"realworld/inc"
 	"realworld/inc/system/widget"
 )
 
@@ -72,4 +73,50 @@ func escapeToMenu(name string, stage *Stage) *inkwell.KeyBinding {
 		Key:  ebiten.KeyEscape,
 		Do:   inkwell.GoToStage(MainMenu),
 	}
+}
+
+func consoleToggle(name string, stage *Stage) *inkwell.KeyBinding {
+	return &inkwell.KeyBinding{
+		Name: name,
+		When: inkwell.OnStage(stage),
+		Key:  ebiten.KeyTab,
+		Do: inkwell.If(
+			inkwell.Flag(inc.FlagConsoleCollapsed),
+			inkwell.ClearFlag(inc.FlagConsoleCollapsed),
+			inkwell.SetFlag(inc.FlagConsoleCollapsed),
+		),
+	}
+}
+
+func foldToggle(name string, stage *Stage) *inkwell.KeyBinding {
+	return &inkwell.KeyBinding{
+		Name: name,
+		When: inkwell.OnStage(stage),
+		Key:  ebiten.KeySpace,
+		Do:   widget.FoldToggle(),
+	}
+}
+
+func mockChrome(stage *Stage) *Stage {
+	showing := inkwell.OnStage(stage)
+	entry := []inkwell.Action{
+		inkwell.ClearFlag(inc.FlagConsoleCollapsed),
+		inkwell.ClearFlag(inc.FlagUICollapsed),
+	}
+	if stage.OnEnter != nil {
+		entry = append(entry, stage.OnEnter)
+	}
+	stage.OnEnter = inkwell.Seq(entry...)
+	widget.WidgetManager.Register(&widget.FrameSplit{
+		Name: stage.Name + "_frame",
+		When: showing,
+	})
+	widget.WidgetManager.Register(&widget.Scanlines{
+		Name: stage.Name + "_scanlines",
+		When: showing,
+	})
+	widget.WidgetManager.Register(escapeToMenu(stage.Name+"_escape", stage))
+	widget.WidgetManager.Register(consoleToggle(stage.Name+"_tab", stage))
+	widget.WidgetManager.Register(foldToggle(stage.Name+"_space", stage))
+	return stage
 }

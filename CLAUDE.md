@@ -135,6 +135,7 @@ already fallen off, and now two directories have.
   themes are written in.
 
 ```
+docs/ui_system.md                        the frame, the panes, the fold, the eight mock screens
 main.go                                  flags, one Game literal, inkwell.Run
 main.debug.go                            debugBuild = true, behind -tags debug
 main.release.go                          debugBuild = false, without it
@@ -488,6 +489,13 @@ func (h *hudFrame) Layer() inkwell.Layer { return inkwell.LayerPanel }
 
 A widget that says nothing sits on `LayerHUD`; ours all say it, because the
 layer is the one thing about a widget the file cannot show.
+
+The frame those widgets sit in — the 3/5–2/5 split, its constants, the
+right-hand console and its rail, the fold that drops the UI half to a tenth of
+the frame, and the eight mock screens `-stage mock_*` boots — is written down
+in **`docs/ui_system.md`**. A widget that draws part of the frame belongs
+there too, in the table of what each one does open and folded — a change to
+the frame, the panes or the fold is a change to that file as well.
 
 The other thing a widget declares is **when it is there at all**. The HUD is
 there on the world stage and nowhere else, and that is a condition over game
@@ -922,6 +930,7 @@ make watch     rebuild on change
 make steam VERSION=<v> STEAM_SDK=<sdk>   win-x64 and linux-x64 zips with Steam, -tags steam
 make steam-debug                         native binary with Steam and the debug menu on
 go run . -scene <name>     start on a given scene
+go run . -stage <name>     start on a given stage, the eight UI mocks included
 go run . -finale           start with the finale
 go run . -debug            with the debug menu on d
 go run . -explore          the entity explorer, full screen, instead of the game

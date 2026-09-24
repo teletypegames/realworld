@@ -42,6 +42,7 @@ func main() {
 }
 
 type options struct {
+	stage    string
 	scene    string
 	finale   bool
 	language string
@@ -50,6 +51,7 @@ type options struct {
 }
 
 func parseOptions() options {
+	startStage := flag.String("stage", "", "start on this stage, skipping the splash cards and the main menu")
 	startScene := flag.String("scene", "", "start straight in this scene, skipping the main menu")
 	finale := flag.Bool("finale", false, "start with the finale, to try the Nokia-punk theme switch")
 	language := flag.String("lang", "", "language the game speaks for this run (en, hu); the saved setting otherwise")
@@ -58,6 +60,7 @@ func parseOptions() options {
 	flag.Parse()
 
 	return options{
+		stage:    *startStage,
 		scene:    *startScene,
 		finale:   *finale,
 		language: *language,
@@ -74,6 +77,9 @@ func (chosen options) run(game *inkwell.Game) error {
 }
 
 func (chosen options) startStage() *stage.Stage {
+	if chosen.stage != "" {
+		return stage.StageManager.MustGet(chosen.stage)
+	}
 	if chosen.scene != "" || chosen.finale {
 		return stage.Game
 	}
@@ -109,7 +115,7 @@ func (chosen options) game() *inkwell.Game {
 		Height:      widget.ScreenHeight,
 		WindowScale: 2,
 		MaxLogLines: 64,
-		SceneRect:   inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.HUDTop-widget.TopBarHeight),
+		SceneRect:   inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.UITop-widget.TopBarHeight),
 
 		StartStage:   chosen.startStage(),
 		StartScene:   chosen.startScene(),

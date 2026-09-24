@@ -38,6 +38,8 @@ const (
 	FlagACPDistracted      = "acp_distracted"
 	FlagMarenTalked        = "maren_talked"
 	FlagServerFarmMapped   = "server_farm_mapped"
+	FlagConsoleCollapsed   = "console_collapsed"
+	FlagUICollapsed        = "ui_collapsed"
 
 	VarSlot2        = "armilla.slot2"
 	VarArmillaStrip = "armilla.strip"

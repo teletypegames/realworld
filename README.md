@@ -29,6 +29,8 @@ go run . -finale           # the finale — try the Nokia-punk theme switch
 go run . -scene alley      # straight into the alley (beat 3), no main menu
 go run . -scene selector   # the location selector: the map the city hangs off
 go run . -scene hospital   # any scene in the deck, e.g. to look at the art
+go run . -stage credits    # straight onto any stage, skipping the front door
+go run . -stage mock_menu  # one of the eight UI mock screens — see docs/ui_system.md
 go run . -debug            # with the debug menu on d — see The debug menu below
 go run . -explore          # the entity explorer instead of the game — see below
 ```
@@ -219,37 +221,40 @@ wide VGA frame at an exact 2× of a 320-wide canvas — and it still keeps the
 engine's fixed **6×16** font readable, at 4% of the screen height. (At
 320×190 it would be 8%: rows overlap and the top bar cannot hold a line.)
 
-The HUD is therefore an opaque strip laid over the foot of the painting, and it
-is measured from the bottom and kept as short as its contents allow — a status
-row, then the two rows of inventory slots, which are the tallest thing in it.
-Every pixel it gives back is a pixel of art.
+The frame splits **once**, and always at the same line: the top **3/5** is the
+world, the bottom **2/5** is the UI. That is the Adventure Game UI design's one
+rule, and it is the reason the HUD is no longer measured from the bottom up out
+of whatever its contents happened to need. The art is authored against a fixed
+region rather than against the leftovers.
 
 ```
-     0                                     394│396                    639
+     0                                       416│                      639
    ┌────────────────────────────────────────────────────────────────────┐
  0 │ ALLEY — paused                              SRP: 1 tape            │ TopBar (20)
 20 ├────────────────────────────────────────────────────────────────────┤
-   │            scene — hotspots, characters, SpeechBubble              │ Scene (242)
-262├─────────────────────────────────────────┬──────────────────────────┤
-   │ Use hook on: floor grate                │ DEX                      │
-   │ ┌───┬───┬───┬───┐   ┌───────┐┌────────┐ │ "The hook is a hand      │ HUD (118)
-   │ └───┴───┴───┴───┘   │ 1 DEX ││ 2  —   │ │  shorter than the gap."  │
-379└─────────────────────────────────────────┴──────────────────────────┘
-     InventoryBar          TapeSlots           TapeChannel
+   │            scene — hotspots, characters, SpeechBubble              │ Scene (208)
+228├───────────────────────────────────────────┬────────────────────────┤
+   │ Use trinket on: gap at the foot of the wall│ DEX                   │
+   │ ┌───┬───┬───┬───┐   ┌───────┐┌────────┐   │ "The trinket is softer │ UI (152)
+   │ └───┴───┴───┴───┘   │ 1 DEX ││ 2  —   │   │  than the mortar."     │
+379└───────────────────────────────────────────┴────────────────────────┘
+     InventoryBar          TapeSlots             TapeChannel
 ```
 
-Every vertical measurement derives from `LineHeight` (glyph cell + leading) and
-from `ScreenHeight`, both in `widget/widget.manager.go`, not from the wireframe deck's ratios, so
-the layout cannot drift out of step with the font — or with the art — again.
-The tape channel comes out at 4 rows of 38
-columns, which is about one and a half of Dex's remarks on screen at once.
+Every measurement derives from `ScreenWidth`, `ScreenHeight` and `LineHeight`
+(glyph cell + leading) in `widget/widget.manager.go`, so the layout cannot
+drift out of step with the font — or with the art — again. The vertical divider
+is the design's own proportion: 65% world, 35% console. The dialog box
+deliberately spans only the left region, so a tape can comment *alongside* a
+conversation, and the tape channel sits in the right one, 36 columns wide.
 
-The vertical divider at x=394 is the one proportion carried over from the
-wireframe deck: 61.6% world, 38.4% tape channel. The deck's *vertical*
-proportions are not carried over.
+The UI half also **folds**: a chip on the heading row, or Space, drops it to a
+tenth of the frame — one heading row — so the art runs to y=342 and there is
+more picture to look at and to click. The cutscene screen opens that way.
 
-The dialog box deliberately spans only the left region, so a tape can comment
-*alongside* a conversation.
+The constants, the widgets that draw the frame and the console, the console's
+own rail, and the eight mock screens `-stage mock_*` boots are all in
+**[docs/ui_system.md](docs/ui_system.md)**.
 
 ## Languages
 
