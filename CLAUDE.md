@@ -368,7 +368,7 @@ to me" never names its own variable.
 **What stays a string.** `Name`, because a save file, a `State` var and the
 `-scene` flag have to find the entity again from outside the process — `main`
 turns the flag into a scene with `scene.SceneManager.MustGet`. Slot two is a
-`State` var holding an item's `Name`, and `armilla.Slot2()` turns it back into
+`State` var holding an item's `Name`, and `armilla.Slot2(game)` turns it back into
 the `*Item` through the engine's `ItemManager`. Hotspot and trigger names, which
 are labels inside one literal. Dialog node names, which are inside one tree.
 And every flag and var, which is what `inc` is for.
@@ -754,14 +754,17 @@ fiction the code models as a package of its own: slot two and a phosphor text
 strip.
 
 ```go
-armilla.Slot2()          armilla.Insert(cassette)      armilla.StripIfEmpty(text)
+armilla.Slot2(game)      armilla.Insert(cassette)      armilla.StripIfEmpty(text)
 ```
 
 Both are `State` vars — `inc.VarSlot2` and `inc.VarArmillaStrip`, both spelled
 `armilla.…`, so the save file says the same word the package does. The slot
 holds the cassette's `Name`, because a `State` var has to survive a save;
-`Slot2()` hands back the `*inkwell.Item` itself, found through the engine's
-`ItemManager`, and `Insert` takes one. There is no
+`Slot2(game)` hands back the `*inkwell.Item` itself, found through the
+`ItemManager` of the game it is handed, and `Insert` takes one. It reads the
+game it is given rather than `system.System`'s, because the solver
+(**Solving** in `README.md`) asks it about copies of the game that are not the
+one on screen. There is no
 package state left at all, which is why there is no `Reset` either: it had
 nothing to clear once the pending cassette and the waiting tape went.
 
@@ -925,6 +928,7 @@ go run . -scene <name>     start on a given scene
 go run . -finale           start with the finale
 go run . -debug            with the debug menu on d
 go run . -explore          the entity explorer, full screen, instead of the game
+go run . -solve            play every path without a window; exits non-zero if the game cannot be finished
 ```
 
 The debug menu is the engine's `Menu` widget with `inkwell.DebugMenuRoot`

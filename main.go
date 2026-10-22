@@ -47,6 +47,7 @@ type options struct {
 	language string
 	debug    bool
 	explore  bool
+	solve    bool
 }
 
 func parseOptions() options {
@@ -55,6 +56,7 @@ func parseOptions() options {
 	language := flag.String("lang", "", "language the game speaks for this run (en, hu); the saved setting otherwise")
 	debug := flag.Bool("debug", false, "open the debug menu with d (a debug build has it anyway)")
 	explore := flag.Bool("explore", false, "browse the game's entities instead of playing it")
+	solve := flag.Bool("solve", false, "play every path through the game without a window and report whether it can be finished")
 	flag.Parse()
 
 	return options{
@@ -63,12 +65,16 @@ func parseOptions() options {
 		language: *language,
 		debug:    *debug,
 		explore:  *explore,
+		solve:    *solve,
 	}
 }
 
 func (chosen options) run(game *inkwell.Game) error {
 	if chosen.explore {
 		return inkwell.Explore(game)
+	}
+	if chosen.solve {
+		return report(game.Solve(inkwell.SolveOptions{}))
 	}
 	return inkwell.Run(game)
 }

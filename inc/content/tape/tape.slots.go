@@ -67,7 +67,7 @@ func (slots *slotPanel) hotspots(game *inkwell.Game) []Hotspot {
 			{Lang: "hu", Text: "Az első foglalat az enyém. Nem megyek sehová."},
 		}),
 	}
-	loaded := armilla.Slot2()
+	loaded := armilla.Slot2(game)
 	if loaded == nil {
 		empty := speaker.Dex.Say(Text{
 			{Lang: "en", Text: "The second slot is empty. That's the rarer state."},
@@ -130,7 +130,7 @@ func (slots *slotPanel) Draw(destination *ebiten.Image, context *inkwell.UICtx) 
 			int(area.Y)+widget.Padding/2+widget.LineHeight, textColor)
 	}
 	paint(slots.first, slot1Label, speaker.Dex.DisplayName(), true)
-	if loaded := armilla.Slot2(); loaded != nil {
+	if loaded := armilla.Slot2(game); loaded != nil {
 		paint(slots.second, slot2Label, loaded.Description, true)
 		return
 	}

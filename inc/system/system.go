@@ -21,6 +21,10 @@ func (system *system) Game() *inkwell.Game { return system.game }
 
 func (system *system) Do(action inkwell.Action) { system.game.Do(action) }
 
+func (system *system) Situation() inkwell.Situation {
+	return system.game.Situation(inkwell.SolveOptions{})
+}
+
 func (system *system) Paused(inner inkwell.Action) inkwell.Action {
 	return inkwell.Noting(inc.VarNote, inc.NotePaused, inner)
 }

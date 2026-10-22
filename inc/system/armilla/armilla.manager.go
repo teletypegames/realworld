@@ -4,7 +4,6 @@ import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
 	"realworld/inc"
-	"realworld/inc/system"
 )
 
 var stripReading = inkwell.Text{
@@ -12,8 +11,7 @@ var stripReading = inkwell.Text{
 	{Lang: "hu", Text: "2. FOGL: OLVAS"},
 }
 
-func Slot2() *inkwell.Item {
-	game := system.System.Game()
+func Slot2(game *inkwell.Game) *inkwell.Item {
 	name, isText := game.State.Var(inc.VarSlot2).(string)
 	if !isText {
 		return nil

@@ -202,6 +202,65 @@ a back arrow and a close box. The game keeps running underneath — clicks
 outside the window still reach it — and the menu stays live during a cutscene,
 which is what makes it closable once one starts.
 
+## Solving
+
+`-solve` plays the game with nobody at the controls and no window, through
+the engine's `Game.Solve`, and reports whether it can be finished:
+
+```bash
+go run . -solve
+```
+
+It goes from milestone to milestone — the nearest flag not raised yet, found
+breadth first over every hotspot, verb, item and dialog choice the game
+answers — until the end card, stepping back whenever a milestone leads
+nowhere. What it prints is the way through, move by move, the milestones in
+the order it raised them, the scenes it never stood in, and the first **dead
+end** it met: the moves into it and what still changed the world there. It
+exits non-zero when the game cannot be finished, so a script can gate on it.
+The engine's manual has the rest, under **Solving**.
+
+This is the game's test suite in the only form this repository allows: it is
+running the game, just without a window. On its first run it found three
+bugs that had made the game unfinishable, two of them fixed on the same
+branch:
+
+- **The slot was compared against the cassette, not its name.**
+  `armilla.slot2` holds the cassette's `Name`, but the security terminal,
+  the club, the server farm, the lab, the abandoned office and the toilet
+  compared it against the `*inkwell.Item` itself — a leftover of
+  *References are pointers* — so no tape in the second slot ever opened
+  anything. They compare against `item.X.Name` now.
+- **A `Once` choice used up in one dialog hid another dialog's.** The engine
+  keyed spent choices by node and position only, and nearly every
+  conversation starts at `root`: Vasquez's deal disappeared for a player who
+  had used the choice at the same place with somebody else. The key carries
+  the dialog's name now (an engine change; old saves forget which choices
+  they had spent).
+- **A tape pushed into the second slot destroys the one already there**, and
+  the support tape is bought in a `Once` choice. A player who reads the
+  mystery tape or the server-farm tape after the support tape, and before the
+  security room, can never distract its ACP. Not fixed: whether the old tape
+  should come back to the inventory, or the shop sell another, is a design
+  call. `-solve` still finds the way round it, and reports it as its first
+  dead end.
+
+`armilla.Slot2` takes the game it reads from, because the solver asks the
+tape slots about copies of the game that are not the one on screen.
+
+### Dex knows where you are
+
+Dex has one question more: *Where do I even go from here?* His answer is
+`Game.Situation` — the same milestone step `-solve` takes, from the session as
+it stands — turned into a line in his voice: the thing to go to and the place
+it is in, never the moves in between. That is the canon's restricted mode, a
+Personal Tape without an operator licence: it can point, it cannot play the
+game for you. The line is decided when it is spoken, with `Reply`, so it is
+always about now; the search takes milliseconds.
+
+`HRL.md` has where the idea came from and what is left: Dex speaking up on his
+own when the player has been stuck for a while, rather than only when asked.
+
 ## Layout
 
 Internal resolution is **640×380**: the size of one painted background.
@@ -650,13 +709,14 @@ assembly — every content package imports `system`, so the wiring lives in
 
 The device came out of it. **Armilla** is the wiki's word for the wrist-worn
 runtime a Personal Tape snaps into, and Paul's is the one piece of the fiction
-with enough state to earn a package — though barely, now: `armilla.Slot2()`,
+with enough state to earn a package — though barely, now: `armilla.Slot2(game)`,
 `armilla.Insert(cassette)`, `armilla.StripIfEmpty(text)`, and nothing else.
 Both values are `State` vars already spelled `armilla.slot2` and
 `armilla.strip` in the save file, so there is no package state left and no
 `Reset` either. The slot var holds the cassette's `Name`, because it has to
-survive a save; `Slot2()` hands the `*inkwell.Item` back, found through the
-engine's `ItemManager`.
+survive a save; `Slot2(game)` hands the `*inkwell.Item` back, found through
+the `ItemManager` of the game it is handed — never `system.System`'s, because
+the solver asks about copies of the game that are not the one on screen.
 
 Two things went. `SetPending`/`TakePending` existed only because a script could
 not be told which cassette the player had just pushed in; now the slot is a
