@@ -120,7 +120,7 @@ var AbandonedOffice = SceneManager.Register(&Scene{
 			),
 			OnUse: inkwell.If(inkwell.Flag(inc.FlagFridgeOpen),
 				abandonedOfficeOpen,
-				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
+				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape.Name),
 					inkwell.Seq(
 						speaker.TapeSupport.Say(Text{
 							{Lang: "en", Text: "Have you tried turning it off and on again?"},

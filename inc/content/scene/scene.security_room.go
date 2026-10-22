@@ -100,7 +100,7 @@ var SecurityRoom = SceneManager.Register(&Scene{
 					{Lang: "en", Text: "Door release is unlocked. It's still on hold with Raj."},
 					{Lang: "hu", Text: "Az ajtónyitó szabad. Még mindig várakoztatja Raj."},
 				}),
-				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
+				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape.Name),
 					inkwell.RunScript(script.ACPDistracted),
 					securityRoomRefused,
 				),

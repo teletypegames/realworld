@@ -15,7 +15,7 @@ var restaurantToiletToggle = inkwell.If(inkwell.Flag(inc.FlagMirrorPassword),
 		{Lang: "en", Text: "It's dead, and the sun is still there behind it. I've got what it was hiding."},
 		{Lang: "hu", Text: "Kihalt, és a nap még mindig ott van mögötte. Megvan, amit rejtett."},
 	}),
-	inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape),
+	inkwell.If(inkwell.VarEq(inc.VarSlot2, item.SupportTape.Name),
 		inkwell.RunScript(script.MirrorPassword),
 		inkwell.Seq(
 			character.Paul.Say(Text{

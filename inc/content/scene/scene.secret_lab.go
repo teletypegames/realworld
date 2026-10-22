@@ -141,7 +141,7 @@ var SecretLab = SceneManager.Register(&Scene{
 				{Lang: "en", Text: "Rack-sized. Warm. One empty tape slot on the front panel, lit up like it's waiting."},
 				{Lang: "hu", Text: "Rack-méretű. Meleg. Egy üres kazettafoglalat az előlapon, kivilágítva, mintha várna."},
 			}),
-			OnUse: inkwell.If(inkwell.VarEq(inc.VarSlot2, item.MysteryTape),
+			OnUse: inkwell.If(inkwell.VarEq(inc.VarSlot2, item.MysteryTape.Name),
 				inkwell.Seq(
 					inkwell.SetVar(inc.VarSlot2, ""),
 					inkwell.RunScript(script.Finale),

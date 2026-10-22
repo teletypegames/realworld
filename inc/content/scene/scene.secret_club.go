@@ -182,7 +182,7 @@ var SecretClub = SceneManager.Register(&Scene{
 				Flag:    inc.FlagNormanNamed,
 				NotFlag: inc.FlagTapeSpeaks,
 				Var:     inc.VarSlot2,
-				Is:      item.MysteryTape,
+				Is:      item.MysteryTape.Name,
 			},
 			Do: inkwell.RunScript(script.TapeSpeaks),
 		},
@@ -192,7 +192,7 @@ var SecretClub = SceneManager.Register(&Scene{
 			When: inkwell.And(
 				inkwell.Flag(inc.FlagNormanNamed),
 				inkwell.Not(inkwell.Flag(inc.FlagTapeSpeaks)),
-				inkwell.Not(inkwell.VarEq(inc.VarSlot2, item.MysteryTape)),
+				inkwell.Not(inkwell.VarEq(inc.VarSlot2, item.MysteryTape.Name)),
 			),
 			Do: speaker.Dex.Say(Text{
 				{Lang: "en", Text: "The riddle said the key is forged here. If that tape's going to hear anything, it hears it from the slot."},

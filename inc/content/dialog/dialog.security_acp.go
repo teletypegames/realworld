@@ -81,7 +81,7 @@ var SecurityACP = DialogManager.Register(&Dialog{
 				},
 				Show: Given{
 					Var:     inc.VarSlot2,
-					Is:      item.SupportTape,
+					Is:      item.SupportTape.Name,
 					NotFlag: inc.FlagACPDistracted,
 				},
 				Actions: []Action{

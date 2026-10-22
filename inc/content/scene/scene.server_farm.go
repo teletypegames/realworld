@@ -61,7 +61,7 @@ var ServerFarm = SceneManager.Register(&Scene{
 					{Lang: "en", Text: "I've seen the floor. It's one thing in there, spread thin, and it's growing."},
 					{Lang: "hu", Text: "Láttam a szintet. Egyetlen dolog van bent, vékonyan elterülve, és nő."},
 				}),
-				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.ServerFarmTape),
+				inkwell.If(inkwell.VarEq(inc.VarSlot2, item.ServerFarmTape.Name),
 					serverFarmWalkTheRacks,
 					inkwell.Seq(
 						character.Paul.Say(Text{
