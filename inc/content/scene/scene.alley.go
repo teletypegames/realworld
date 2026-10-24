@@ -12,6 +12,19 @@ import (
 	"realworld/inc/system/armilla"
 )
 
+var mysteryTapeTaken = character.Paul.Say(Text{
+	{Lang: "en", Text: "That’s enough trash for one day."},
+	{Lang: "hu", Text: "Ennyi szemét elég volt mára."},
+})
+
+var mysteryTapePickUp = inkwell.Seq(
+	inkwell.Give(item.MysteryTape),
+	character.Paul.Say(Text{
+		{Lang: "en", Text: "A tape! This must be Noodle’s."},
+		{Lang: "hu", Text: "Egy kazetta! Ez biztos Noodle-é."},
+	}),
+)
+
 var Alley = SceneManager.Register(&Scene{
 	Name: "alley",
 	Title: Text{
@@ -173,6 +186,7 @@ var Alley = SceneManager.Register(&Scene{
 					{Lang: "hu", Text: "A rendőrség nem túr kukákban. Akkor ki?"},
 				}),
 			),
+			OnTake: inkwell.If(inkwell.HasItem(item.MysteryTape), mysteryTapeTaken, mysteryTapePickUp),
 		},
 		{
 			Name: "fire_escape",
