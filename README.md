@@ -31,7 +31,7 @@ go run . -debug            # with the debug menu on d — see The debug menu bel
 go run . -explore          # the entity explorer instead of the game — see below
 ```
 
-Scene names are the `Name` fields of the scene files (`selector`, `noodle_house`, `alley`, `bus`).
+Scene names are the `Name` fields of the scene files (`selector`, `noodle_house`, `alley`, `bus`, `opening`).
 
 Settings and saves outlive the process. The engine keeps two JSON documents
 under the game's name, `realworld`, where the platform keeps a user's
