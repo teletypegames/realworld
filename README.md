@@ -25,20 +25,13 @@ go run .
 ```bash
 go run .                   # the two splash cards, then the main menu
 go run . -lang hu          # the same game in Hungarian, for this run only
-go run . -finale           # the finale — try the Nokia-punk theme switch
 go run . -scene alley      # straight into the alley (beat 3), no main menu
 go run . -scene selector   # the location selector: the map the city hangs off
-go run . -scene hospital   # any scene in the deck, e.g. to look at the art
 go run . -debug            # with the debug menu on d — see The debug menu below
 go run . -explore          # the entity explorer instead of the game — see below
 ```
 
-Scene names are the `Name` fields of the scene files (`selector`, `paul_shop`,
-`noodle_house`, `alley`, `norman_apartment`, `police_station`, `hackerspace`,
-`ice_cream_shop`, `trinket_shop`, `small_restaurant`, `secret_club`,
-`bbs_terminal`, `street`, `hospital`, `server_farm`, `secret_lab`,
-`rooftop_hideout`, `public_bbs`, `bvk_branch`, `curator_shop`, `scrap_market`,
-`samizdat_press`, `showroom`, `columbarium`).
+Scene names are the `Name` fields of the scene files (`selector`, `noodle_house`, `alley`, `bus`).
 
 Settings and saves outlive the process. The engine keeps two JSON documents
 under the game's name, `realworld`, where the platform keeps a user's

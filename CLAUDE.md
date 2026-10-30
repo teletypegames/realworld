@@ -578,7 +578,6 @@ game := inkwell.New(inkwell.Game{
 	StartStage:   chosen.startStage(),
 	StartScene:   chosen.scene(),
 	StartScript:  script.Opening,
-	FinaleScript: chosen.finaleScript(),
 	StartTheme:   theme.RealWorld,
 	Flags:        chosen.flags(),
 	Extensions:   platformExtensions,

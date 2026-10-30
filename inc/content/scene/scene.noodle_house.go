@@ -26,7 +26,7 @@ var NoodleHouse = SceneManager.Register(&Scene{
 		{
 			Asset: &Asset{
 				Name: "noodle_house",
-				Path: "assets/bg/v2_noodle_house_police.jpeg",
+				Path: "assets/bg/noodle_house_police.jpeg",
 			},
 			Z: -1,
 		},

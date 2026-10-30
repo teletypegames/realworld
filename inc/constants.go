@@ -4,6 +4,7 @@ const (
 	FlagPoliceTip          = "police_tip"
 	FlagHasTape            = "has_mystery_tape"
 	FlagDebug              = "debug"
+	FlagOpeningDone        = "opening_done"
 	FlagBusTutorialDone    = "bus_tutorial_done"
 	FlagOfficerFed         = "officer_fed"
 	FlagNoodleReleased     = "noodle_released"

@@ -82,7 +82,7 @@ func (chosen options) startStage() *stage.Stage {
 
 func (chosen options) startScene() *scene.Scene {
 	if chosen.scene == "" {
-		return scene.NoodleHouse
+		return scene.Opening
 	}
 	return scene.SceneManager.MustGet(chosen.scene)
 }

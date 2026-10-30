@@ -21,7 +21,7 @@ var Bus = SceneManager.Register(&Scene{
 		{
 			Asset: &Asset{
 				Name: "bus",
-				Path: "assets/bg/v2_bus.jpeg",
+				Path: "assets/bg/bus.jpeg",
 			},
 			Z: -1,
 		},
