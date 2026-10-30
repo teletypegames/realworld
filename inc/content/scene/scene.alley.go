@@ -35,7 +35,7 @@ var Alley = SceneManager.Register(&Scene{
 		{
 			Asset: &Asset{
 				Name: "alley",
-				Path: "assets/bg/alley.png",
+				Path: "assets/bg/v2_alley.jpeg",
 			},
 			Z: -1,
 		},
