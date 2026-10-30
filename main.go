@@ -80,6 +80,13 @@ func (chosen options) startStage() *stage.Stage {
 	return stage.SplashStudio
 }
 
+func (chosen options) startScene() *scene.Scene {
+	if chosen.scene == "" {
+		return scene.NoodleHouse
+	}
+	return scene.SceneManager.MustGet(chosen.scene)
+}
+
 func (chosen options) flags() []string {
 	if !chosen.debug && !debugBuild {
 		return nil
@@ -100,7 +107,6 @@ func (chosen options) game() *inkwell.Game {
 		StartStage:   chosen.startStage(),
 		StartScene:   chosen.startScene(),
 		StartScript:  script.Opening,
-		FinaleScript: chosen.finaleScript(),
 		StartTheme:   theme.RealWorld,
 		Flags:        chosen.flags(),
 		Extensions:   platformExtensions,

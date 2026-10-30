@@ -3,7 +3,6 @@ package dialog
 import (
 	inkwell "git.teletypegames.org/engines/inkwell"
 
-	"realworld/inc"
 	"realworld/inc/content/character"
 	"realworld/inc/content/speaker"
 )
@@ -44,7 +43,6 @@ func keypadNodes() []DialogNode {
 					{Lang: "en", Text: "Well. Somebody knew that."},
 					{Lang: "hu", Text: "Nos. Ezt valaki tudta."},
 				}),
-				inkwell.SetFlag(inc.FlagSecretRoomOpen),
 				inkwell.EndDialog(),
 			}
 		}

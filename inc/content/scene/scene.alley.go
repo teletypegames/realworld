@@ -5,10 +5,8 @@ import (
 
 	"realworld/inc"
 	"realworld/inc/content/character"
-	"realworld/inc/content/dialog"
 	"realworld/inc/content/item"
 	"realworld/inc/content/speaker"
-	"realworld/inc/system"
 	"realworld/inc/system/armilla"
 )
 
@@ -123,47 +121,6 @@ var Alley = SceneManager.Register(&Scene{
 				{Lang: "en", Text: "I'm not carrying a wall."},
 				{Lang: "hu", Text: "Nem cipelek el egy falat."},
 			}),
-		},
-		{
-			Name: "back_door",
-			Label: Text{
-				{Lang: "en", Text: "locked back door"},
-				{Lang: "hu", Text: "zárt hátsó ajtó"},
-			},
-			Area: inkwell.Rect(72, 106, 80, 124),
-			OnLook: inkwell.Seq(
-				character.Paul.Say(Text{
-					{Lang: "en", Text: "Keypad. Four digits, worn keys."},
-					{Lang: "hu", Text: "Számbillentyűzet. Négy számjegy, kopott gombok."},
-				}),
-				speaker.Dex.Say(Text{
-					{Lang: "en", Text: "The wear is heaviest on the two and the seven. That isn't a code. It's fewer options."},
-					{Lang: "hu", Text: "A kettes és a hetes kopott a legjobban. Az nem a kód. Az kevesebb lehetőség."},
-				}),
-			),
-			OnUse: inkwell.If(inkwell.Flag(inc.FlagSecretRoomOpen),
-				character.Paul.Say(Text{
-					{Lang: "en", Text: "It's open. I don't need to type it twice."},
-					{Lang: "hu", Text: "Nyitva van. Nem kell kétszer beütnöm."},
-				}),
-				system.System.Paused(inkwell.RunDialog(dialog.Keypad)),
-			),
-			OnTalk: character.Paul.Say(Text{
-				{Lang: "en", Text: "To the door? I'm not there yet."},
-				{Lang: "hu", Text: "Az ajtóhoz? Még nem tartok ott."},
-			}),
-			OnUseWith: map[*inkwell.Item]Action{
-				item.BlackArmilla: inkwell.Seq(
-					character.Paul.Say(Text{
-						{Lang: "en", Text: "A black-market bracelet doesn't open a keypad."},
-						{Lang: "hu", Text: "Egy feketepiaci karperec nem nyit ki egy számzárat."},
-					}),
-					speaker.Dex.Say(Text{
-						{Lang: "en", Text: "But you do get an advert out of it."},
-						{Lang: "hu", Text: "Viszont kapsz hozzá egy reklámot."},
-					}),
-				),
-			},
 		},
 		{
 			Name: "bin",
