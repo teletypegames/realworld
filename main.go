@@ -80,20 +80,6 @@ func (chosen options) startStage() *stage.Stage {
 	return stage.SplashStudio
 }
 
-func (chosen options) startScene() *scene.Scene {
-	if chosen.scene == "" {
-		return scene.PaulShop
-	}
-	return scene.SceneManager.MustGet(chosen.scene)
-}
-
-func (chosen options) finaleScript() *script.Script {
-	if !chosen.finale {
-		return nil
-	}
-	return script.Finale
-}
-
 func (chosen options) flags() []string {
 	if !chosen.debug && !debugBuild {
 		return nil
