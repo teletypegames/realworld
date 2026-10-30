@@ -221,23 +221,4 @@ var _ = NoodleHouse.Leads(
 		},
 		Side: inkwell.ExitRight,
 	},
-	Exit{
-		To: NoodleOffice,
-		Label: Text{
-			{Lang: "en", Text: "Noodle's front door"},
-			{Lang: "hu", Text: "Noodle bejárati ajtaja"},
-		},
-		Side:  inkwell.ExitBack,
-		Needs: inc.FlagNoodleReleased,
-		Blocked: inkwell.Seq(
-			character.OfficerOnGuard.Say(Text{
-				{Lang: "en", Text: "Sir. The tape is there for a reason."},
-				{Lang: "hu", Text: "Uram. A szalag okkal van ott."},
-			}),
-			character.Paul.Say(Text{
-				{Lang: "en", Text: "Sealed. And watched."},
-				{Lang: "hu", Text: "Lepecsételve. És figyelik."},
-			}),
-		),
-	},
 )

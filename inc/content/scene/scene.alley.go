@@ -216,17 +216,4 @@ var _ = Alley.Leads(
 		},
 		Side: inkwell.ExitLeft,
 	},
-	Exit{
-		To: NoodleSecretRoom,
-		Label: Text{
-			{Lang: "en", Text: "the back door"},
-			{Lang: "hu", Text: "a hátsó ajtó"},
-		},
-		Side:  inkwell.ExitBack,
-		Needs: inc.FlagSecretRoomOpen,
-		Blocked: character.Paul.Say(Text{
-			{Lang: "en", Text: "Locked. Four digits between me and whatever's behind it."},
-			{Lang: "hu", Text: "Zárva. Négy számjegy köztem és aközött, ami mögötte van."},
-		}),
-	},
 )
