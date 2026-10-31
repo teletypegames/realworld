@@ -29,4 +29,8 @@ func (frame *hudFrame) Draw(destination *ebiten.Image, context *inkwell.UICtx) {
 	vector.StrokeLine(destination, DividerX, HUDTop+1, DividerX, ScreenHeight, 1, theme.CharacterPanelBorder, false)
 }
 
-func (frame *hudFrame) BlocksClickAt(point inkwell.Point) bool { return point.Y >= HUDTop }
+func (frame *hudFrame) BlocksClickAt(context *inkwell.UICtx, point inkwell.Point) bool {
+	return point.Y >= HUDTop
+}
+
+var _ inkwell.ClickBlocker = (*hudFrame)(nil)
