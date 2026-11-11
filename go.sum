@@ -1,5 +1,5 @@
-git.teletypegames.org/engines/inkwell v0.3.0 h1:pAGPedyGDp2faag8Dm7TorpFLLndETcIjRuTx4/Fwf4=
-git.teletypegames.org/engines/inkwell v0.3.0/go.mod h1:xMUk5QZ+qpUvFBM7U4y7kkO8vaW8rgZZLoOyh+lLwaM=
+git.teletypegames.org/engines/inkwell v0.4.0 h1:Ze6ZAzvmFVG+k0rYfwI/ZPRY0kZ1byjvyabJQZsHySc=
+git.teletypegames.org/engines/inkwell v0.4.0/go.mod h1:xMUk5QZ+qpUvFBM7U4y7kkO8vaW8rgZZLoOyh+lLwaM=
 github.com/bogdannbv/go-steamworks v1.64.4 h1:Eu4WJD9hDgUJcCns41a3RbN7h+AkpcAwJghJISW0IqQ=
 github.com/bogdannbv/go-steamworks v1.64.4/go.mod h1:TBnrqJDn9vYbeOeI0Byuv0tStY9c7NZs+Rwq9HF60Iw=
 github.com/ebitengine/gomobile v0.0.0-20250923094054-ea854a63cce1 h1:+kz5iTT3L7uU+VhlMfTb8hHcxLO3TlaELlX8wa4XjA0=
