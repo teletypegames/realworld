@@ -1,14 +1,13 @@
 package inc
 
 const (
-	FlagPoliceTip          = "police_tip"
-	FlagHasTape            = "has_mystery_tape"
-	FlagDebug              = "debug"
-	FlagOpeningDone        = "opening_done"
-	FlagBusTutorialDone    = "bus_tutorial_done"
-	FlagOfficerFed         = "officer_fed"
-	FlagNoodleReleased     = "noodle_released"
-	FlagTapeSpeaks         = "tape_speaks"
+	FlagPoliceTip       = "police_tip"
+	FlagHasTape         = "has_mystery_tape"
+	FlagDebug           = "debug"
+	FlagBusTutorialDone = "bus_tutorial_done"
+	FlagOfficerFed      = "officer_fed"
+	FlagNoodleReleased  = "noodle_released"
+	FlagTapeSpeaks      = "tape_speaks"
 
 	VarSlot2        = "armilla.slot2"
 	VarArmillaStrip = "armilla.strip"
@@ -17,7 +16,7 @@ const (
 
 	NotePaused = "paused"
 
-	DecayTapeSpeaks  = "tape_speaks"
+	DecayTapeSpeaks = "tape_speaks"
 )
 
 const (

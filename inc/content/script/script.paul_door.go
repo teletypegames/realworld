@@ -8,8 +8,8 @@ import (
 	"realworld/inc/content/speaker"
 )
 
-var Opening = ScriptManager.Register(&Script{
-	Name: "opening",
+var PaulDoor = ScriptManager.Register(&Script{
+	Name: "paul_door",
 	Actions: inkwell.Seq(
 		inkwell.Wait(0.6),
 		speaker.Dex.Say(Text{

@@ -1,4 +1,4 @@
-# Underwater Sun Rise
+# Underwater Sun Rising
 
 A point & click adventure built on the inkwell engine (Ebitengine).
 
@@ -569,7 +569,7 @@ is, the same way a scene is what its literal says it is.
 
 ```go
 game := inkwell.New(inkwell.Game{
-	Title:       "Underwater Sun Rise",
+	Title:       "Underwater Sun Rising",
 	App:         "realworld",
 	Width:       widget.ScreenWidth,
 	Height:      widget.ScreenHeight,
@@ -577,7 +577,6 @@ game := inkwell.New(inkwell.Game{
 
 	StartStage:   chosen.startStage(),
 	StartScene:   chosen.scene(),
-	StartScript:  script.Opening,
 	StartTheme:   theme.RealWorld,
 	Flags:        chosen.flags(),
 	Extensions:   platformExtensions,
@@ -592,13 +591,14 @@ game := inkwell.New(inkwell.Game{
 })
 ```
 
-The opening a player sees is content like every other script, in
-`script/script.opening.go`, named by `StartScript` rather than built as a slice
-in the wiring. `FinaleScript` is the engine's slot for a closing script, queued
-straight after the opening; `-finale` is what fills it, and `nil` is an
-ordinary run. `Flags` is the same shape for `-debug`: a boot flag list, not a
+The opening a player sees is a chain of scenes, not a start script: the start
+scene is `scene.PaulDoor`, and each link's `OnEnter` runs its script and then
+`GoTo`s the next — `paul_door` (the letter), `aircraft_takeoff`,
+`aircraft_landing` (the aircraft is a `character.Aircraft` walked across an
+empty walkbox list), then `bus`. So `-scene` into any link plays from there, and
+nothing runs twice. `StartScript` and `FinaleScript` stay empty. `Flags` is the same shape for `-debug`: a boot flag list, not a
 reach into `State` after construction. Every one of these is the entity
-itself — `script.Opening`, `theme.RealWorld`, `character.Paul` — and the one
+itself — `scene.PaulDoor`, `theme.RealWorld`, `character.Paul` — and the one
 that arrives as a string, the `-scene` flag, becomes one through
 `scene.SceneManager.MustGet` before it reaches the literal.
 
