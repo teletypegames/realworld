@@ -2,6 +2,7 @@ package character
 
 import (
 	"realworld/inc/system/theme"
+	inkwell "git.teletypegames.org/engines/inkwell"
 )
 
 var Paul = CharacterManager.Register(&Character{
@@ -22,4 +23,13 @@ var Paul = CharacterManager.Register(&Character{
 		Y: 232,
 	},
 	SpeechColor: theme.Ink,
+	Poses: map[inkwell.Pose]*inkwell.Sprite{
+		inkwell.PoseIdle: &inkwell.Sprite{
+			Sheet: &inkwell.Asset{
+				Name: "paul-sprite",
+				Path: "assets/sprite/paul.jpeg",
+			},
+			Faces: inkwell.FacingRight,
+		},
+	},
 })
