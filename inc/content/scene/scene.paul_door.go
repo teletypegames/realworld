@@ -16,7 +16,7 @@ var PaulDoor = SceneManager.Register(&Scene{
 		{
 			Asset: &Asset{
 				Name: "paul_door",
-				Path: "assets/bg/paul_door.png",
+				Path: "assets/bg/paul_door.jpeg",
 			},
 			Z: -1,
 		},

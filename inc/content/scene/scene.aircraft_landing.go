@@ -17,7 +17,7 @@ var AircraftLanding = SceneManager.Register(&Scene{
 		{
 			Asset: &Asset{
 				Name: "aircraft_landing",
-				Path: "assets/bg/aircraft_landing.png",
+				Path: "assets/bg/airport_take_on.jpeg",
 			},
 			Z: -1,
 		},
