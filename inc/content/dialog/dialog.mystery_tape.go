@@ -108,8 +108,7 @@ var MysteryTape = DialogManager.Register(&Dialog{
 					{Lang: "hu", Text: "Hol van Norman?"},
 				},
 				Show: Given{
-					Flag:    inc.FlagTapeSpeaks,
-					NotFlag: inc.FlagLabLocated,
+					Flag: inc.FlagTapeSpeaks,
 				},
 				Actions: []Action{
 					speaker.TapeMystery.Say(Text{
@@ -143,82 +142,6 @@ var MysteryTape = DialogManager.Register(&Dialog{
 					speaker.Dex.Say(Text{
 						{Lang: "en", Text: "Or what he thought he could get you to do."},
 						{Lang: "hu", Text: "Vagy hogy mit gondolt, mire lehet rávenni téged."},
-					}),
-					inkwell.GotoNode("root"),
-				},
-			},
-			{
-				Text: Text{
-					{Lang: "en", Text: "Norman's Armilla was empty. Where's his tape?"},
-					{Lang: "hu", Text: "Norman Armillája üres volt. Hol a kazettája?"},
-				},
-				Show: Given{
-					Flag: inc.FlagArmillaSeen,
-				},
-				Actions: []Action{
-					speaker.TapeMystery.Say(Text{
-						{Lang: "en", Text: "Confiscated. The BVK took it the night they took him. A man's tape is evidence, and evidence disappears."},
-						{Lang: "hu", Text: "Lefoglalták. A BVK vitte el, azon az éjjelen, amikor őt is. Egy ember kazettája bizonyíték, és a bizonyíték eltűnik."},
-					}),
-					speaker.TapeMystery.Say(Text{
-						{Lang: "en", Text: "Stolen, if you want the honest word. Whatever Norman kept on it, they have it now."},
-						{Lang: "hu", Text: "Ellopták, ha az őszinte szót akarod. Amit Norman rajta tartott, az most náluk van."},
-					}),
-					speaker.Dex.Say(Text{
-						{Lang: "en", Text: "Convenient."},
-						{Lang: "hu", Text: "Kényelmes."},
-					}),
-					inkwell.GotoNode("root"),
-				},
-			},
-			{
-				Text: Text{
-					{Lang: "en", Text: "The man at the hot dog stand. Sumphor. Do you know him?"},
-					{Lang: "hu", Text: "A hotdogos fickó. Sumphor. Ismered?"},
-				},
-				Show: Given{
-					Flag: inc.FlagSumphorTalked,
-				},
-				Actions: []Action{
-					speaker.TapeMystery.Say(Text{
-						{Lang: "en", Text: "Know him. I was his. He is the scientist I told you about. The one the project broke."},
-						{Lang: "hu", Text: "Ismerem. Az övé voltam. Ő az a tudós, akiről beszéltem. Akit a projekt összetört."},
-					}),
-					character.Paul.Say(Text{
-						{Lang: "en", Text: "He says he's never seen you."},
-						{Lang: "hu", Text: "Azt mondja, sosem látott."},
-					}),
-					speaker.TapeMystery.Say(Text{
-						{Lang: "en", Text: "He sat in the chair, Paul. He says a lot of things. Which of us sounds like the one who lost his mind?"},
-						{Lang: "hu", Text: "Ő ült a székben, Paul. Sok mindent mond. Melyikünk hangzik úgy, mint aki elvesztette az eszét?"},
-					}),
-					speaker.Dex.Say(Text{
-						{Lang: "en", Text: "The one who's calm is not always the one who's right. I'd remember that."},
-						{Lang: "hu", Text: "Aki nyugodt, nem mindig az, akinek igaza van. Ezt megjegyezném."},
-					}),
-					inkwell.GotoNode("root"),
-				},
-			},
-			{
-				Text: Text{
-					{Lang: "en", Text: "The logs say the Golden Gate. What then?"},
-					{Lang: "hu", Text: "A naplók szerint a Golden Gate. És aztán?"},
-				},
-				Show: Given{
-					Flag: inc.FlagLabLocated,
-				},
-				Actions: []Action{
-					speaker.TapeMystery.Say(Text{
-						{Lang: "en", Text: "Then you go. Into the bridge, up to where he sleeps, and to the machine that runs it."},
-						{Lang: "hu", Text: "Aztán mész. Be a hídba, fel oda, ahol alszik, és a géphez, amely futtatja."},
-					}),
-					speaker.TapeMystery.Say(Text{
-						{Lang: "en", Text: "Put me in it. I know the simulation from the inside. I can reach him where nobody else can. Please, Paul. It has to be me."},
-						{Lang: "hu", Text: "Tegyél be engem. Belülről ismerem a szimulációt. Elérem ott, ahol senki más nem. Kérlek, Paul. Nekem kell lennem."},
-					}),
-					speaker.Dex.Say(Text{
-						{Lang: "en", Text: "“Please” is new. Tapes don't say please. I never have."},
-						{Lang: "hu", Text: "A „kérlek” új. A kazetták nem mondanak kérleket. Én soha nem mondtam."},
 					}),
 					inkwell.GotoNode("root"),
 				},

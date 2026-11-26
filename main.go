@@ -82,16 +82,9 @@ func (chosen options) startStage() *stage.Stage {
 
 func (chosen options) startScene() *scene.Scene {
 	if chosen.scene == "" {
-		return scene.PaulShop
+		return scene.PaulDoor
 	}
 	return scene.SceneManager.MustGet(chosen.scene)
-}
-
-func (chosen options) finaleScript() *script.Script {
-	if !chosen.finale {
-		return nil
-	}
-	return script.Finale
 }
 
 func (chosen options) flags() []string {
@@ -103,7 +96,7 @@ func (chosen options) flags() []string {
 
 func (chosen options) game() *inkwell.Game {
 	return inkwell.New(inkwell.Game{
-		Title:       "Underwater Sun Rise",
+		Title:       "Underwater Sun Rising",
 		App:         "realworld",
 		Width:       widget.ScreenWidth,
 		Height:      widget.ScreenHeight,
@@ -111,13 +104,11 @@ func (chosen options) game() *inkwell.Game {
 		MaxLogLines: 64,
 		SceneRect:   inkwell.Rect(0, widget.TopBarHeight, widget.ScreenWidth, widget.HUDTop-widget.TopBarHeight),
 
-		StartStage:   chosen.startStage(),
-		StartScene:   chosen.startScene(),
-		StartScript:  script.Opening,
-		FinaleScript: chosen.finaleScript(),
-		StartTheme:   theme.RealWorld,
-		Flags:        chosen.flags(),
-		Extensions:   platformExtensions,
+		StartStage: chosen.startStage(),
+		StartScene: chosen.startScene(),
+		StartTheme: theme.RealWorld,
+		Flags:      chosen.flags(),
+		Extensions: platformExtensions,
 
 		Player:      character.Paul,
 		WalkOnClick: true,

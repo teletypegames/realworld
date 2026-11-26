@@ -5,11 +5,22 @@ import (
 
 	"realworld/inc"
 	"realworld/inc/content/character"
-	"realworld/inc/content/dialog"
 	"realworld/inc/content/item"
 	"realworld/inc/content/speaker"
-	"realworld/inc/system"
 	"realworld/inc/system/armilla"
+)
+
+var mysteryTapeTaken = character.Paul.Say(Text{
+	{Lang: "en", Text: "That’s enough trash for one day."},
+	{Lang: "hu", Text: "Ennyi szemét elég volt mára."},
+})
+
+var mysteryTapePickUp = inkwell.Seq(
+	inkwell.Give(item.MysteryTape),
+	character.Paul.Say(Text{
+		{Lang: "en", Text: "A tape! This must be Noodle’s."},
+		{Lang: "hu", Text: "Egy kazetta! Ez biztos Noodle-é."},
+	}),
 )
 
 var Alley = SceneManager.Register(&Scene{
@@ -22,7 +33,7 @@ var Alley = SceneManager.Register(&Scene{
 		{
 			Asset: &Asset{
 				Name: "alley",
-				Path: "assets/bg/alley.png",
+				Path: "assets/bg/alley.jpeg",
 			},
 			Z: -1,
 		},
@@ -112,47 +123,6 @@ var Alley = SceneManager.Register(&Scene{
 			}),
 		},
 		{
-			Name: "back_door",
-			Label: Text{
-				{Lang: "en", Text: "locked back door"},
-				{Lang: "hu", Text: "zárt hátsó ajtó"},
-			},
-			Area: inkwell.Rect(72, 106, 80, 124),
-			OnLook: inkwell.Seq(
-				character.Paul.Say(Text{
-					{Lang: "en", Text: "Keypad. Four digits, worn keys."},
-					{Lang: "hu", Text: "Számbillentyűzet. Négy számjegy, kopott gombok."},
-				}),
-				speaker.Dex.Say(Text{
-					{Lang: "en", Text: "The wear is heaviest on the two and the seven. That isn't a code. It's fewer options."},
-					{Lang: "hu", Text: "A kettes és a hetes kopott a legjobban. Az nem a kód. Az kevesebb lehetőség."},
-				}),
-			),
-			OnUse: inkwell.If(inkwell.Flag(inc.FlagSecretRoomOpen),
-				character.Paul.Say(Text{
-					{Lang: "en", Text: "It's open. I don't need to type it twice."},
-					{Lang: "hu", Text: "Nyitva van. Nem kell kétszer beütnöm."},
-				}),
-				system.System.Paused(inkwell.RunDialog(dialog.Keypad)),
-			),
-			OnTalk: character.Paul.Say(Text{
-				{Lang: "en", Text: "To the door? I'm not there yet."},
-				{Lang: "hu", Text: "Az ajtóhoz? Még nem tartok ott."},
-			}),
-			OnUseWith: map[*inkwell.Item]Action{
-				item.BlackArmilla: inkwell.Seq(
-					character.Paul.Say(Text{
-						{Lang: "en", Text: "A black-market bracelet doesn't open a keypad."},
-						{Lang: "hu", Text: "Egy feketepiaci karperec nem nyit ki egy számzárat."},
-					}),
-					speaker.Dex.Say(Text{
-						{Lang: "en", Text: "But you do get an advert out of it."},
-						{Lang: "hu", Text: "Viszont kapsz hozzá egy reklámot."},
-					}),
-				),
-			},
-		},
-		{
 			Name: "bin",
 			Label: Text{
 				{Lang: "en", Text: "toppled bin"},
@@ -173,6 +143,7 @@ var Alley = SceneManager.Register(&Scene{
 					{Lang: "hu", Text: "A rendőrség nem túr kukákban. Akkor ki?"},
 				}),
 			),
+			OnTake: inkwell.If(inkwell.HasItem(item.MysteryTape), mysteryTapeTaken, mysteryTapePickUp),
 		},
 		{
 			Name: "fire_escape",
@@ -201,18 +172,5 @@ var _ = Alley.Leads(
 			{Lang: "hu", Text: "vissza az utcára"},
 		},
 		Side: inkwell.ExitLeft,
-	},
-	Exit{
-		To: NoodleSecretRoom,
-		Label: Text{
-			{Lang: "en", Text: "the back door"},
-			{Lang: "hu", Text: "a hátsó ajtó"},
-		},
-		Side:  inkwell.ExitBack,
-		Needs: inc.FlagSecretRoomOpen,
-		Blocked: character.Paul.Say(Text{
-			{Lang: "en", Text: "Locked. Four digits between me and whatever's behind it."},
-			{Lang: "hu", Text: "Zárva. Négy számjegy köztem és aközött, ami mögötte van."},
-		}),
 	},
 )

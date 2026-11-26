@@ -26,7 +26,7 @@ var NoodleHouse = SceneManager.Register(&Scene{
 		{
 			Asset: &Asset{
 				Name: "noodle_house",
-				Path: "assets/bg/noodle_house.png",
+				Path: "assets/bg/noodle_house_police.jpeg",
 			},
 			Z: -1,
 		},
@@ -220,24 +220,5 @@ var _ = NoodleHouse.Leads(
 			{Lang: "hu", Text: "a sikátor a ház mögött"},
 		},
 		Side: inkwell.ExitRight,
-	},
-	Exit{
-		To: NoodleOffice,
-		Label: Text{
-			{Lang: "en", Text: "Noodle's front door"},
-			{Lang: "hu", Text: "Noodle bejárati ajtaja"},
-		},
-		Side:  inkwell.ExitBack,
-		Needs: inc.FlagNoodleReleased,
-		Blocked: inkwell.Seq(
-			character.OfficerOnGuard.Say(Text{
-				{Lang: "en", Text: "Sir. The tape is there for a reason."},
-				{Lang: "hu", Text: "Uram. A szalag okkal van ott."},
-			}),
-			character.Paul.Say(Text{
-				{Lang: "en", Text: "Sealed. And watched."},
-				{Lang: "hu", Text: "Lepecsételve. És figyelik."},
-			}),
-		),
 	},
 )

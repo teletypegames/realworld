@@ -25,7 +25,7 @@ var Selector = SceneManager.Register(&Scene{
 		{
 			Asset: &Asset{
 				Name: "selector",
-				Path: "assets/bg/selector.png",
+				Path: "assets/bg/map.jpeg",
 			},
 			Z: -1,
 		},

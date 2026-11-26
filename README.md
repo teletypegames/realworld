@@ -1,4 +1,4 @@
-# Underwater Sun Rise
+# Underwater Sun Rising
 
 Point & click adventure — game two of the Norman Arc. Engine:
 [inkwell](../../engines/inkwell).
@@ -25,20 +25,15 @@ go run .
 ```bash
 go run .                   # the two splash cards, then the main menu
 go run . -lang hu          # the same game in Hungarian, for this run only
-go run . -finale           # the finale — try the Nokia-punk theme switch
 go run . -scene alley      # straight into the alley (beat 3), no main menu
 go run . -scene selector   # the location selector: the map the city hangs off
-go run . -scene hospital   # any scene in the deck, e.g. to look at the art
 go run . -debug            # with the debug menu on d — see The debug menu below
 go run . -explore          # the entity explorer instead of the game — see below
 ```
 
-Scene names are the `Name` fields of the scene files (`selector`, `paul_shop`,
-`noodle_house`, `alley`, `norman_apartment`, `police_station`, `hackerspace`,
-`ice_cream_shop`, `trinket_shop`, `small_restaurant`, `secret_club`,
-`bbs_terminal`, `street`, `hospital`, `server_farm`, `secret_lab`,
-`rooftop_hideout`, `public_bbs`, `bvk_branch`, `curator_shop`, `scrap_market`,
-`samizdat_press`, `showroom`, `columbarium`).
+Scene names are the `Name` fields of the scene files (`paul_door`, `aircraft_takeoff`, `aircraft_landing`, `bus`, `noodle_house`,
+`alley`, `selector`). The game starts at `paul_door`, and the first three play
+themselves through to the bus.
 
 Settings and saves outlive the process. The engine keeps two JSON documents
 under the game's name, `realworld`, where the platform keeps a user's
@@ -553,7 +548,7 @@ screens, an `inkwell.TextCard` for the credits and for the two splash cards.
 Sticky because a menu with nothing behind it must not be closable.
 
 The splash cards are what the game opens on: `stage.SplashStudio`, the
-Teletype Games logo, and `stage.SplashTitle`, "Underwater Sun Rise" centred, each
+Teletype Games logo, and `stage.SplashTitle`, "Underwater Sun Rising" centred, each
 two seconds, each fading to the next. None of that is code in this
 repository: a `Stage` says `Hold: 2` and `Next`, `Skippable` so that Space,
 Enter or a click moves on without the wait, and the fade is its
@@ -787,6 +782,9 @@ way the splash logo nests in its stage.
   hides them; the deck wanted them struck through but visible, so the list
   becomes a memory of what you already tried. Needs a thin override over
   `DialogBox`.
+- **The opening art is a placeholder.** `paul_door.png` is the first panel of
+  `introvideo.png`; `aircraft_takeoff.png`, `aircraft_landing.png` and
+  `assets/sprite/aircraft.png` are cut from the `intro.png` sketches.
 - **Only beat 3 exists.** The alley is a vertical slice; the opening script sets
   the police-tip flag that beat 2 will eventually set.
 - **The render has only been inspected once, by the author of this repo.**

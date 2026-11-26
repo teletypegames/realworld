@@ -25,8 +25,8 @@ var _ = widget.WidgetManager.Register(&inkwell.TextCard{
 	Backdrop: true,
 	Lines: []Text{
 		{
-			{Lang: "en", Text: "Underwater Sun Rise"},
-			{Lang: "hu", Text: "Underwater Sun Rise"},
+			{Lang: "en", Text: "Underwater Sun Rising"},
+			{Lang: "hu", Text: "Underwater Sun Rising"},
 		},
 	},
 })
